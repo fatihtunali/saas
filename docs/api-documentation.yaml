@@ -1,0 +1,3752 @@
+openapi: 3.0.3
+info:
+  title: Tour Operations SaaS API
+  description: |
+    **Multi-tenant SaaS platform for tour operations management**
+
+    Complete REST API for managing tour operations including suppliers, bookings, payments, and more.
+
+    ## Authentication
+    All protected endpoints require a Bearer token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+
+    ## Multi-Tenant Architecture
+    - **super_admin**: Full system access, can view all operators' data
+    - **operator**: Can only access their own data (filtered by operator_id)
+    - **manager, staff, accountant, sales**: Role-based access within operator
+
+    ## Soft Delete Pattern
+    All DELETE operations are soft deletes (sets deleted_at timestamp).
+    Data is preserved for audit purposes.
+
+    ## Standard Response Codes
+    - **200**: Success
+    - **201**: Created
+    - **400**: Bad Request
+    - **401**: Unauthorized
+    - **404**: Not Found
+    - **500**: Internal Server Error
+
+    ## Base URL
+    Development: `http://localhost:3000/api`
+
+  version: 2.0.0
+  contact:
+    name: Tour Operations SaaS Support
+    email: fatihtunali@gmail.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: http://134.209.137.11:3000/api
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User authentication and registration
+  - name: Master Data
+    description: Cities, currencies, exchange rates, seasons, tax rates
+  - name: Suppliers
+    description: Supplier management (base table for all service providers)
+  - name: Hotels
+    description: Hotel management with per-person pricing
+  - name: Vehicles
+    description: Vehicle companies, types, transfer routes, rentals
+  - name: Other Services
+    description: Guides, restaurants, entrance fees, tours, extra expenses
+  - name: Clients
+    description: B2C clients and B2B operators clients
+  - name: Quotations
+    description: Quotation and quotation services management
+  - name: Bookings
+    description: Booking management (main feature)
+  - name: Passengers
+    description: Booking passengers (required for vouchers)
+  - name: Payments
+    description: Client payments, supplier payments, refunds, commissions
+  - name: Operations
+    description: Pickup locations, availability, cancellation policies, schedules
+  - name: Visas & Insurance
+    description: Visa requirements, passenger visas, travel insurance
+  - name: Documents
+    description: Vouchers, documents, templates, email logs
+  - name: Notifications
+    description: Notifications and notification settings
+  - name: Marketing
+    description: Promotional codes, campaigns, reviews, waiting list
+  - name: System
+    description: API keys, number sequences, vehicle maintenance
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Error message"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        role:
+          type: string
+          enum: [super_admin, operator, manager, staff, accountant, sales]
+        operator_id:
+          type: integer
+          nullable: true
+        full_name:
+          type: string
+        phone:
+          type: string
+        is_active:
+          type: boolean
+        last_login:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    City:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        country:
+          type: string
+        city_type:
+          type: string
+          enum: [city, touristic_region, airport]
+        code:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        picture_url:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    Currency:
+      type: object
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+          example: "USD"
+        name:
+          type: string
+          example: "US Dollar"
+        symbol:
+          type: string
+          example: "$"
+        is_active:
+          type: boolean
+
+    Supplier:
+      type: object
+      properties:
+        id:
+          type: integer
+        operator_id:
+          type: integer
+        supplier_type:
+          type: string
+          enum: [hotel, vehicle, guide, restaurant, entrance, tour, other]
+        company_name:
+          type: string
+        contact_person:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        city_id:
+          type: integer
+        tax_id:
+          type: string
+        payment_terms:
+          type: string
+        bank_account_info:
+          type: string
+        notes:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Hotel:
+      type: object
+      properties:
+        id:
+          type: integer
+        operator_id:
+          type: integer
+        supplier_id:
+          type: integer
+        hotel_name:
+          type: string
+        star_rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        city_id:
+          type: integer
+        price_per_person_double:
+          type: number
+          format: decimal
+          description: "Per person price in double room"
+        single_supplement:
+          type: number
+          format: decimal
+          description: "Extra charge for single room"
+        price_per_person_triple:
+          type: number
+          format: decimal
+        child_price_0_2:
+          type: number
+          format: decimal
+          description: "Price for children 0-2.99 years"
+        child_price_3_5:
+          type: number
+          format: decimal
+          description: "Price for children 3-5.99 years"
+        child_price_6_11:
+          type: number
+          format: decimal
+          description: "Price for children 6-11.99 years"
+        currency:
+          type: string
+        meal_plan:
+          type: string
+          enum: [room_only, bed_breakfast, half_board, full_board, all_inclusive]
+        picture_url:
+          type: string
+        is_active:
+          type: boolean
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        operator_id:
+          type: integer
+        booking_code:
+          type: string
+          example: "BK-2025-0001"
+        client_id:
+          type: integer
+        travel_start_date:
+          type: string
+          format: date
+        travel_end_date:
+          type: string
+          format: date
+        num_adults:
+          type: integer
+        num_children:
+          type: integer
+        status:
+          type: string
+          enum: [quotation, confirmed, completed, cancelled]
+        total_cost:
+          type: number
+        total_selling_price:
+          type: number
+        markup_percentage:
+          type: number
+        profit_amount:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+
+security:
+  - BearerAuth: []
+
+paths:
+  # ==========================================
+  # AUTHENTICATION
+  # ==========================================
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new operator
+      description: Create a new operator account with admin user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - companyName
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+                companyName:
+                  type: string
+                contactPhone:
+                  type: string
+      responses:
+        '201':
+          description: Operator created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+                  operator:
+                    type: object
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate with email and password. Returns JWT token.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "fatihtunali@gmail.com"
+                password:
+                  type: string
+                  example: "your-password"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      description: Get authenticated user information
+      responses:
+        '200':
+          description: User information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ==========================================
+  # MASTER DATA
+  # ==========================================
+  /cities:
+    get:
+      tags:
+        - Master Data
+      summary: List all cities
+      description: Get all cities (seed data, read-only)
+      responses:
+        '200':
+          description: List of cities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+
+  /cities/{id}:
+    get:
+      tags:
+        - Master Data
+      summary: Get city by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: City details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+        '404':
+          description: City not found
+
+  /currencies:
+    get:
+      tags:
+        - Master Data
+      summary: List all currencies
+      description: Get all currencies (seed data, read-only)
+      responses:
+        '200':
+          description: List of currencies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Currency'
+
+  /currencies/{id}:
+    get:
+      tags:
+        - Master Data
+      summary: Get currency by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Currency details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+
+  /exchange-rates:
+    get:
+      tags:
+        - Master Data
+      summary: List exchange rates
+      responses:
+        '200':
+          description: List of exchange rates
+    post:
+      tags:
+        - Master Data
+      summary: Create exchange rate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from_currency:
+                  type: string
+                to_currency:
+                  type: string
+                rate:
+                  type: number
+                rate_type:
+                  type: string
+                rate_date:
+                  type: string
+                  format: date
+      responses:
+        '201':
+          description: Exchange rate created
+
+  /exchange-rates/{id}:
+    get:
+      tags:
+        - Master Data
+      summary: Get exchange rate by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Exchange rate details
+    put:
+      tags:
+        - Master Data
+      summary: Update exchange rate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Exchange rate updated
+    delete:
+      tags:
+        - Master Data
+      summary: Delete exchange rate (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Exchange rate deleted
+
+  /seasons:
+    get:
+      tags:
+        - Master Data
+      summary: List seasons
+      responses:
+        '200':
+          description: List of seasons
+    post:
+      tags:
+        - Master Data
+      summary: Create season
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                season_name:
+                  type: string
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+                price_multiplier:
+                  type: number
+      responses:
+        '201':
+          description: Season created
+
+  /seasons/{id}:
+    get:
+      tags:
+        - Master Data
+      summary: Get season by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Season details
+    put:
+      tags:
+        - Master Data
+      summary: Update season
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Season updated
+    delete:
+      tags:
+        - Master Data
+      summary: Delete season (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Season deleted
+
+  /seasonal-pricing:
+    get:
+      tags:
+        - Master Data
+      summary: List seasonal pricing
+      responses:
+        '200':
+          description: List of seasonal pricing
+    post:
+      tags:
+        - Master Data
+      summary: Create seasonal pricing
+      responses:
+        '201':
+          description: Seasonal pricing created
+
+  /seasonal-pricing/{id}:
+    get:
+      tags:
+        - Master Data
+      summary: Get seasonal pricing by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Seasonal pricing details
+    put:
+      tags:
+        - Master Data
+      summary: Update seasonal pricing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Seasonal pricing updated
+    delete:
+      tags:
+        - Master Data
+      summary: Delete seasonal pricing (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Seasonal pricing deleted
+
+  /tax-rates:
+    get:
+      tags:
+        - Master Data
+      summary: List tax rates
+      responses:
+        '200':
+          description: List of tax rates
+    post:
+      tags:
+        - Master Data
+      summary: Create tax rate
+      responses:
+        '201':
+          description: Tax rate created
+
+  /tax-rates/{id}:
+    get:
+      tags:
+        - Master Data
+      summary: Get tax rate by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tax rate details
+    put:
+      tags:
+        - Master Data
+      summary: Update tax rate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tax rate updated
+    delete:
+      tags:
+        - Master Data
+      summary: Delete tax rate (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tax rate deleted
+
+  # ==========================================
+  # SUPPLIERS
+  # ==========================================
+  /suppliers:
+    get:
+      tags:
+        - Suppliers
+      summary: List all suppliers
+      description: Get all suppliers for the operator
+      responses:
+        '200':
+          description: List of suppliers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supplier'
+    post:
+      tags:
+        - Suppliers
+      summary: Create supplier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+      responses:
+        '201':
+          description: Supplier created
+
+  /suppliers/{id}:
+    get:
+      tags:
+        - Suppliers
+      summary: Get supplier by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier details
+    put:
+      tags:
+        - Suppliers
+      summary: Update supplier
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier updated
+    delete:
+      tags:
+        - Suppliers
+      summary: Delete supplier (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier deleted
+
+  /supplier-contacts:
+    get:
+      tags:
+        - Suppliers
+      summary: List supplier contacts
+      responses:
+        '200':
+          description: List of supplier contacts
+    post:
+      tags:
+        - Suppliers
+      summary: Create supplier contact
+      responses:
+        '201':
+          description: Supplier contact created
+
+  /supplier-contacts/{id}:
+    get:
+      tags:
+        - Suppliers
+      summary: Get supplier contact by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier contact details
+    put:
+      tags:
+        - Suppliers
+      summary: Update supplier contact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier contact updated
+    delete:
+      tags:
+        - Suppliers
+      summary: Delete supplier contact (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier contact deleted
+
+  /supplier-ratings:
+    get:
+      tags:
+        - Suppliers
+      summary: List supplier ratings
+      responses:
+        '200':
+          description: List of supplier ratings
+    post:
+      tags:
+        - Suppliers
+      summary: Create supplier rating
+      responses:
+        '201':
+          description: Supplier rating created
+
+  /supplier-ratings/{id}:
+    get:
+      tags:
+        - Suppliers
+      summary: Get supplier rating by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier rating details
+    put:
+      tags:
+        - Suppliers
+      summary: Update supplier rating
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier rating updated
+    delete:
+      tags:
+        - Suppliers
+      summary: Delete supplier rating (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier rating deleted
+
+  /supplier-contracts:
+    get:
+      tags:
+        - Suppliers
+      summary: List supplier contracts
+      responses:
+        '200':
+          description: List of supplier contracts
+    post:
+      tags:
+        - Suppliers
+      summary: Create supplier contract
+      responses:
+        '201':
+          description: Supplier contract created
+
+  /supplier-contracts/{id}:
+    get:
+      tags:
+        - Suppliers
+      summary: Get supplier contract by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier contract details
+    put:
+      tags:
+        - Suppliers
+      summary: Update supplier contract
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier contract updated
+    delete:
+      tags:
+        - Suppliers
+      summary: Delete supplier contract (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier contract deleted
+
+  # ==========================================
+  # HOTELS
+  # ==========================================
+  /hotels:
+    get:
+      tags:
+        - Hotels
+      summary: List all hotels
+      description: Get all hotels with per-person pricing
+      responses:
+        '200':
+          description: List of hotels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Hotel'
+    post:
+      tags:
+        - Hotels
+      summary: Create hotel
+      description: Create hotel with per-person pricing model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Hotel'
+      responses:
+        '201':
+          description: Hotel created
+
+  /hotels/{id}:
+    get:
+      tags:
+        - Hotels
+      summary: Get hotel by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Hotel details
+    put:
+      tags:
+        - Hotels
+      summary: Update hotel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Hotel updated
+    delete:
+      tags:
+        - Hotels
+      summary: Delete hotel (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Hotel deleted
+
+  /hotel-room-types:
+    get:
+      tags:
+        - Hotels
+      summary: List hotel room types
+      responses:
+        '200':
+          description: List of hotel room types
+    post:
+      tags:
+        - Hotels
+      summary: Create hotel room type
+      responses:
+        '201':
+          description: Hotel room type created
+
+  /hotel-room-types/{id}:
+    get:
+      tags:
+        - Hotels
+      summary: Get hotel room type by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Hotel room type details
+    put:
+      tags:
+        - Hotels
+      summary: Update hotel room type
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Hotel room type updated
+    delete:
+      tags:
+        - Hotels
+      summary: Delete hotel room type (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Hotel room type deleted
+
+  # ==========================================
+  # VEHICLES
+  # ==========================================
+  /vehicle-companies:
+    get:
+      tags:
+        - Vehicles
+      summary: List vehicle companies
+      responses:
+        '200':
+          description: List of vehicle companies
+    post:
+      tags:
+        - Vehicles
+      summary: Create vehicle company
+      responses:
+        '201':
+          description: Vehicle company created
+
+  /vehicle-companies/{id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Get vehicle company by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle company details
+    put:
+      tags:
+        - Vehicles
+      summary: Update vehicle company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle company updated
+    delete:
+      tags:
+        - Vehicles
+      summary: Delete vehicle company (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle company deleted
+
+  /vehicle-types:
+    get:
+      tags:
+        - Vehicles
+      summary: List vehicle types
+      responses:
+        '200':
+          description: List of vehicle types
+    post:
+      tags:
+        - Vehicles
+      summary: Create vehicle type
+      responses:
+        '201':
+          description: Vehicle type created
+
+  /vehicle-types/{id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Get vehicle type by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle type details
+    put:
+      tags:
+        - Vehicles
+      summary: Update vehicle type
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle type updated
+    delete:
+      tags:
+        - Vehicles
+      summary: Delete vehicle type (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle type deleted
+
+  /transfer-routes:
+    get:
+      tags:
+        - Vehicles
+      summary: List transfer routes
+      description: City-to-city predefined transfer routes
+      responses:
+        '200':
+          description: List of transfer routes
+    post:
+      tags:
+        - Vehicles
+      summary: Create transfer route
+      responses:
+        '201':
+          description: Transfer route created
+
+  /transfer-routes/{id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Get transfer route by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Transfer route details
+    put:
+      tags:
+        - Vehicles
+      summary: Update transfer route
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Transfer route updated
+    delete:
+      tags:
+        - Vehicles
+      summary: Delete transfer route (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Transfer route deleted
+
+  /vehicle-rentals:
+    get:
+      tags:
+        - Vehicles
+      summary: List vehicle rentals
+      description: Full day, half day, night rental pricing
+      responses:
+        '200':
+          description: List of vehicle rentals
+    post:
+      tags:
+        - Vehicles
+      summary: Create vehicle rental
+      responses:
+        '201':
+          description: Vehicle rental created
+
+  /vehicle-rentals/{id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Get vehicle rental by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle rental details
+    put:
+      tags:
+        - Vehicles
+      summary: Update vehicle rental
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle rental updated
+    delete:
+      tags:
+        - Vehicles
+      summary: Delete vehicle rental (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle rental deleted
+
+  /vehicle-maintenance:
+    get:
+      tags:
+        - System
+      summary: List vehicle maintenance records
+      responses:
+        '200':
+          description: List of vehicle maintenance
+    post:
+      tags:
+        - System
+      summary: Create vehicle maintenance record
+      responses:
+        '201':
+          description: Vehicle maintenance created
+
+  /vehicle-maintenance/{id}:
+    get:
+      tags:
+        - System
+      summary: Get vehicle maintenance by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle maintenance details
+    put:
+      tags:
+        - System
+      summary: Update vehicle maintenance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle maintenance updated
+    delete:
+      tags:
+        - System
+      summary: Delete vehicle maintenance (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle maintenance deleted
+
+  # ==========================================
+  # OTHER SERVICES (Guides, Restaurants, Entrance Fees, Tours, Extra Expenses)
+  # ==========================================
+  /guides:
+    get:
+      tags:
+        - Other Services
+      summary: List guides
+      description: Guides with multiple rate types (daily, half-day, night, transfer)
+      responses:
+        '200':
+          description: List of guides
+    post:
+      tags:
+        - Other Services
+      summary: Create guide
+      responses:
+        '201':
+          description: Guide created
+
+  /guides/{id}:
+    get:
+      tags:
+        - Other Services
+      summary: Get guide by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Guide details
+    put:
+      tags:
+        - Other Services
+      summary: Update guide
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Guide updated
+    delete:
+      tags:
+        - Other Services
+      summary: Delete guide (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Guide deleted
+
+  /restaurants:
+    get:
+      tags:
+        - Other Services
+      summary: List restaurants
+      responses:
+        '200':
+          description: List of restaurants
+    post:
+      tags:
+        - Other Services
+      summary: Create restaurant
+      responses:
+        '201':
+          description: Restaurant created
+
+  /restaurants/{id}:
+    get:
+      tags:
+        - Other Services
+      summary: Get restaurant by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Restaurant details
+    put:
+      tags:
+        - Other Services
+      summary: Update restaurant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Restaurant updated
+    delete:
+      tags:
+        - Other Services
+      summary: Delete restaurant (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Restaurant deleted
+
+  /entrance-fees:
+    get:
+      tags:
+        - Other Services
+      summary: List entrance fees
+      responses:
+        '200':
+          description: List of entrance fees
+    post:
+      tags:
+        - Other Services
+      summary: Create entrance fee
+      responses:
+        '201':
+          description: Entrance fee created
+
+  /entrance-fees/{id}:
+    get:
+      tags:
+        - Other Services
+      summary: Get entrance fee by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Entrance fee details
+    put:
+      tags:
+        - Other Services
+      summary: Update entrance fee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Entrance fee updated
+    delete:
+      tags:
+        - Other Services
+      summary: Delete entrance fee (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Entrance fee deleted
+
+  /tour-companies:
+    get:
+      tags:
+        - Other Services
+      summary: List tour companies
+      description: SIC (fixed rate) and PVT (pricing slabs 2-4-6-8-10 pax)
+      responses:
+        '200':
+          description: List of tour companies
+    post:
+      tags:
+        - Other Services
+      summary: Create tour company
+      responses:
+        '201':
+          description: Tour company created
+
+  /tour-companies/{id}:
+    get:
+      tags:
+        - Other Services
+      summary: Get tour company by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tour company details
+    put:
+      tags:
+        - Other Services
+      summary: Update tour company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tour company updated
+    delete:
+      tags:
+        - Other Services
+      summary: Delete tour company (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tour company deleted
+
+  /extra-expenses:
+    get:
+      tags:
+        - Other Services
+      summary: List extra expenses
+      responses:
+        '200':
+          description: List of extra expenses
+    post:
+      tags:
+        - Other Services
+      summary: Create extra expense
+      responses:
+        '201':
+          description: Extra expense created
+
+  /extra-expenses/{id}:
+    get:
+      tags:
+        - Other Services
+      summary: Get extra expense by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Extra expense details
+    put:
+      tags:
+        - Other Services
+      summary: Update extra expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Extra expense updated
+    delete:
+      tags:
+        - Other Services
+      summary: Delete extra expense (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Extra expense deleted
+
+  # ==========================================
+  # CLIENTS
+  # ==========================================
+  /clients:
+    get:
+      tags:
+        - Clients
+      summary: List B2C clients
+      description: Direct clients (B2C)
+      responses:
+        '200':
+          description: List of clients
+    post:
+      tags:
+        - Clients
+      summary: Create B2C client
+      responses:
+        '201':
+          description: Client created
+
+  /clients/{id}:
+    get:
+      tags:
+        - Clients
+      summary: Get client by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client details
+    put:
+      tags:
+        - Clients
+      summary: Update client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client updated
+    delete:
+      tags:
+        - Clients
+      summary: Delete client (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client deleted
+
+  /operators-clients:
+    get:
+      tags:
+        - Clients
+      summary: List B2B operator clients
+      description: Other tour operators (B2B partners)
+      responses:
+        '200':
+          description: List of operator clients
+    post:
+      tags:
+        - Clients
+      summary: Create B2B operator client
+      responses:
+        '201':
+          description: Operator client created
+
+  /operators-clients/{id}:
+    get:
+      tags:
+        - Clients
+      summary: Get operator client by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Operator client details
+    put:
+      tags:
+        - Clients
+      summary: Update operator client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Operator client updated
+    delete:
+      tags:
+        - Clients
+      summary: Delete operator client (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Operator client deleted
+
+  # ==========================================
+  # QUOTATIONS
+  # ==========================================
+  /quotations:
+    get:
+      tags:
+        - Quotations
+      summary: List quotations
+      responses:
+        '200':
+          description: List of quotations
+    post:
+      tags:
+        - Quotations
+      summary: Create quotation
+      responses:
+        '201':
+          description: Quotation created
+
+  /quotations/{id}:
+    get:
+      tags:
+        - Quotations
+      summary: Get quotation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quotation details
+    put:
+      tags:
+        - Quotations
+      summary: Update quotation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quotation updated
+    delete:
+      tags:
+        - Quotations
+      summary: Delete quotation (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quotation deleted
+
+  /quotation-services:
+    get:
+      tags:
+        - Quotations
+      summary: List quotation services
+      responses:
+        '200':
+          description: List of quotation services
+    post:
+      tags:
+        - Quotations
+      summary: Create quotation service
+      responses:
+        '201':
+          description: Quotation service created
+
+  /quotation-services/{id}:
+    get:
+      tags:
+        - Quotations
+      summary: Get quotation service by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quotation service details
+    put:
+      tags:
+        - Quotations
+      summary: Update quotation service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quotation service updated
+    delete:
+      tags:
+        - Quotations
+      summary: Delete quotation service (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quotation service deleted
+
+  # ==========================================
+  # BOOKINGS (Main Feature)
+  # ==========================================
+  /bookings:
+    get:
+      tags:
+        - Bookings
+      summary: List all bookings
+      description: Main booking management feature
+      responses:
+        '200':
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+    post:
+      tags:
+        - Bookings
+      summary: Create booking
+      description: Create new booking with transaction support
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+      responses:
+        '201':
+          description: Booking created
+
+  /bookings/{id}:
+    get:
+      tags:
+        - Bookings
+      summary: Get booking by ID
+      description: Get booking with passengers, services, flights
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking details with related data
+    put:
+      tags:
+        - Bookings
+      summary: Update booking
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking updated
+    delete:
+      tags:
+        - Bookings
+      summary: Delete booking (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking deleted
+
+  /booking-passengers:
+    get:
+      tags:
+        - Passengers
+      summary: List booking passengers
+      description: Individual passenger details (required for vouchers)
+      responses:
+        '200':
+          description: List of booking passengers
+    post:
+      tags:
+        - Passengers
+      summary: Create booking passenger
+      responses:
+        '201':
+          description: Booking passenger created
+
+  /booking-passengers/{id}:
+    get:
+      tags:
+        - Passengers
+      summary: Get booking passenger by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking passenger details
+    put:
+      tags:
+        - Passengers
+      summary: Update booking passenger
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking passenger updated
+    delete:
+      tags:
+        - Passengers
+      summary: Delete booking passenger (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking passenger deleted
+
+  /booking-services:
+    get:
+      tags:
+        - Bookings
+      summary: List booking services
+      description: Services attached to bookings (hotel, transfer, etc.)
+      responses:
+        '200':
+          description: List of booking services
+    post:
+      tags:
+        - Bookings
+      summary: Create booking service
+      responses:
+        '201':
+          description: Booking service created
+
+  /booking-services/{id}:
+    get:
+      tags:
+        - Bookings
+      summary: Get booking service by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking service details
+    put:
+      tags:
+        - Bookings
+      summary: Update booking service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking service updated
+    delete:
+      tags:
+        - Bookings
+      summary: Delete booking service (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking service deleted
+
+  /booking-flights:
+    get:
+      tags:
+        - Bookings
+      summary: List booking flights
+      description: Arrival and departure flight information
+      responses:
+        '200':
+          description: List of booking flights
+    post:
+      tags:
+        - Bookings
+      summary: Create booking flight
+      responses:
+        '201':
+          description: Booking flight created
+
+  /booking-flights/{id}:
+    get:
+      tags:
+        - Bookings
+      summary: Get booking flight by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking flight details
+    put:
+      tags:
+        - Bookings
+      summary: Update booking flight
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking flight updated
+    delete:
+      tags:
+        - Bookings
+      summary: Delete booking flight (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking flight deleted
+
+  /booking-itinerary:
+    get:
+      tags:
+        - Bookings
+      summary: List booking itinerary
+      responses:
+        '200':
+          description: List of booking itinerary
+    post:
+      tags:
+        - Bookings
+      summary: Create booking itinerary
+      responses:
+        '201':
+          description: Booking itinerary created
+
+  /booking-itinerary/{id}:
+    get:
+      tags:
+        - Bookings
+      summary: Get booking itinerary by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking itinerary details
+    put:
+      tags:
+        - Bookings
+      summary: Update booking itinerary
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking itinerary updated
+    delete:
+      tags:
+        - Bookings
+      summary: Delete booking itinerary (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking itinerary deleted
+
+  /booking-tasks:
+    get:
+      tags:
+        - Bookings
+      summary: List booking tasks
+      responses:
+        '200':
+          description: List of booking tasks
+    post:
+      tags:
+        - Bookings
+      summary: Create booking task
+      responses:
+        '201':
+          description: Booking task created
+
+  /booking-tasks/{id}:
+    get:
+      tags:
+        - Bookings
+      summary: Get booking task by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking task details
+    put:
+      tags:
+        - Bookings
+      summary: Update booking task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking task updated
+    delete:
+      tags:
+        - Bookings
+      summary: Delete booking task (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking task deleted
+
+  /booking-modifications:
+    get:
+      tags:
+        - Bookings
+      summary: List booking modifications
+      description: Change history (immutable audit log)
+      responses:
+        '200':
+          description: List of booking modifications
+    post:
+      tags:
+        - Bookings
+      summary: Create booking modification
+      description: Log a booking change
+      responses:
+        '201':
+          description: Booking modification created
+
+  /booking-modifications/{id}:
+    get:
+      tags:
+        - Bookings
+      summary: Get booking modification by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking modification details
+
+  /booking-activities:
+    get:
+      tags:
+        - Bookings
+      summary: List booking activities
+      description: Activity log (immutable audit trail)
+      responses:
+        '200':
+          description: List of booking activities
+    post:
+      tags:
+        - Bookings
+      summary: Create booking activity
+      description: Log a booking activity
+      responses:
+        '201':
+          description: Booking activity created
+
+  # ==========================================
+  # PAYMENTS
+  # ==========================================
+  /bank-accounts:
+    get:
+      tags:
+        - Payments
+      summary: List bank accounts
+      responses:
+        '200':
+          description: List of bank accounts
+    post:
+      tags:
+        - Payments
+      summary: Create bank account
+      responses:
+        '201':
+          description: Bank account created
+
+  /bank-accounts/{id}:
+    get:
+      tags:
+        - Payments
+      summary: Get bank account by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Bank account details
+    put:
+      tags:
+        - Payments
+      summary: Update bank account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Bank account updated
+    delete:
+      tags:
+        - Payments
+      summary: Delete bank account (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Bank account deleted
+
+  /client-payments:
+    get:
+      tags:
+        - Payments
+      summary: List client payments
+      description: Payments received from clients
+      responses:
+        '200':
+          description: List of client payments
+    post:
+      tags:
+        - Payments
+      summary: Create client payment
+      responses:
+        '201':
+          description: Client payment created
+
+  /client-payments/{id}:
+    get:
+      tags:
+        - Payments
+      summary: Get client payment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client payment details
+    put:
+      tags:
+        - Payments
+      summary: Update client payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client payment updated
+    delete:
+      tags:
+        - Payments
+      summary: Delete client payment (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client payment deleted
+
+  /supplier-payments:
+    get:
+      tags:
+        - Payments
+      summary: List supplier payments
+      description: Payments made to suppliers
+      responses:
+        '200':
+          description: List of supplier payments
+    post:
+      tags:
+        - Payments
+      summary: Create supplier payment
+      responses:
+        '201':
+          description: Supplier payment created
+
+  /supplier-payments/{id}:
+    get:
+      tags:
+        - Payments
+      summary: Get supplier payment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier payment details
+    put:
+      tags:
+        - Payments
+      summary: Update supplier payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier payment updated
+    delete:
+      tags:
+        - Payments
+      summary: Delete supplier payment (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Supplier payment deleted
+
+  /refunds:
+    get:
+      tags:
+        - Payments
+      summary: List refunds
+      responses:
+        '200':
+          description: List of refunds
+    post:
+      tags:
+        - Payments
+      summary: Create refund
+      responses:
+        '201':
+          description: Refund created
+
+  /refunds/{id}:
+    get:
+      tags:
+        - Payments
+      summary: Get refund by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Refund details
+    put:
+      tags:
+        - Payments
+      summary: Update refund
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Refund updated
+    delete:
+      tags:
+        - Payments
+      summary: Delete refund (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Refund deleted
+
+  /commissions:
+    get:
+      tags:
+        - Payments
+      summary: List commissions
+      responses:
+        '200':
+          description: List of commissions
+    post:
+      tags:
+        - Payments
+      summary: Create commission
+      responses:
+        '201':
+          description: Commission created
+
+  /commissions/{id}:
+    get:
+      tags:
+        - Payments
+      summary: Get commission by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Commission details
+    put:
+      tags:
+        - Payments
+      summary: Update commission
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Commission updated
+    delete:
+      tags:
+        - Payments
+      summary: Delete commission (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Commission deleted
+
+  # ==========================================
+  # OPERATIONS
+  # ==========================================
+  /pickup-locations:
+    get:
+      tags:
+        - Operations
+      summary: List pickup locations
+      responses:
+        '200':
+          description: List of pickup locations
+    post:
+      tags:
+        - Operations
+      summary: Create pickup location
+      responses:
+        '201':
+          description: Pickup location created
+
+  /pickup-locations/{id}:
+    get:
+      tags:
+        - Operations
+      summary: Get pickup location by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Pickup location details
+    put:
+      tags:
+        - Operations
+      summary: Update pickup location
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Pickup location updated
+    delete:
+      tags:
+        - Operations
+      summary: Delete pickup location (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Pickup location deleted
+
+  /service-availability:
+    get:
+      tags:
+        - Operations
+      summary: List service availability
+      description: Prevent overbooking
+      responses:
+        '200':
+          description: List of service availability
+    post:
+      tags:
+        - Operations
+      summary: Create service availability
+      responses:
+        '201':
+          description: Service availability created
+
+  /service-availability/{id}:
+    get:
+      tags:
+        - Operations
+      summary: Get service availability by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Service availability details
+    put:
+      tags:
+        - Operations
+      summary: Update service availability
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Service availability updated
+    delete:
+      tags:
+        - Operations
+      summary: Delete service availability (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Service availability deleted
+
+  /cancellation-policies:
+    get:
+      tags:
+        - Operations
+      summary: List cancellation policies
+      responses:
+        '200':
+          description: List of cancellation policies
+    post:
+      tags:
+        - Operations
+      summary: Create cancellation policy
+      responses:
+        '201':
+          description: Cancellation policy created
+
+  /cancellation-policies/{id}:
+    get:
+      tags:
+        - Operations
+      summary: Get cancellation policy by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cancellation policy details
+    put:
+      tags:
+        - Operations
+      summary: Update cancellation policy
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cancellation policy updated
+    delete:
+      tags:
+        - Operations
+      summary: Delete cancellation policy (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cancellation policy deleted
+
+  /staff-schedule:
+    get:
+      tags:
+        - Operations
+      summary: List staff schedule
+      responses:
+        '200':
+          description: List of staff schedule
+    post:
+      tags:
+        - Operations
+      summary: Create staff schedule
+      responses:
+        '201':
+          description: Staff schedule created
+
+  /staff-schedule/{id}:
+    get:
+      tags:
+        - Operations
+      summary: Get staff schedule by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Staff schedule details
+    put:
+      tags:
+        - Operations
+      summary: Update staff schedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Staff schedule updated
+    delete:
+      tags:
+        - Operations
+      summary: Delete staff schedule (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Staff schedule deleted
+
+  # ==========================================
+  # VISAS & INSURANCE
+  # ==========================================
+  /visa-requirements:
+    get:
+      tags:
+        - Visas & Insurance
+      summary: List visa requirements
+      description: Global visa requirements (not operator-specific)
+      responses:
+        '200':
+          description: List of visa requirements
+    post:
+      tags:
+        - Visas & Insurance
+      summary: Create visa requirement
+      responses:
+        '201':
+          description: Visa requirement created
+
+  /visa-requirements/{id}:
+    get:
+      tags:
+        - Visas & Insurance
+      summary: Get visa requirement by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Visa requirement details
+    put:
+      tags:
+        - Visas & Insurance
+      summary: Update visa requirement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Visa requirement updated
+    delete:
+      tags:
+        - Visas & Insurance
+      summary: Delete visa requirement (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Visa requirement deleted
+
+  /passenger-visas:
+    get:
+      tags:
+        - Visas & Insurance
+      summary: List passenger visas
+      responses:
+        '200':
+          description: List of passenger visas
+    post:
+      tags:
+        - Visas & Insurance
+      summary: Create passenger visa
+      responses:
+        '201':
+          description: Passenger visa created
+
+  /passenger-visas/{id}:
+    get:
+      tags:
+        - Visas & Insurance
+      summary: Get passenger visa by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Passenger visa details
+    put:
+      tags:
+        - Visas & Insurance
+      summary: Update passenger visa
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Passenger visa updated
+    delete:
+      tags:
+        - Visas & Insurance
+      summary: Delete passenger visa (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Passenger visa deleted
+
+  /travel-insurance:
+    get:
+      tags:
+        - Visas & Insurance
+      summary: List travel insurance
+      responses:
+        '200':
+          description: List of travel insurance
+    post:
+      tags:
+        - Visas & Insurance
+      summary: Create travel insurance
+      responses:
+        '201':
+          description: Travel insurance created
+
+  /travel-insurance/{id}:
+    get:
+      tags:
+        - Visas & Insurance
+      summary: Get travel insurance by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Travel insurance details
+    put:
+      tags:
+        - Visas & Insurance
+      summary: Update travel insurance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Travel insurance updated
+    delete:
+      tags:
+        - Visas & Insurance
+      summary: Delete travel insurance (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Travel insurance deleted
+
+  # ==========================================
+  # DOCUMENTS
+  # ==========================================
+  /vouchers:
+    get:
+      tags:
+        - Documents
+      summary: List vouchers
+      responses:
+        '200':
+          description: List of vouchers
+    post:
+      tags:
+        - Documents
+      summary: Create voucher
+      responses:
+        '201':
+          description: Voucher created
+
+  /vouchers/{id}:
+    get:
+      tags:
+        - Documents
+      summary: Get voucher by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Voucher details
+    put:
+      tags:
+        - Documents
+      summary: Update voucher
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Voucher updated
+    delete:
+      tags:
+        - Documents
+      summary: Delete voucher (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Voucher deleted
+
+  /documents:
+    get:
+      tags:
+        - Documents
+      summary: List documents
+      responses:
+        '200':
+          description: List of documents
+    post:
+      tags:
+        - Documents
+      summary: Create document
+      responses:
+        '201':
+          description: Document created
+
+  /documents/{id}:
+    get:
+      tags:
+        - Documents
+      summary: Get document by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document details
+    put:
+      tags:
+        - Documents
+      summary: Update document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document updated
+    delete:
+      tags:
+        - Documents
+      summary: Delete document (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document deleted
+
+  /email-templates:
+    get:
+      tags:
+        - Documents
+      summary: List email templates
+      responses:
+        '200':
+          description: List of email templates
+    post:
+      tags:
+        - Documents
+      summary: Create email template
+      responses:
+        '201':
+          description: Email template created
+
+  /email-templates/{id}:
+    get:
+      tags:
+        - Documents
+      summary: Get email template by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Email template details
+    put:
+      tags:
+        - Documents
+      summary: Update email template
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Email template updated
+    delete:
+      tags:
+        - Documents
+      summary: Delete email template (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Email template deleted
+
+  /document-templates:
+    get:
+      tags:
+        - Documents
+      summary: List document templates
+      responses:
+        '200':
+          description: List of document templates
+    post:
+      tags:
+        - Documents
+      summary: Create document template
+      responses:
+        '201':
+          description: Document template created
+
+  /document-templates/{id}:
+    get:
+      tags:
+        - Documents
+      summary: Get document template by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document template details
+    put:
+      tags:
+        - Documents
+      summary: Update document template
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document template updated
+    delete:
+      tags:
+        - Documents
+      summary: Delete document template (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document template deleted
+
+  /email-logs:
+    get:
+      tags:
+        - Documents
+      summary: List email logs
+      description: Read-only email history
+      responses:
+        '200':
+          description: List of email logs
+
+  /audit-logs:
+    get:
+      tags:
+        - System
+      summary: List audit logs
+      description: Read-only audit trail
+      responses:
+        '200':
+          description: List of audit logs
+
+  # ==========================================
+  # NOTIFICATIONS
+  # ==========================================
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: List notifications
+      responses:
+        '200':
+          description: List of notifications
+    post:
+      tags:
+        - Notifications
+      summary: Create notification
+      responses:
+        '201':
+          description: Notification created
+
+  /notifications/{id}:
+    get:
+      tags:
+        - Notifications
+      summary: Get notification by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification details
+    put:
+      tags:
+        - Notifications
+      summary: Update notification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification updated
+    delete:
+      tags:
+        - Notifications
+      summary: Delete notification (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification deleted
+
+  /notifications/{id}/mark-as-read:
+    put:
+      tags:
+        - Notifications
+      summary: Mark notification as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification marked as read
+
+  /notification-settings:
+    get:
+      tags:
+        - Notifications
+      summary: Get notification settings for current user
+      responses:
+        '200':
+          description: Notification settings
+    put:
+      tags:
+        - Notifications
+      summary: Update notification settings
+      responses:
+        '200':
+          description: Notification settings updated
+
+  # ==========================================
+  # MARKETING
+  # ==========================================
+  /promotional-codes:
+    get:
+      tags:
+        - Marketing
+      summary: List promotional codes
+      responses:
+        '200':
+          description: List of promotional codes
+    post:
+      tags:
+        - Marketing
+      summary: Create promotional code
+      responses:
+        '201':
+          description: Promotional code created
+
+  /promotional-codes/{id}:
+    get:
+      tags:
+        - Marketing
+      summary: Get promotional code by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Promotional code details
+    put:
+      tags:
+        - Marketing
+      summary: Update promotional code
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Promotional code updated
+    delete:
+      tags:
+        - Marketing
+      summary: Delete promotional code (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Promotional code deleted
+
+  /marketing-campaigns:
+    get:
+      tags:
+        - Marketing
+      summary: List marketing campaigns
+      responses:
+        '200':
+          description: List of marketing campaigns
+    post:
+      tags:
+        - Marketing
+      summary: Create marketing campaign
+      responses:
+        '201':
+          description: Marketing campaign created
+
+  /marketing-campaigns/{id}:
+    get:
+      tags:
+        - Marketing
+      summary: Get marketing campaign by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Marketing campaign details
+    put:
+      tags:
+        - Marketing
+      summary: Update marketing campaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Marketing campaign updated
+    delete:
+      tags:
+        - Marketing
+      summary: Delete marketing campaign (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Marketing campaign deleted
+
+  /client-reviews:
+    get:
+      tags:
+        - Marketing
+      summary: List client reviews
+      responses:
+        '200':
+          description: List of client reviews
+    post:
+      tags:
+        - Marketing
+      summary: Create client review
+      responses:
+        '201':
+          description: Client review created
+
+  /client-reviews/{id}:
+    get:
+      tags:
+        - Marketing
+      summary: Get client review by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client review details
+    put:
+      tags:
+        - Marketing
+      summary: Update client review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client review updated
+    delete:
+      tags:
+        - Marketing
+      summary: Delete client review (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client review deleted
+
+  /tour-waiting-list:
+    get:
+      tags:
+        - Marketing
+      summary: List tour waiting list
+      responses:
+        '200':
+          description: List of tour waiting list
+    post:
+      tags:
+        - Marketing
+      summary: Create tour waiting list entry
+      responses:
+        '201':
+          description: Tour waiting list entry created
+
+  /tour-waiting-list/{id}:
+    get:
+      tags:
+        - Marketing
+      summary: Get tour waiting list entry by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tour waiting list entry details
+    put:
+      tags:
+        - Marketing
+      summary: Update tour waiting list entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tour waiting list entry updated
+    delete:
+      tags:
+        - Marketing
+      summary: Delete tour waiting list entry (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tour waiting list entry deleted
+
+  # ==========================================
+  # SYSTEM
+  # ==========================================
+  /api-keys:
+    get:
+      tags:
+        - System
+      summary: List API keys
+      responses:
+        '200':
+          description: List of API keys
+    post:
+      tags:
+        - System
+      summary: Create API key
+      responses:
+        '201':
+          description: API key created
+
+  /api-keys/{id}:
+    get:
+      tags:
+        - System
+      summary: Get API key by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: API key details
+    put:
+      tags:
+        - System
+      summary: Update API key
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: API key updated
+    delete:
+      tags:
+        - System
+      summary: Delete API key (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: API key deleted
+
+  /number-sequences:
+    get:
+      tags:
+        - System
+      summary: List number sequences
+      description: Auto-generate booking/invoice numbers
+      responses:
+        '200':
+          description: List of number sequences
+    post:
+      tags:
+        - System
+      summary: Create number sequence
+      responses:
+        '201':
+          description: Number sequence created
+
+  /number-sequences/{id}:
+    get:
+      tags:
+        - System
+      summary: Get number sequence by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Number sequence details
+    put:
+      tags:
+        - System
+      summary: Update number sequence
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Number sequence updated
+    delete:
+      tags:
+        - System
+      summary: Delete number sequence (soft delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Number sequence deleted

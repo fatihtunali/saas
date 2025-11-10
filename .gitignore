@@ -1,0 +1,63 @@
+# Environment files with secrets
+**/.env
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+
+# Dependencies
+**/node_modules/
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build outputs
+dist/
+build/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Documentation with sensitive info (will create sanitized versions)
+# Uncomment these before pushing to public repo:
+# DEVELOPMENT_ROADMAP.md
+# FRONTEND_MASTER_PLAN.md
+# API_REFERENCE_SCHEMA.md
+# MASTER_INDEX.md
+# PROJECT_ROADMAP.md
+# README.md
