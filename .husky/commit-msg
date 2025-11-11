@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Simple commit message validation (min length)
 commit_msg=$(cat "$1")
 min_length=10
