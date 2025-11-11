@@ -1,0 +1,22 @@
+{
+  "name": "tour-operations-saas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tour Operations SaaS - Multi-tenant tour operator management system",
+  "scripts": {
+    "prepare": "husky",
+    "frontend:lint": "cd frontend && npm run lint",
+    "backend:lint": "cd backend && npm run lint",
+    "frontend:build": "cd frontend && npm run build",
+    "backend:start": "cd backend && npm run dev",
+    "frontend:start": "cd frontend && npm run dev"
+  },
+  "devDependencies": {
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}

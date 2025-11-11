@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Simple commit message validation (min length)
+commit_msg=$(cat "$1")
+min_length=10
+
+if [ ${#commit_msg} -lt $min_length ]; then
+    echo "❌ Commit message too short. Minimum length is $min_length characters."
+    echo "Current message: $commit_msg"
+    exit 1
+fi
