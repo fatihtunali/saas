@@ -127,9 +127,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center p-4 bg-green-50 rounded-lg">
             <div className="flex-1">
-              <h3 className="text-sm font-medium text-gray-900">
-                shadcn/ui components installed
-              </h3>
+              <h3 className="text-sm font-medium text-gray-900">shadcn/ui components installed</h3>
               <p className="text-sm text-gray-600">
                 Button, Input, Select, Dialog, and Toast components are ready to use
               </p>
