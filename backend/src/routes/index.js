@@ -12,6 +12,85 @@ const clientController = require('../controllers/clientController');
 const quotationController = require('../controllers/quotationController');
 const bookingController = require('../controllers/bookingController');
 const allRemainingController = require('../controllers/allRemainingController');
+const reportsController = require('../controllers/reportsController');
+const authController = require('../controllers/authController');
+const userController = require('../controllers/userController');
+const dashboardController = require('../controllers/dashboardController');
+
+// Import permissions middleware - Phase 9
+const { requirePermission, getMyPermissions } = require('../middleware/permissions');
+
+// ============================================
+// AUTH ROUTES (Phase 9 Updated)
+// ============================================
+
+// Public auth routes (no token required)
+const authRouter = require('./auth');
+router.use('/api/auth', authRouter);
+
+// Profile routes (authenticated users)
+router.get('/api/profile', authenticateToken, authController.getProfile);
+router.put('/api/profile', authenticateToken, authController.updateProfile);
+router.put('/api/profile/password', authenticateToken, authController.changePassword);
+
+// Get my permissions (authenticated users)
+router.get('/api/permissions/me', authenticateToken, getMyPermissions);
+
+// ============================================
+// USER MANAGEMENT ROUTES (Phase 9)
+// ============================================
+
+// List all users (with multi-tenant filtering)
+router.get('/api/users', authenticateToken, requirePermission('users', 'view'), userController.getAllUsers);
+
+// Get single user by ID
+router.get('/api/users/:id', authenticateToken, requirePermission('users', 'view'), userController.getUserById);
+
+// Create new user
+router.post('/api/users', authenticateToken, requirePermission('users', 'create'), userController.createUser);
+
+// Update user details
+router.put('/api/users/:id', authenticateToken, requirePermission('users', 'edit'), userController.updateUser);
+
+// Delete user (soft delete)
+router.delete('/api/users/:id', authenticateToken, requirePermission('users', 'delete'), userController.deleteUser);
+
+// Update password (user changes their own password)
+router.put('/api/users/:id/password', authenticateToken, userController.updatePassword);
+
+// Reset password (admin resets another user's password)
+router.post('/api/users/:id/reset-password', authenticateToken, requirePermission('users', 'edit'), userController.resetPassword);
+
+// Toggle user status (activate/deactivate)
+router.put('/api/users/:id/status', authenticateToken, requirePermission('users', 'edit'), userController.toggleUserStatus);
+
+// Update last login timestamp
+router.put('/api/users/:id/last-login', authenticateToken, userController.updateLastLogin);
+
+// Get user activity log
+router.get('/api/users/:id/activity', authenticateToken, userController.getUserActivity);
+
+// Get users by role
+router.get('/api/users/by-role/:role', authenticateToken, requirePermission('users', 'view'), userController.getUsersByRole);
+
+// ============================================
+// DASHBOARD ROUTES (Phase 3)
+// ============================================
+
+// Dashboard statistics (bookings, revenue, receivables, payables)
+router.get('/api/dashboard/stats', authenticateToken, requirePermission('dashboard', 'view'), dashboardController.getDashboardStats);
+
+// Revenue chart data
+router.get('/api/dashboard/revenue', authenticateToken, requirePermission('dashboard', 'view'), dashboardController.getRevenueChart);
+
+// Bookings chart data (status breakdown)
+router.get('/api/dashboard/bookings', authenticateToken, requirePermission('dashboard', 'view'), dashboardController.getBookingsChart);
+
+// Recent activity feed (bookings, payments, modifications)
+router.get('/api/dashboard/activity', authenticateToken, requirePermission('dashboard', 'view'), dashboardController.getRecentActivity);
+
+// Upcoming tours
+router.get('/api/dashboard/upcoming-tours', authenticateToken, requirePermission('dashboard', 'view'), dashboardController.getUpcomingTours);
 
 // ============================================
 // MASTER DATA ROUTES
@@ -191,6 +270,13 @@ router.get('/api/operators-clients/:id', authenticateToken, clientController.get
 router.post('/api/operators-clients', authenticateToken, clientController.createOperatorsClient);
 router.put('/api/operators-clients/:id', authenticateToken, clientController.updateOperatorsClient);
 router.delete('/api/operators-clients/:id', authenticateToken, clientController.deleteOperatorsClient);
+
+// Operators Management (Super Admin)
+router.get('/api/operators', authenticateToken, clientController.getOperators);
+router.get('/api/operators/:id', authenticateToken, clientController.getOperatorById);
+router.post('/api/operators', authenticateToken, clientController.createOperator);
+router.put('/api/operators/:id', authenticateToken, clientController.updateOperator);
+router.delete('/api/operators/:id', authenticateToken, clientController.deleteOperator);
 
 // ============================================
 // QUOTATION ROUTES
@@ -467,5 +553,34 @@ router.get('/api/vehicle-maintenance/:id', authenticateToken, allRemainingContro
 router.post('/api/vehicle-maintenance', authenticateToken, allRemainingController.vehicleMaintenance.create);
 router.put('/api/vehicle-maintenance/:id', authenticateToken, allRemainingController.vehicleMaintenance.update);
 router.delete('/api/vehicle-maintenance/:id', authenticateToken, allRemainingController.vehicleMaintenance.delete);
+
+// ============================================
+// REPORTS ROUTES
+// ============================================
+
+// Financial Reports
+router.get('/api/reports/revenue', authenticateToken, reportsController.getRevenueReport);
+router.get('/api/reports/profit-loss', authenticateToken, reportsController.getProfitLossReport);
+router.get('/api/reports/receivables-aging', authenticateToken, reportsController.getReceivablesAgingReport);
+router.get('/api/reports/payables-aging', authenticateToken, reportsController.getPayablesAgingReport);
+router.get('/api/reports/commissions', authenticateToken, reportsController.getCommissionReport);
+
+// Booking Reports
+router.get('/api/reports/bookings-by-date', authenticateToken, reportsController.getBookingsByDateReport);
+router.get('/api/reports/bookings-by-status', authenticateToken, reportsController.getBookingsByStatusReport);
+router.get('/api/reports/bookings-by-destination', authenticateToken, reportsController.getBookingsByDestinationReport);
+router.get('/api/reports/cancellations', authenticateToken, reportsController.getCancellationReport);
+router.get('/api/reports/booking-sources', authenticateToken, reportsController.getBookingSourcesReport);
+
+// Operations Reports
+router.get('/api/reports/service-utilization', authenticateToken, reportsController.getServiceUtilizationReport);
+router.get('/api/reports/guide-performance', authenticateToken, reportsController.getGuidePerformanceReport);
+router.get('/api/reports/hotel-occupancy', authenticateToken, reportsController.getHotelOccupancyReport);
+router.get('/api/reports/vehicle-utilization', authenticateToken, reportsController.getVehicleUtilizationReport);
+
+// Client Reports
+router.get('/api/reports/client-revenue', authenticateToken, reportsController.getClientRevenueReport);
+router.get('/api/reports/client-history', authenticateToken, reportsController.getClientBookingHistoryReport);
+router.get('/api/reports/outstanding-balances', authenticateToken, reportsController.getOutstandingBalancesReport);
 
 module.exports = router;

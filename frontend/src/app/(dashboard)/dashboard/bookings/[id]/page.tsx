@@ -1,0 +1,197 @@
+'use client';
+//ft
+
+import { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useBooking } from '@/lib/hooks/useBookings';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  FileText,
+  Users,
+  Package,
+  Plane,
+  Calendar,
+  CreditCard,
+  FileCheck,
+  Activity,
+  AlertCircle,
+  ArrowLeft,
+} from 'lucide-react';
+import {
+  BookingHeader,
+  OverviewTab,
+  ItineraryTab,
+  ServicesTab,
+  DocumentsTab,
+  TimelineTab,
+  CommunicationTab,
+} from './_components';
+
+// Loading Skeleton Component
+function BookingDetailsSkeleton() {
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex items-center gap-4">
+        <Skeleton className="h-10 w-10 rounded-md" />
+        <div className="flex-1">
+          <Skeleton className="h-8 w-48 mb-2" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <Skeleton className="h-8 w-24" />
+      </div>
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-96 w-full" />
+    </div>
+  );
+}
+
+// Error Display Component
+function ErrorDisplay({ error }: { error: Error | null }) {
+  const router = useRouter();
+
+  return (
+    <div className="container mx-auto py-6">
+      <div className="flex flex-col items-center justify-center py-12">
+        <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+        <h2 className="text-2xl font-bold mb-2">Booking Not Found</h2>
+        <p className="text-muted-foreground mb-4 text-center max-w-md">
+          {error?.message || 'The booking you are looking for does not exist or has been deleted.'}
+        </p>
+        <Button onClick={() => router.push('/dashboard/bookings')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Bookings
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Main Booking Details Page
+export default function BookingDetailsPage() {
+  const params = useParams();
+  const router = useRouter();
+  const bookingId = params.id as string;
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const { data: booking, isLoading, error } = useBooking(bookingId);
+
+  // Loading state
+  if (isLoading) {
+    return <BookingDetailsSkeleton />;
+  }
+
+  // Error state
+  if (error || !booking) {
+    return <ErrorDisplay error={error} />;
+  }
+
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      {/* Header Section */}
+      <BookingHeader booking={booking} />
+
+      <Separator />
+
+      {/* Tabs Section */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 h-auto">
+          <TabsTrigger value="overview" className="flex items-center gap-1.5 py-2">
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Overview</span>
+          </TabsTrigger>
+          <TabsTrigger value="itinerary" className="flex items-center gap-1.5 py-2">
+            <Calendar className="h-4 w-4" />
+            <span className="hidden sm:inline">Itinerary</span>
+          </TabsTrigger>
+          <TabsTrigger value="services" className="flex items-center gap-1.5 py-2">
+            <Package className="h-4 w-4" />
+            <span className="hidden sm:inline">Services</span>
+          </TabsTrigger>
+          <TabsTrigger value="passengers" className="flex items-center gap-1.5 py-2">
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Passengers</span>
+          </TabsTrigger>
+          <TabsTrigger value="payments" className="flex items-center gap-1.5 py-2">
+            <CreditCard className="h-4 w-4" />
+            <span className="hidden sm:inline">Payments</span>
+          </TabsTrigger>
+          <TabsTrigger value="documents" className="flex items-center gap-1.5 py-2">
+            <FileCheck className="h-4 w-4" />
+            <span className="hidden sm:inline">Documents</span>
+          </TabsTrigger>
+          <TabsTrigger value="timeline" className="flex items-center gap-1.5 py-2">
+            <Activity className="h-4 w-4" />
+            <span className="hidden sm:inline">Timeline</span>
+          </TabsTrigger>
+          <TabsTrigger value="communication" className="flex items-center gap-1.5 py-2">
+            <Plane className="h-4 w-4" />
+            <span className="hidden sm:inline">Communication</span>
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview">
+          <OverviewTab booking={booking} />
+        </TabsContent>
+
+        {/* Itinerary Tab */}
+        <TabsContent value="itinerary">
+          <ItineraryTab booking={booking} />
+        </TabsContent>
+
+        {/* Services Tab */}
+        <TabsContent value="services">
+          <ServicesTab bookingId={bookingId} booking={booking} />
+        </TabsContent>
+
+        <TabsContent value="passengers">
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Users className="h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-lg font-medium">Passengers tab coming soon...</p>
+              <p className="text-sm text-muted-foreground">
+                This will display all passengers for this booking
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="payments">
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <CreditCard className="h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-lg font-medium">Payments tab coming soon...</p>
+              <p className="text-sm text-muted-foreground">
+                This will display all payments for this booking
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Documents Tab */}
+        <TabsContent value="documents">
+          <DocumentsTab bookingId={bookingId} />
+        </TabsContent>
+
+        {/* Timeline Tab */}
+        <TabsContent value="timeline">
+          <TimelineTab bookingId={bookingId} />
+        </TabsContent>
+
+        {/* Communication Tab */}
+        <TabsContent value="communication">
+          <CommunicationTab
+            bookingId={bookingId}
+            clientEmail={booking.clientEmail || 'client@example.com'}
+            clientName={booking.clientName || 'Client'}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

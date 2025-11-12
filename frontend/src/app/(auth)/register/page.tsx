@@ -1,4 +1,5 @@
 'use client';
+//ft
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -13,17 +14,19 @@ import { authApi } from '@/lib/api/auth';
 import { useAuthStore } from '@/store/authStore';
 
 // Validation schema
-const registerSchema = z.object({
-  company_name: z.string().min(2, 'Company name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
-  contact_phone: z.string().optional(),
-  address: z.string().optional(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-});
+const registerSchema = z
+  .object({
+    company_name: z.string().min(2, 'Company name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string(),
+    contact_phone: z.string().optional(),
+    address: z.string().optional(),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
@@ -85,13 +88,14 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-xl p-8">
           <h1 className="text-3xl font-bold text-center mb-2">Create Account</h1>
-          <p className="text-center text-gray-600 mb-8">
-            Start managing your tour operations
-          </p>
+          <p className="text-center text-gray-600 mb-8">Start managing your tour operations</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
-              <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="company_name"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Company Name <span className="text-red-500">*</span>
               </label>
               <Input
@@ -119,13 +123,14 @@ export default function RegisterPage() {
                 {...register('email')}
                 disabled={isLoading}
               />
-              {errors.email && (
-                <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>}
             </div>
 
             <div>
-              <label htmlFor="contact_phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="contact_phone"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Phone Number
               </label>
               <Input
@@ -176,7 +181,10 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Confirm Password <span className="text-red-500">*</span>
               </label>
               <Input

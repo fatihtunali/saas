@@ -35,12 +35,12 @@ info:
   version: 2.0.0
   contact:
     name: Tour Operations SaaS Support
-    email: fatihtunali@gmail.com
+    email: support@example.com
 
 servers:
   - url: http://localhost:3000/api
     description: Development server
-  - url: http://134.209.137.11:3000/api
+  - url: http://<YOUR_SERVER_IP>:3000/api
     description: Production server
 
 tags:
@@ -370,7 +370,7 @@ paths:
                 email:
                   type: string
                   format: email
-                  example: "fatihtunali@gmail.com"
+                  example: "admin@example.com"
                 password:
                   type: string
                   example: "your-password"

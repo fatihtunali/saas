@@ -47,11 +47,26 @@ build/
 *.db
 *.sqlite
 *.sqlite3
+**/database/*.sql
+backend/database/*.sql
+*.dump
+*_backup_*.sql
 
 # Temporary files
 tmp/
 temp/
 *.tmp
+
+# Scripts with sensitive data
+backend/scripts/checkSchema.js
+backend/scripts/checkExtrasOnly.js
+backend/scripts/seedTestData.js
+backend/scripts/seedTestData_CORRECTED.js
+backend/scripts/verifyData.js
+backend/scripts/resetTestPassword.js
+
+# Documentation with sensitive information
+SECURITY_CHECKLIST_BEFORE_GITHUB.md
 
 # Documentation with sensitive info (will create sanitized versions)
 # Uncomment these before pushing to public repo:
@@ -61,3 +76,4 @@ temp/
 # MASTER_INDEX.md
 # PROJECT_ROADMAP.md
 # README.md
+frontend/src/NUL

@@ -37,3 +37,7 @@ export interface QueryParams {
   sortOrder?: 'asc' | 'desc';
   [key: string]: any;
 }
+
+// Re-export all bookings types
+export * from './bookings';
+export * from './dashboard';

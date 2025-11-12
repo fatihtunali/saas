@@ -1,4 +1,5 @@
 'use client';
+//ft
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -75,9 +76,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-xl p-8">
           <h1 className="text-3xl font-bold text-center mb-2">Welcome Back</h1>
-          <p className="text-center text-gray-600 mb-8">
-            Sign in to your account to continue
-          </p>
+          <p className="text-center text-gray-600 mb-8">Sign in to your account to continue</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
@@ -92,9 +91,7 @@ export default function LoginPage() {
                 {...register('email')}
                 disabled={isLoading}
               />
-              {errors.email && (
-                <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>}
             </div>
 
             <div>

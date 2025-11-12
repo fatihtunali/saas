@@ -438,3 +438,182 @@ exports.deleteOperatorsClient = async (req, res) => {
     res.status(500).json({ error: 'Failed to delete operators client' });
   }
 };
+
+// ============================================
+// OPERATORS (Super Admin Only - CRUD)
+// ============================================
+
+exports.getOperators = async (req, res) => {
+  try {
+    // Super admin sees all operators, operators see only themselves
+    const operatorId = req.user.role === 'super_admin' ? null : req.user.operator_id;
+
+    let query = 'SELECT * FROM operators WHERE deleted_at IS NULL';
+    const params = [];
+
+    if (operatorId) {
+      query += ' AND id = $1';
+      params.push(operatorId);
+    }
+
+    query += ' ORDER BY company_name ASC';
+
+    const result = await db.query(query, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching operators:', error);
+    res.status(500).json({ error: 'Failed to fetch operators' });
+  }
+};
+
+exports.getOperatorById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const operatorId = req.user.role === 'super_admin' ? null : req.user.operator_id;
+
+    let query = 'SELECT * FROM operators WHERE id = $1 AND deleted_at IS NULL';
+    const params = [id];
+
+    if (operatorId && operatorId != id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const result = await db.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Operator not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching operator:', error);
+    res.status(500).json({ error: 'Failed to fetch operator' });
+  }
+};
+
+exports.createOperator = async (req, res) => {
+  try {
+    // Only super admin can create operators
+    if (req.user.role !== 'super_admin') {
+      return res.status(403).json({ error: 'Only super admin can create operators' });
+    }
+
+    const {
+      company_name, contact_email, contact_phone, address,
+      city, country, tax_id, base_currency, is_active
+    } = req.body;
+
+    // Validation
+    if (!company_name || !contact_email) {
+      return res.status(400).json({ error: 'Company name and contact email are required' });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contact_email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    const query = `
+      INSERT INTO operators (
+        company_name, contact_email, contact_phone, address,
+        city, country, tax_id, base_currency, is_active
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *
+    `;
+
+    const result = await db.query(query, [
+      company_name, contact_email, contact_phone, address,
+      city, country, tax_id, base_currency || 'TRY', is_active !== false
+    ]);
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error creating operator:', error);
+    res.status(500).json({ error: 'Failed to create operator' });
+  }
+};
+
+exports.updateOperator = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Only super admin can update operators
+    if (req.user.role !== 'super_admin' && req.user.operator_id != id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const {
+      company_name, contact_email, contact_phone, address,
+      city, country, tax_id, base_currency, is_active
+    } = req.body;
+
+    // Validate email format if provided
+    if (contact_email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(contact_email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+      }
+    }
+
+    const query = `
+      UPDATE operators
+      SET company_name = COALESCE($2, company_name),
+          contact_email = COALESCE($3, contact_email),
+          contact_phone = COALESCE($4, contact_phone),
+          address = COALESCE($5, address),
+          city = COALESCE($6, city),
+          country = COALESCE($7, country),
+          tax_id = COALESCE($8, tax_id),
+          base_currency = COALESCE($9, base_currency),
+          is_active = COALESCE($10, is_active),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1 AND deleted_at IS NULL
+      RETURNING *
+    `;
+
+    const result = await db.query(query, [
+      id, company_name, contact_email, contact_phone, address,
+      city, country, tax_id, base_currency, is_active
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Operator not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating operator:', error);
+    res.status(500).json({ error: 'Failed to update operator' });
+  }
+};
+
+exports.deleteOperator = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Only super admin can delete operators
+    if (req.user.role !== 'super_admin') {
+      return res.status(403).json({ error: 'Only super admin can delete operators' });
+    }
+
+    const query = `
+      UPDATE operators
+      SET deleted_at = CURRENT_TIMESTAMP
+      WHERE id = $1 AND deleted_at IS NULL
+      RETURNING id
+    `;
+
+    const result = await db.query(query, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Operator not found' });
+    }
+
+    res.json({ message: 'Operator deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting operator:', error);
+    res.status(500).json({ error: 'Failed to delete operator' });
+  }
+};

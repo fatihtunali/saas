@@ -12,7 +12,67 @@ const applyOperatorFilter = (req) => {
 exports.getBookings = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
-    let query = `
+
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 25;
+    const offset = (page - 1) * limit;
+
+    // Filtering parameters
+    const search = req.query.search || '';
+    const sortByParam = req.query.sortBy || 'createdAt';
+    const sortOrder = req.query.sortOrder || 'desc';
+
+    // Map camelCase to snake_case for database columns
+    const sortByMap = {
+      'createdAt': 'created_at',
+      'updatedAt': 'updated_at',
+      'bookingCode': 'booking_code',
+      'travelStartDate': 'travel_start_date',
+      'totalCost': 'total_cost'
+    };
+    const sortBy = sortByMap[sortByParam] || 'created_at';
+
+    // Build WHERE clause
+    let whereConditions = ['b.deleted_at IS NULL'];
+    const params = [];
+    let paramIndex = 1;
+
+    if (operatorId) {
+      whereConditions.push(`b.operator_id = $${paramIndex}`);
+      params.push(operatorId);
+      paramIndex++;
+    }
+
+    // Search filter
+    if (search) {
+      whereConditions.push(`(
+        b.booking_code ILIKE $${paramIndex} OR
+        c.full_name ILIKE $${paramIndex} OR
+        oc.full_name ILIKE $${paramIndex} OR
+        ci.name ILIKE $${paramIndex}
+      )`);
+      params.push(`%${search}%`);
+      paramIndex++;
+    }
+
+    const whereClause = whereConditions.join(' AND ');
+
+    // Count total records
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM bookings b
+      LEFT JOIN clients c ON b.client_id = c.id
+      LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
+      LEFT JOIN cities ci ON b.destination_city_id = ci.id
+      WHERE ${whereClause}
+    `;
+
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Fetch paginated data
+    const dataQuery = `
       SELECT b.*,
              c.full_name as client_name,
              oc.full_name as operator_client_name,
@@ -23,19 +83,23 @@ exports.getBookings = async (req, res) => {
       LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
       LEFT JOIN cities ci ON b.destination_city_id = ci.id
       LEFT JOIN users u ON b.created_by = u.id
-      WHERE b.deleted_at IS NULL
+      WHERE ${whereClause}
+      ORDER BY b.${sortBy} ${sortOrder.toUpperCase()}
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
-    const params = [];
 
-    if (operatorId) {
-      query += ' AND b.operator_id = $1';
-      params.push(operatorId);
-    }
+    params.push(limit, offset);
 
-    query += ' ORDER BY b.travel_start_date DESC, b.created_at DESC';
+    const result = await db.query(dataQuery, params);
 
-    const result = await db.query(query, params);
-    res.json(result.rows);
+    // Return paginated response
+    res.json({
+      data: result.rows,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    });
   } catch (error) {
     console.error('Error fetching bookings:', error);
     res.status(500).json({ error: 'Failed to fetch bookings' });
