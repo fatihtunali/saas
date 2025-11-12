@@ -190,7 +190,7 @@ export default function EntranceFeeDetailsPage() {
                 <TableRow>
                   <TableCell className="font-medium">Adult</TableCell>
                   <TableCell className="text-right">
-                    {entranceFee.adult_price.toFixed(2)} {entranceFee.currency || 'TRY'}
+                    {parseFloat(entranceFee.adult_price).toFixed(2)} {entranceFee.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -198,7 +198,7 @@ export default function EntranceFeeDetailsPage() {
                 <TableRow>
                   <TableCell className="font-medium">Child</TableCell>
                   <TableCell className="text-right">
-                    {entranceFee.child_price.toFixed(2)} {entranceFee.currency || 'TRY'}
+                    {parseFloat(entranceFee.child_price).toFixed(2)} {entranceFee.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -206,7 +206,8 @@ export default function EntranceFeeDetailsPage() {
                 <TableRow>
                   <TableCell className="font-medium">Student</TableCell>
                   <TableCell className="text-right">
-                    {entranceFee.student_price.toFixed(2)} {entranceFee.currency || 'TRY'}
+                    {parseFloat(entranceFee.student_price).toFixed(2)}{' '}
+                    {entranceFee.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -214,7 +215,8 @@ export default function EntranceFeeDetailsPage() {
                 <TableRow>
                   <TableCell className="font-medium">Senior</TableCell>
                   <TableCell className="text-right">
-                    {entranceFee.senior_price.toFixed(2)} {entranceFee.currency || 'TRY'}
+                    {parseFloat(entranceFee.senior_price).toFixed(2)}{' '}
+                    {entranceFee.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}

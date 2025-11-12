@@ -109,7 +109,7 @@ export default function HotelsPage() {
         if (!hotel.price_per_person_double) return 'N/A';
         return (
           <div className="text-right font-medium">
-            {hotel.price_per_person_double.toFixed(2)} {hotel.currency || 'TRY'}
+            {Number(hotel.price_per_person_double).toFixed(2)} {hotel.currency || 'TRY'}
           </div>
         );
       },

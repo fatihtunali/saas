@@ -34,7 +34,7 @@ export function useExtras(params?: QueryParams) {
       queryKey: ['extras', id],
       queryFn: async () => {
         const response = await extrasApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -78,8 +78,8 @@ export function useExtras(params?: QueryParams) {
   });
 
   return {
-    extras: extras?.data || [],
-    pagination: extras?.pagination,
+    extras: extras?.data?.extra_expenses || [],
+    pagination: extras?.data?.pagination,
     isLoading,
     error,
     refetch,

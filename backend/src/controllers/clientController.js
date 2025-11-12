@@ -12,21 +12,46 @@ const applyOperatorFilter = (req) => {
 exports.getClients = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = 'SELECT * FROM clients WHERE deleted_at IS NULL';
     const params = [];
+    let paramCount = 0;
 
     if (operatorId) {
-      query += ' AND operator_id = $1';
+      paramCount++;
+      query += ` AND operator_id = $${paramCount}`;
       params.push(operatorId);
     }
 
+    // Count total records
+    const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
     query += ' ORDER BY full_name ASC';
+    query += ` LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+
+    res.json({
+      success: true,
+      data: {
+        b2c_clients: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching clients:', error);
-    res.status(500).json({ error: 'Failed to fetch clients' });
+    res.status(500).json({ success: false, error: 'Failed to fetch clients' });
   }
 };
 
@@ -224,6 +249,10 @@ exports.deleteClient = async (req, res) => {
 exports.getOperatorsClients = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT oc.*, o.company_name as partner_company_name
       FROM operators_clients oc
@@ -231,19 +260,40 @@ exports.getOperatorsClients = async (req, res) => {
       WHERE oc.deleted_at IS NULL
     `;
     const params = [];
+    let paramCount = 0;
 
     if (operatorId) {
-      query += ' AND oc.operator_id = $1';
+      paramCount++;
+      query += ` AND oc.operator_id = $${paramCount}`;
       params.push(operatorId);
     }
 
+    // Count total records
+    const countQuery = query.replace('SELECT oc.*, o.company_name as partner_company_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
     query += ' ORDER BY oc.full_name ASC';
+    query += ` LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+
+    res.json({
+      success: true,
+      data: {
+        b2b_clients: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching operators clients:', error);
-    res.status(500).json({ error: 'Failed to fetch operators clients' });
+    res.status(500).json({ success: false, error: 'Failed to fetch operators clients' });
   }
 };
 
@@ -447,22 +497,46 @@ exports.getOperators = async (req, res) => {
   try {
     // Super admin sees all operators, operators see only themselves
     const operatorId = req.user.role === 'super_admin' ? null : req.user.operator_id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
 
     let query = 'SELECT * FROM operators WHERE deleted_at IS NULL';
     const params = [];
+    let paramCount = 0;
 
     if (operatorId) {
-      query += ' AND id = $1';
+      paramCount++;
+      query += ` AND id = $${paramCount}`;
       params.push(operatorId);
     }
 
+    // Count total records
+    const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
     query += ' ORDER BY company_name ASC';
+    query += ` LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+
+    res.json({
+      success: true,
+      data: {
+        operators: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching operators:', error);
-    res.status(500).json({ error: 'Failed to fetch operators' });
+    res.status(500).json({ success: false, error: 'Failed to fetch operators' });
   }
 };
 

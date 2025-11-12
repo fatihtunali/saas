@@ -111,7 +111,7 @@ export default function ExtraExpenseDetailsPage() {
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Price</p>
                 <p className="text-2xl font-bold text-primary">
-                  {extra.price.toFixed(2)} {extra.currency || 'TRY'}
+                  {parseFloat(extra.price).toFixed(2)} {extra.currency || 'TRY'}
                 </p>
               </div>
             ) : (

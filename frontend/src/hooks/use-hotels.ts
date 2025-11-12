@@ -34,7 +34,7 @@ export function useHotels(params?: QueryParams) {
       queryKey: ['hotels', id],
       queryFn: async () => {
         const response = await hotelsApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -89,8 +89,8 @@ export function useHotels(params?: QueryParams) {
   });
 
   return {
-    hotels: hotels?.data || [],
-    pagination: hotels?.pagination,
+    hotels: hotels?.data?.hotels || [],
+    pagination: hotels?.data?.pagination,
     isLoading,
     error,
     refetch,

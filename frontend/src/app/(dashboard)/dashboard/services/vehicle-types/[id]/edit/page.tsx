@@ -159,7 +159,7 @@ export default function EditVehicleTypePage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {vehicleCompanies?.map(company => (
+                        {vehicleCompanies?.map((company: any) => (
                           <SelectItem key={company.id} value={company.id.toString()}>
                             {company.company_name}
                           </SelectItem>
@@ -184,7 +184,7 @@ export default function EditVehicleTypePage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {VEHICLE_TYPES.map(type => (
+                        {VEHICLE_TYPES.map((type: any) => (
                           <SelectItem key={type} value={type}>
                             {type}
                           </SelectItem>

@@ -34,7 +34,7 @@ export function useTransferRoutes(params?: QueryParams) {
       queryKey: ['transfer-routes', id],
       queryFn: async () => {
         const response = await transferRoutesApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -78,8 +78,8 @@ export function useTransferRoutes(params?: QueryParams) {
   });
 
   return {
-    transferRoutes: transferRoutes?.data || [],
-    pagination: transferRoutes?.pagination,
+    transferRoutes: transferRoutes?.data?.transfer_routes || [],
+    pagination: transferRoutes?.data?.pagination,
     isLoading,
     error,
     refetch,

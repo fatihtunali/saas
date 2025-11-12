@@ -34,7 +34,7 @@ export function useTourCompanies(params?: QueryParams) {
       queryKey: ['tour-companies', id],
       queryFn: async () => {
         const response = await tourCompaniesApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -78,8 +78,8 @@ export function useTourCompanies(params?: QueryParams) {
   });
 
   return {
-    tourCompanies: tourCompanies?.data || [],
-    pagination: tourCompanies?.pagination,
+    tourCompanies: tourCompanies?.data?.tour_companies || [],
+    pagination: tourCompanies?.data?.pagination,
     isLoading,
     error,
     refetch,

@@ -34,7 +34,7 @@ export function useSuppliers(params?: QueryParams) {
       queryKey: ['suppliers', id],
       queryFn: async () => {
         const response = await suppliersApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -78,8 +78,8 @@ export function useSuppliers(params?: QueryParams) {
   });
 
   return {
-    suppliers: suppliers?.data || [],
-    pagination: suppliers?.pagination,
+    suppliers: suppliers?.data?.suppliers || [],
+    pagination: suppliers?.data?.pagination,
     isLoading,
     error,
     refetch,

@@ -130,7 +130,7 @@ export default function CreateVehicleRentalPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {vehicleCompanies?.map(company => (
+                        {vehicleCompanies?.map((company: any) => (
                           <SelectItem key={company.id} value={company.id.toString()}>
                             {company.company_name}
                           </SelectItem>
@@ -158,7 +158,7 @@ export default function CreateVehicleRentalPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {vehicleTypes?.map(type => (
+                        {vehicleTypes?.map((type: any) => (
                           <SelectItem key={type.id} value={type.id.toString()}>
                             {type.vehicle_type} ({type.capacity} pax)
                           </SelectItem>

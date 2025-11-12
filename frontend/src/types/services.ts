@@ -385,12 +385,14 @@ export type UpdateSupplierDto = Partial<CreateSupplierDto>;
 
 // API Response Types
 export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+  data: {
+    [key: string]: T[] | any; // Dynamic key for different endpoints (hotels, entrance_fees, etc.)
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
   };
 }
 

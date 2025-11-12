@@ -92,7 +92,7 @@ export default function HotelDetailsPage() {
             </div>
             {hotel.star_rating && (
               <div className="flex items-center gap-1 mt-2">
-                {Array.from({ length: hotel.star_rating }).map((_, i) => (
+                {Array.from({ length: parseInt(hotel.star_rating) }).map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" />
                 ))}
               </div>
@@ -220,7 +220,8 @@ export default function HotelDetailsPage() {
                     <div>
                       <p className="font-medium">Meal Plan Supplement</p>
                       <p className="text-lg font-semibold text-primary mt-1">
-                        {hotel.meal_plan_supplement.toFixed(2)} {hotel.currency || 'TRY'} / person
+                        {parseFloat(hotel.meal_plan_supplement).toFixed(2)}{' '}
+                        {hotel.currency || 'TRY'} / person
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Additional cost per person for meal plan upgrade
@@ -258,7 +259,7 @@ export default function HotelDetailsPage() {
                 <TableRow>
                   <TableCell className="font-medium">Double Room</TableCell>
                   <TableCell className="text-right">
-                    {hotel.price_per_person_double.toFixed(2)} {hotel.currency || 'TRY'}
+                    {parseFloat(hotel.price_per_person_double).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -266,7 +267,7 @@ export default function HotelDetailsPage() {
                 <TableRow>
                   <TableCell className="font-medium">Single Supplement</TableCell>
                   <TableCell className="text-right">
-                    +{hotel.single_supplement.toFixed(2)} {hotel.currency || 'TRY'}
+                    +{parseFloat(hotel.single_supplement).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -274,7 +275,7 @@ export default function HotelDetailsPage() {
                 <TableRow>
                   <TableCell className="font-medium">Triple Room</TableCell>
                   <TableCell className="text-right">
-                    {hotel.price_per_person_triple.toFixed(2)} {hotel.currency || 'TRY'}
+                    {parseFloat(hotel.price_per_person_triple).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -292,7 +293,7 @@ export default function HotelDetailsPage() {
                 <TableRow>
                   <TableCell className="pl-8">Child (0-2 years)</TableCell>
                   <TableCell className="text-right">
-                    {hotel.child_price_0_2.toFixed(2)} {hotel.currency || 'TRY'}
+                    {parseFloat(hotel.child_price_0_2).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -300,7 +301,7 @@ export default function HotelDetailsPage() {
                 <TableRow>
                   <TableCell className="pl-8">Child (3-5 years)</TableCell>
                   <TableCell className="text-right">
-                    {hotel.child_price_3_5.toFixed(2)} {hotel.currency || 'TRY'}
+                    {parseFloat(hotel.child_price_3_5).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -308,7 +309,7 @@ export default function HotelDetailsPage() {
                 <TableRow>
                   <TableCell className="pl-8">Child (6-11 years)</TableCell>
                   <TableCell className="text-right">
-                    {hotel.child_price_6_11.toFixed(2)} {hotel.currency || 'TRY'}
+                    {parseFloat(hotel.child_price_6_11).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}

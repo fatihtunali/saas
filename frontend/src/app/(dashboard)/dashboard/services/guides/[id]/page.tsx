@@ -250,7 +250,7 @@ export default function GuideDetailsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {guide.daily_rate.toFixed(2)} {guide.currency || 'TRY'}
+                    {parseFloat(guide.daily_rate).toFixed(2)} {guide.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -263,7 +263,7 @@ export default function GuideDetailsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {guide.half_day_rate.toFixed(2)} {guide.currency || 'TRY'}
+                    {parseFloat(guide.half_day_rate).toFixed(2)} {guide.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -276,7 +276,7 @@ export default function GuideDetailsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {guide.night_rate.toFixed(2)} {guide.currency || 'TRY'}
+                    {parseFloat(guide.night_rate).toFixed(2)} {guide.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
@@ -289,7 +289,7 @@ export default function GuideDetailsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {guide.transfer_rate.toFixed(2)} {guide.currency || 'TRY'}
+                    {parseFloat(guide.transfer_rate).toFixed(2)} {guide.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}

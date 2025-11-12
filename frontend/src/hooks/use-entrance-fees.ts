@@ -34,7 +34,7 @@ export function useEntranceFees(params?: QueryParams) {
       queryKey: ['entrance-fees', id],
       queryFn: async () => {
         const response = await entranceFeesApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -78,8 +78,8 @@ export function useEntranceFees(params?: QueryParams) {
   });
 
   return {
-    entranceFees: entranceFees?.data || [],
-    pagination: entranceFees?.pagination,
+    entranceFees: entranceFees?.data?.entrance_fees || [],
+    pagination: entranceFees?.data?.pagination,
     isLoading,
     error,
     refetch,

@@ -12,6 +12,10 @@ const applyOperatorFilter = (req) => {
 exports.getGuides = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT g.*, s.company_name as supplier_name
       FROM guides g
@@ -25,10 +29,29 @@ exports.getGuides = async (req, res) => {
       params.push(operatorId);
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT g.*, s.company_name as supplier_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY g.guide_name ASC';
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        guides: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching guides:', error);
     res.status(500).json({ error: 'Failed to fetch guides' });
@@ -218,6 +241,10 @@ exports.deleteGuide = async (req, res) => {
 exports.getRestaurants = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT r.*, s.company_name as supplier_name, c.name as city_name
       FROM restaurants r
@@ -232,10 +259,29 @@ exports.getRestaurants = async (req, res) => {
       params.push(operatorId);
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT r.*, s.company_name as supplier_name, c.name as city_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY r.restaurant_name ASC';
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        restaurants: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching restaurants:', error);
     res.status(500).json({ error: 'Failed to fetch restaurants' });
@@ -409,6 +455,10 @@ exports.deleteRestaurant = async (req, res) => {
 exports.getEntranceFees = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT ef.*, s.company_name as supplier_name, c.name as city_name
       FROM entrance_fees ef
@@ -423,10 +473,29 @@ exports.getEntranceFees = async (req, res) => {
       params.push(operatorId);
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT ef.*, s.company_name as supplier_name, c.name as city_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY ef.site_name ASC';
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        entrance_fees: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching entrance fees:', error);
     res.status(500).json({ error: 'Failed to fetch entrance fees' });
@@ -599,6 +668,10 @@ exports.deleteEntranceFee = async (req, res) => {
 exports.getTourCompanies = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT tc.*, s.company_name as supplier_name
       FROM tour_companies tc
@@ -612,10 +685,29 @@ exports.getTourCompanies = async (req, res) => {
       params.push(operatorId);
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT tc.*, s.company_name as supplier_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY tc.company_name, tc.tour_name ASC';
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        tour_companies: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching tour companies:', error);
     res.status(500).json({ error: 'Failed to fetch tour companies' });
@@ -802,6 +894,10 @@ exports.deleteTourCompany = async (req, res) => {
 exports.getExtraExpenses = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT ee.*, s.company_name as supplier_name
       FROM extra_expenses ee
@@ -815,10 +911,29 @@ exports.getExtraExpenses = async (req, res) => {
       params.push(operatorId);
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT ee.*, s.company_name as supplier_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY ee.expense_name ASC';
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        extra_expenses: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching extra expenses:', error);
     res.status(500).json({ error: 'Failed to fetch extra expenses' });

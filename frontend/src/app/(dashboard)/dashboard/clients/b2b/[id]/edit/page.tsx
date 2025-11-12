@@ -194,7 +194,7 @@ export default function EditB2BClientPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {operators.map(op => (
+                        {operators.map((op: any) => (
                           <SelectItem key={op.id} value={op.id.toString()}>
                             {op.company_name}
                           </SelectItem>

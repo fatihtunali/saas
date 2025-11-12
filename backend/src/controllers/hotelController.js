@@ -12,6 +12,10 @@ const applyOperatorFilter = (req) => {
 exports.getHotels = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT h.*, s.company_name as supplier_name, c.name as city_name
       FROM hotels h
@@ -20,19 +24,40 @@ exports.getHotels = async (req, res) => {
       WHERE h.deleted_at IS NULL
     `;
     const params = [];
+    let paramCount = 0;
 
     if (operatorId) {
-      query += ' AND h.operator_id = $1';
+      paramCount++;
+      query += ` AND h.operator_id = $${paramCount}`;
       params.push(operatorId);
     }
 
+    // Count total records
+    const countQuery = query.replace('SELECT h.*, s.company_name as supplier_name, c.name as city_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
     query += ' ORDER BY h.hotel_name ASC';
+    query += ` LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+
+    res.json({
+      success: true,
+      data: {
+        hotels: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching hotels:', error);
-    res.status(500).json({ error: 'Failed to fetch hotels' });
+    res.status(500).json({ success: false, error: 'Failed to fetch hotels' });
   }
 };
 

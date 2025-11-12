@@ -34,7 +34,7 @@ export function useGuides(params?: QueryParams) {
       queryKey: ['guides', id],
       queryFn: async () => {
         const response = await guidesApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -77,8 +77,8 @@ export function useGuides(params?: QueryParams) {
   });
 
   return {
-    guides: guides?.data || [],
-    pagination: guides?.pagination,
+    guides: guides?.data?.guides || [],
+    pagination: guides?.data?.pagination,
     isLoading,
     error,
     refetch,

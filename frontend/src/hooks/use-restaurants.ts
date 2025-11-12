@@ -34,7 +34,7 @@ export function useRestaurants(params?: QueryParams) {
       queryKey: ['restaurants', id],
       queryFn: async () => {
         const response = await restaurantsApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -78,8 +78,8 @@ export function useRestaurants(params?: QueryParams) {
   });
 
   return {
-    restaurants: restaurants?.data || [],
-    pagination: restaurants?.pagination,
+    restaurants: restaurants?.data?.restaurants || [],
+    pagination: restaurants?.data?.pagination,
     isLoading,
     error,
     refetch,

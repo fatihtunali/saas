@@ -34,7 +34,7 @@ export function useVehicleTypes(params?: QueryParams) {
       queryKey: ['vehicle-types', id],
       queryFn: async () => {
         const response = await vehicleTypesApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -78,8 +78,8 @@ export function useVehicleTypes(params?: QueryParams) {
   });
 
   return {
-    vehicleTypes: vehicleTypes?.data || [],
-    pagination: vehicleTypes?.pagination,
+    vehicleTypes: vehicleTypes?.data?.vehicle_types || [],
+    pagination: vehicleTypes?.data?.pagination,
     isLoading,
     error,
     refetch,

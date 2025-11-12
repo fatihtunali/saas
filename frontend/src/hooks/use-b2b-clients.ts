@@ -29,7 +29,7 @@ export function useB2BClients(params?: QueryParams) {
       queryKey: ['b2b-clients', id],
       queryFn: async () => {
         const response = await b2bClientsApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -73,8 +73,8 @@ export function useB2BClients(params?: QueryParams) {
   });
 
   return {
-    b2bClients: b2bClients?.data || [],
-    pagination: b2bClients?.pagination,
+    b2bClients: b2bClients?.data?.b2b_clients || [],
+    pagination: b2bClients?.data?.pagination,
     isLoading,
     error,
     refetch,

@@ -12,6 +12,10 @@ const applyOperatorFilter = (req) => {
 exports.getSuppliers = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT s.*, c.name as city_name
       FROM suppliers s
@@ -25,10 +29,29 @@ exports.getSuppliers = async (req, res) => {
       params.push(operatorId);
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT s.*, c.name as city_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY s.company_name ASC';
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        suppliers: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching suppliers:', error);
     res.status(500).json({ error: 'Failed to fetch suppliers' });

@@ -34,7 +34,7 @@ export function useVehicleRentals(params?: QueryParams) {
       queryKey: ['vehicle-rentals', id],
       queryFn: async () => {
         const response = await vehicleRentalsApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -78,8 +78,8 @@ export function useVehicleRentals(params?: QueryParams) {
   });
 
   return {
-    vehicleRentals: vehicleRentals?.data || [],
-    pagination: vehicleRentals?.pagination,
+    vehicleRentals: vehicleRentals?.data?.vehicle_rentals || [],
+    pagination: vehicleRentals?.data?.pagination,
     isLoading,
     error,
     refetch,

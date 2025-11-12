@@ -12,6 +12,10 @@ const applyOperatorFilter = (req) => {
 exports.getVehicleCompanies = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT vc.*, s.company_name as supplier_name
       FROM vehicle_companies vc
@@ -25,10 +29,29 @@ exports.getVehicleCompanies = async (req, res) => {
       params.push(operatorId);
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT vc.*, s.company_name as supplier_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY vc.company_name ASC';
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        vehicle_companies: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching vehicle companies:', error);
     res.status(500).json({ error: 'Failed to fetch vehicle companies' });
@@ -188,6 +211,9 @@ exports.getVehicleTypes = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
     const { vehicle_company_id } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
 
     let query = `
       SELECT vt.*, vc.company_name as company_name
@@ -207,12 +233,32 @@ exports.getVehicleTypes = async (req, res) => {
     if (vehicle_company_id) {
       query += ` AND vt.vehicle_company_id = $${paramCounter}`;
       params.push(vehicle_company_id);
+      paramCounter++;
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT vt.*, vc.company_name as company_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY vt.vehicle_type ASC';
+    query += ` LIMIT $${paramCounter} OFFSET $${paramCounter + 1}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        vehicle_types: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching vehicle types:', error);
     res.status(500).json({ error: 'Failed to fetch vehicle types' });
@@ -355,6 +401,10 @@ exports.deleteVehicleType = async (req, res) => {
 exports.getTransferRoutes = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT tr.*,
              vc.company_name,
@@ -375,10 +425,29 @@ exports.getTransferRoutes = async (req, res) => {
       params.push(operatorId);
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT tr.*, vc.company_name, vt.vehicle_type, c1.name as from_city_name, c2.name as to_city_name', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY c1.name, c2.name ASC';
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        transfer_routes: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching transfer routes:', error);
     res.status(500).json({ error: 'Failed to fetch transfer routes' });
@@ -549,6 +618,10 @@ exports.deleteTransferRoute = async (req, res) => {
 exports.getVehicleRentals = async (req, res) => {
   try {
     const operatorId = applyOperatorFilter(req);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
     let query = `
       SELECT vr.*,
              vc.company_name,
@@ -565,10 +638,29 @@ exports.getVehicleRentals = async (req, res) => {
       params.push(operatorId);
     }
 
+    // Count query
+    const countQuery = query.replace('SELECT vr.*, vc.company_name, vt.vehicle_type', 'SELECT COUNT(*) as total');
+    const countResult = await db.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Add pagination to main query
     query += ' ORDER BY vc.company_name, vt.vehicle_type ASC';
+    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
 
     const result = await db.query(query, params);
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: {
+        vehicle_rentals: result.rows,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
   } catch (error) {
     console.error('Error fetching vehicle rentals:', error);
     res.status(500).json({ error: 'Failed to fetch vehicle rentals' });

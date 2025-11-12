@@ -34,7 +34,7 @@ export function useVehicleCompanies(params?: QueryParams) {
       queryKey: ['vehicle-companies', id],
       queryFn: async () => {
         const response = await vehicleCompaniesApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -78,8 +78,8 @@ export function useVehicleCompanies(params?: QueryParams) {
   });
 
   return {
-    vehicleCompanies: vehicleCompanies?.data || [],
-    pagination: vehicleCompanies?.pagination,
+    vehicleCompanies: vehicleCompanies?.data?.vehicle_companies || [],
+    pagination: vehicleCompanies?.data?.pagination,
     isLoading,
     error,
     refetch,

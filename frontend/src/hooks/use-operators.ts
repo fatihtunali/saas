@@ -29,7 +29,7 @@ export function useOperators(params?: QueryParams) {
       queryKey: ['operators', id],
       queryFn: async () => {
         const response = await operatorsApi.getById(id);
-        return response.data;
+        return response;
       },
       enabled: !!id,
     });
@@ -73,8 +73,8 @@ export function useOperators(params?: QueryParams) {
   });
 
   return {
-    operators: operators?.data || [],
-    pagination: operators?.pagination,
+    operators: operators?.data?.operators || [],
+    pagination: operators?.data?.pagination,
     isLoading,
     error,
     refetch,
