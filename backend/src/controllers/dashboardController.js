@@ -39,19 +39,19 @@ exports.getDashboardStats = async (req, res) => {
 
     // Get current month revenue
     const revenueQuery = operatorId
-      ? `SELECT COALESCE(SUM(total_price), 0) as total,
+      ? `SELECT COALESCE(SUM(total_selling_price), 0) as total,
                 COALESCE(SUM(CASE WHEN created_at >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
                                     AND created_at < DATE_TRUNC('month', CURRENT_DATE)
-                               THEN total_price ELSE 0 END), 0) as last_month_total
+                               THEN total_selling_price ELSE 0 END), 0) as last_month_total
          FROM bookings
          WHERE operator_id = $1
          AND deleted_at IS NULL
          AND status IN ('confirmed', 'completed')
          AND created_at >= DATE_TRUNC('month', CURRENT_DATE)`
-      : `SELECT COALESCE(SUM(total_price), 0) as total,
+      : `SELECT COALESCE(SUM(total_selling_price), 0) as total,
                 COALESCE(SUM(CASE WHEN created_at >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
                                     AND created_at < DATE_TRUNC('month', CURRENT_DATE)
-                               THEN total_price ELSE 0 END), 0) as last_month_total
+                               THEN total_selling_price ELSE 0 END), 0) as last_month_total
          FROM bookings
          WHERE deleted_at IS NULL
          AND status IN ('confirmed', 'completed')
@@ -173,7 +173,7 @@ exports.getRevenueChart = async (req, res) => {
     const revenueQuery = operatorId
       ? `SELECT
            TO_CHAR(created_at, $1) as period,
-           COALESCE(SUM(total_price), 0) as revenue,
+           COALESCE(SUM(total_selling_price), 0) as revenue,
            COUNT(*) as bookings_count
          FROM bookings
          WHERE operator_id = $2
@@ -184,7 +184,7 @@ exports.getRevenueChart = async (req, res) => {
          ORDER BY period ASC`
       : `SELECT
            TO_CHAR(created_at, $1) as period,
-           COALESCE(SUM(total_price), 0) as revenue,
+           COALESCE(SUM(total_selling_price), 0) as revenue,
            COUNT(*) as bookings_count
          FROM bookings
          WHERE deleted_at IS NULL
@@ -229,7 +229,7 @@ exports.getBookingsChart = async (req, res) => {
       ? `SELECT
            status,
            COUNT(*) as count,
-           COALESCE(SUM(total_price), 0) as total_value
+           COALESCE(SUM(total_selling_price), 0) as total_value
          FROM bookings
          WHERE operator_id = $1
          AND deleted_at IS NULL
@@ -238,7 +238,7 @@ exports.getBookingsChart = async (req, res) => {
       : `SELECT
            status,
            COUNT(*) as count,
-           COALESCE(SUM(total_price), 0) as total_value
+           COALESCE(SUM(total_selling_price), 0) as total_value
          FROM bookings
          WHERE deleted_at IS NULL
          GROUP BY status
@@ -285,14 +285,13 @@ exports.getRecentActivity = async (req, res) => {
         ? `SELECT
              b.id,
              b.booking_code,
-             b.tour_name,
              b.status,
-             b.total_price,
+             b.total_selling_price,
              b.created_at,
              COALESCE(oc.company_name, c.full_name) as customer_name
            FROM bookings b
-           LEFT JOIN operators_clients oc ON b.client_id = oc.id AND b.client_type = 'b2b'
-           LEFT JOIN clients c ON b.client_id = c.id AND b.client_type = 'b2c'
+           LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
+           LEFT JOIN clients c ON b.client_id = c.id
            WHERE b.operator_id = $1
            AND b.deleted_at IS NULL
            ORDER BY b.created_at DESC
@@ -300,14 +299,13 @@ exports.getRecentActivity = async (req, res) => {
         : `SELECT
              b.id,
              b.booking_code,
-             b.tour_name,
              b.status,
-             b.total_price,
+             b.total_selling_price,
              b.created_at,
              COALESCE(oc.company_name, c.full_name) as customer_name
            FROM bookings b
-           LEFT JOIN operators_clients oc ON b.client_id = oc.id AND b.client_type = 'b2b'
-           LEFT JOIN clients c ON b.client_id = c.id AND b.client_type = 'b2c'
+           LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
+           LEFT JOIN clients c ON b.client_id = c.id
            WHERE b.deleted_at IS NULL
            ORDER BY b.created_at DESC
            LIMIT $1`;
@@ -320,10 +318,10 @@ exports.getRecentActivity = async (req, res) => {
         id: row.id,
         type: 'bookings',
         bookingCode: row.booking_code,
-        tourName: row.tour_name,
+        tourName: null,
         customerName: row.customer_name,
         status: row.status,
-        amount: parseFloat(row.total_price),
+        amount: parseFloat(row.total_selling_price),
         timestamp: row.created_at,
       }));
     } else if (type === 'payments') {
@@ -339,8 +337,8 @@ exports.getRecentActivity = async (req, res) => {
              COALESCE(oc.company_name, c.full_name) as customer_name
            FROM client_payments cp
            LEFT JOIN bookings b ON cp.booking_id = b.id
-           LEFT JOIN operators_clients oc ON b.client_id = oc.id AND b.client_type = 'b2b'
-           LEFT JOIN clients c ON b.client_id = c.id AND b.client_type = 'b2c'
+           LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
+           LEFT JOIN clients c ON b.client_id = c.id
            WHERE cp.operator_id = $1
            AND cp.deleted_at IS NULL
            ORDER BY cp.payment_date DESC
@@ -356,8 +354,8 @@ exports.getRecentActivity = async (req, res) => {
              COALESCE(oc.company_name, c.full_name) as customer_name
            FROM client_payments cp
            LEFT JOIN bookings b ON cp.booking_id = b.id
-           LEFT JOIN operators_clients oc ON b.client_id = oc.id AND b.client_type = 'b2b'
-           LEFT JOIN clients c ON b.client_id = c.id AND b.client_type = 'b2c'
+           LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
+           LEFT JOIN clients c ON b.client_id = c.id
            WHERE cp.deleted_at IS NULL
            ORDER BY cp.payment_date DESC
            LIMIT $1`;
@@ -403,45 +401,43 @@ exports.getUpcomingTours = async (req, res) => {
       ? `SELECT
            b.id,
            b.booking_code,
-           b.tour_name,
-           b.start_date,
-           b.end_date,
+           b.travel_start_date,
+           b.travel_end_date,
            b.status,
-           b.total_price,
+           b.total_selling_price,
            COUNT(bp.id) as passenger_count,
            COALESCE(oc.company_name, c.full_name) as customer_name
          FROM bookings b
          LEFT JOIN booking_passengers bp ON b.id = bp.booking_id AND bp.deleted_at IS NULL
-         LEFT JOIN operators_clients oc ON b.client_id = oc.id AND b.client_type = 'b2b'
-         LEFT JOIN clients c ON b.client_id = c.id AND b.client_type = 'b2c'
+         LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
+         LEFT JOIN clients c ON b.client_id = c.id
          WHERE b.operator_id = $1
          AND b.deleted_at IS NULL
-         AND b.start_date >= CURRENT_DATE
-         AND b.status IN ('confirmed', 'pending')
-         GROUP BY b.id, b.booking_code, b.tour_name, b.start_date, b.end_date,
-                  b.status, b.total_price, oc.company_name, c.full_name
-         ORDER BY b.start_date ASC
+         AND b.travel_start_date >= CURRENT_DATE
+         AND b.status IN ('confirmed', 'quotation')
+         GROUP BY b.id, b.booking_code, b.travel_start_date, b.travel_end_date,
+                  b.status, b.total_selling_price, oc.company_name, c.full_name
+         ORDER BY b.travel_start_date ASC
          LIMIT $2`
       : `SELECT
            b.id,
            b.booking_code,
-           b.tour_name,
-           b.start_date,
-           b.end_date,
+           b.travel_start_date,
+           b.travel_end_date,
            b.status,
-           b.total_price,
+           b.total_selling_price,
            COUNT(bp.id) as passenger_count,
            COALESCE(oc.company_name, c.full_name) as customer_name
          FROM bookings b
          LEFT JOIN booking_passengers bp ON b.id = bp.booking_id AND bp.deleted_at IS NULL
-         LEFT JOIN operators_clients oc ON b.client_id = oc.id AND b.client_type = 'b2b'
-         LEFT JOIN clients c ON b.client_id = c.id AND b.client_type = 'b2c'
+         LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
+         LEFT JOIN clients c ON b.client_id = c.id
          WHERE b.deleted_at IS NULL
-         AND b.start_date >= CURRENT_DATE
-         AND b.status IN ('confirmed', 'pending')
-         GROUP BY b.id, b.booking_code, b.tour_name, b.start_date, b.end_date,
-                  b.status, b.total_price, oc.company_name, c.full_name
-         ORDER BY b.start_date ASC
+         AND b.travel_start_date >= CURRENT_DATE
+         AND b.status IN ('confirmed', 'quotation')
+         GROUP BY b.id, b.booking_code, b.travel_start_date, b.travel_end_date,
+                  b.status, b.total_selling_price, oc.company_name, c.full_name
+         ORDER BY b.travel_start_date ASC
          LIMIT $1`;
 
     const result = operatorId
@@ -451,13 +447,13 @@ exports.getUpcomingTours = async (req, res) => {
     const tours = result.rows.map(row => ({
       id: row.id,
       bookingCode: row.booking_code,
-      tourName: row.tour_name,
+      tourName: null,
       customerName: row.customer_name,
-      startDate: row.start_date,
-      endDate: row.end_date,
+      startDate: row.travel_start_date,
+      endDate: row.travel_end_date,
       status: row.status,
       passengerCount: parseInt(row.passenger_count),
-      totalPrice: parseFloat(row.total_price),
+      totalPrice: parseFloat(row.total_selling_price),
     }));
 
     res.json({
