@@ -97,7 +97,7 @@ exports.getRevenueReport = async (req, res) => {
     const [revenueData] = await pool.query(`
       SELECT
         DATE(b.created_at) as date,
-        b.booking_reference,
+        b.booking_code,
         CASE
           WHEN b.client_type = 'b2c' THEN c.full_name
           WHEN b.client_type = 'b2b' THEN oc.full_name
@@ -332,7 +332,7 @@ exports.getReceivablesAgingReport = async (req, res) => {
 
     const [receivablesData] = await pool.query(`
       SELECT
-        b.booking_reference,
+        b.booking_code,
         CASE
           WHEN b.client_type = 'b2c' THEN c.full_name
           WHEN b.client_type = 'b2b' THEN oc.full_name
@@ -416,7 +416,7 @@ exports.getPayablesAgingReport = async (req, res) => {
 
     const [payablesData] = await pool.query(`
       SELECT
-        b.booking_reference,
+        b.booking_code,
         s.name as supplier_name,
         sp.invoice_date,
         sp.due_date,
@@ -517,7 +517,7 @@ exports.getCommissionReport = async (req, res) => {
 
     const [commissionsData] = await pool.query(`
       SELECT
-        b.booking_reference,
+        b.booking_code,
         c.commission_type,
         CASE
           WHEN c.user_id IS NOT NULL THEN u.username
@@ -618,7 +618,7 @@ exports.getBookingsByDateReport = async (req, res) => {
     const [bookingsData] = await pool.query(`
       SELECT
         DATE(b.created_at) as booking_date,
-        b.booking_reference,
+        b.booking_code,
         CASE
           WHEN b.client_type = 'b2c' THEN c.full_name
           WHEN b.client_type = 'b2b' THEN oc.full_name
@@ -835,7 +835,7 @@ exports.getCancellationReport = async (req, res) => {
 
     const [cancellationsData] = await pool.query(`
       SELECT
-        b.booking_reference,
+        b.booking_code,
         CASE
           WHEN b.client_type = 'b2c' THEN c.full_name
           WHEN b.client_type = 'b2b' THEN oc.full_name
@@ -1454,7 +1454,7 @@ exports.getClientBookingHistoryReport = async (req, res) => {
       SELECT
         b.id,
         DATE(b.created_at) as booking_date,
-        b.booking_reference,
+        b.booking_code,
         b.start_date,
         b.destination,
         GROUP_CONCAT(DISTINCT bs.service_type) as services_used,
@@ -1524,7 +1524,7 @@ exports.getOutstandingBalancesReport = async (req, res) => {
           c.id as client_id,
           c.full_name as client_name,
           'b2c' as client_type,
-          b.booking_reference,
+          b.booking_code,
           b.created_at as invoice_date,
           b.start_date as due_date,
           DATEDIFF(NOW(), b.start_date) as days_outstanding,
@@ -1552,7 +1552,7 @@ exports.getOutstandingBalancesReport = async (req, res) => {
           oc.id as client_id,
           oc.full_name as client_name,
           'b2b' as client_type,
-          b.booking_reference,
+          b.booking_code,
           b.created_at as invoice_date,
           b.start_date as due_date,
           DATEDIFF(NOW(), b.start_date) as days_outstanding,
@@ -1597,7 +1597,7 @@ exports.getOutstandingBalancesReport = async (req, res) => {
         client_id: row.client_id,
         client_name: row.client_name,
         client_type: row.client_type,
-        booking_reference: row.booking_reference,
+        booking_code: row.booking_code,
         invoice_date: row.invoice_date,
         due_date: row.due_date,
         days_outstanding: daysOutstanding,

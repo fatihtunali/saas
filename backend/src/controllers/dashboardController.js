@@ -328,7 +328,7 @@ exports.getRecentActivity = async (req, res) => {
       const paymentsQuery = operatorId
         ? `SELECT
              cp.id,
-             cp.payment_code,
+             cp.payment_reference as payment_code,
              cp.amount,
              cp.payment_method,
              cp.status,
@@ -345,7 +345,7 @@ exports.getRecentActivity = async (req, res) => {
            LIMIT $2`
         : `SELECT
              cp.id,
-             cp.payment_code,
+             cp.payment_reference as payment_code,
              cp.amount,
              cp.payment_method,
              cp.status,
