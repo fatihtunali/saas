@@ -73,7 +73,8 @@ export function useB2BClients(params?: QueryParams) {
   });
 
   return {
-    b2bClients: b2bClients?.data?.b2b_clients || [],
+    // FIXED: Access transformed camelCase property
+    b2bClients: b2bClients?.data?.b2bClients || [],
     pagination: b2bClients?.data?.pagination,
     isLoading,
     error,
