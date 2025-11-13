@@ -150,23 +150,23 @@ exports.getRevenueChart = async (req, res) => {
     switch (period) {
       case 'daily':
         dateFormat = 'YYYY-MM-DD';
-        dateInterval = '1 day';
+        dateInterval = 'day';
         limit = 30;
         break;
       case 'weekly':
         dateFormat = 'IYYY-IW';
-        dateInterval = '1 week';
+        dateInterval = 'week';
         limit = 12;
         break;
       case 'yearly':
         dateFormat = 'YYYY';
-        dateInterval = '1 year';
+        dateInterval = 'year';
         limit = 5;
         break;
       case 'monthly':
       default:
         dateFormat = 'YYYY-MM';
-        dateInterval = '1 month';
+        dateInterval = 'month';
         limit = 12;
     }
 
@@ -288,7 +288,7 @@ exports.getRecentActivity = async (req, res) => {
              b.status,
              b.total_selling_price,
              b.created_at,
-             COALESCE(oc.company_name, c.full_name) as customer_name
+             COALESCE(oc.full_name, c.full_name) as customer_name
            FROM bookings b
            LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
            LEFT JOIN clients c ON b.client_id = c.id
@@ -302,7 +302,7 @@ exports.getRecentActivity = async (req, res) => {
              b.status,
              b.total_selling_price,
              b.created_at,
-             COALESCE(oc.company_name, c.full_name) as customer_name
+             COALESCE(oc.full_name, c.full_name) as customer_name
            FROM bookings b
            LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
            LEFT JOIN clients c ON b.client_id = c.id
@@ -334,7 +334,7 @@ exports.getRecentActivity = async (req, res) => {
              cp.status,
              cp.payment_date,
              b.booking_code,
-             COALESCE(oc.company_name, c.full_name) as customer_name
+             COALESCE(oc.full_name, c.full_name) as customer_name
            FROM client_payments cp
            LEFT JOIN bookings b ON cp.booking_id = b.id
            LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
@@ -351,7 +351,7 @@ exports.getRecentActivity = async (req, res) => {
              cp.status,
              cp.payment_date,
              b.booking_code,
-             COALESCE(oc.company_name, c.full_name) as customer_name
+             COALESCE(oc.full_name, c.full_name) as customer_name
            FROM client_payments cp
            LEFT JOIN bookings b ON cp.booking_id = b.id
            LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
@@ -406,7 +406,7 @@ exports.getUpcomingTours = async (req, res) => {
            b.status,
            b.total_selling_price,
            COUNT(bp.id) as passenger_count,
-           COALESCE(oc.company_name, c.full_name) as customer_name
+           COALESCE(oc.full_name, c.full_name) as customer_name
          FROM bookings b
          LEFT JOIN booking_passengers bp ON b.id = bp.booking_id AND bp.deleted_at IS NULL
          LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
@@ -416,7 +416,7 @@ exports.getUpcomingTours = async (req, res) => {
          AND b.travel_start_date >= CURRENT_DATE
          AND b.status IN ('confirmed', 'quotation')
          GROUP BY b.id, b.booking_code, b.travel_start_date, b.travel_end_date,
-                  b.status, b.total_selling_price, oc.company_name, c.full_name
+                  b.status, b.total_selling_price, oc.full_name, c.full_name
          ORDER BY b.travel_start_date ASC
          LIMIT $2`
       : `SELECT
@@ -427,7 +427,7 @@ exports.getUpcomingTours = async (req, res) => {
            b.status,
            b.total_selling_price,
            COUNT(bp.id) as passenger_count,
-           COALESCE(oc.company_name, c.full_name) as customer_name
+           COALESCE(oc.full_name, c.full_name) as customer_name
          FROM bookings b
          LEFT JOIN booking_passengers bp ON b.id = bp.booking_id AND bp.deleted_at IS NULL
          LEFT JOIN operators_clients oc ON b.operators_client_id = oc.id
@@ -436,7 +436,7 @@ exports.getUpcomingTours = async (req, res) => {
          AND b.travel_start_date >= CURRENT_DATE
          AND b.status IN ('confirmed', 'quotation')
          GROUP BY b.id, b.booking_code, b.travel_start_date, b.travel_end_date,
-                  b.status, b.total_selling_price, oc.company_name, c.full_name
+                  b.status, b.total_selling_price, oc.full_name, c.full_name
          ORDER BY b.travel_start_date ASC
          LIMIT $1`;
 
