@@ -232,7 +232,7 @@ const getEventColor = (type: TimelineEvent['type']) => {
   }
 };
 
-export default function TimelineTab({ bookingId }: TimelineTabProps) {
+export function TimelineTab({ bookingId }: TimelineTabProps) {
   const [filterType, setFilterType] = useState<string>('all');
   const { timeline, isLoading, error } = useBookingTimeline(bookingId, filterType);
 

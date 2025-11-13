@@ -33,6 +33,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
+  type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -298,7 +299,7 @@ export default function SecurityPage() {
 }
 
 interface InfoRowProps {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   label: string;
   value: React.ReactNode;
 }

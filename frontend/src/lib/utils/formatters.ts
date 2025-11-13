@@ -3,8 +3,8 @@
  */
 export function formatCurrency(
   amount: number,
-  currency: string = 'TRY',
-  locale: string = 'tr-TR'
+  currency: string = 'EUR',
+  locale: string = 'en-IE'
 ): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',

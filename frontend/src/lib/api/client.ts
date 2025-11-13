@@ -66,6 +66,31 @@ class ApiClient {
         'Content-Type': 'application/json',
       },
       timeout: 30000,
+      // Configure parameter serialization to handle arrays correctly for Express.js
+      paramsSerializer: {
+        serialize: (params) => {
+          const searchParams = new URLSearchParams();
+
+          Object.entries(params).forEach(([key, value]) => {
+            if (value === undefined || value === null) {
+              return; // Skip undefined/null values
+            }
+
+            if (Array.isArray(value)) {
+              // Send arrays as repeated parameters: ?status=DRAFT&status=CONFIRMED
+              value.forEach(item => {
+                if (item !== undefined && item !== null) {
+                  searchParams.append(key, String(item));
+                }
+              });
+            } else {
+              searchParams.append(key, String(value));
+            }
+          });
+
+          return searchParams.toString();
+        }
+      }
     });
 
     this.setupInterceptors();
@@ -85,10 +110,8 @@ class ApiClient {
           config.data = transformKeysToSnakeCase(config.data);
         }
 
-        // Transform query params to snake_case for backend
-        if (config.params && typeof config.params === 'object') {
-          config.params = transformKeysToSnakeCase(config.params);
-        }
+        // NOTE: Do NOT transform query params - backend bookingController expects camelCase params
+        // Leave query params as-is in camelCase (page, limit, sortBy, sortOrder, etc.)
 
         return config;
       },

@@ -79,7 +79,7 @@ const DEFAULT_CURRENCIES: Currency[] = [
 
 export function CurrencyInput({
   value,
-  currency = 'USD',
+  currency = 'EUR',
   onValueChange,
   onCurrencyChange,
   placeholder = '0.00',

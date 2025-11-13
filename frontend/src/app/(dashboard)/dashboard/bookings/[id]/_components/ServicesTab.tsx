@@ -44,8 +44,8 @@ import type { Booking, BookingService, ServiceType } from '@/types/bookings';
 import { VoucherQuickActions } from '@/components/features/vouchers';
 
 // Utility Functions
-function formatCurrency(amount: number, currency = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
+function formatCurrency(amount: number, currency = 'EUR'): string {
+  return new Intl.NumberFormat('en-IE', {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
@@ -284,7 +284,7 @@ interface ServicesTabProps {
   booking: Booking;
 }
 
-export default function ServicesTab({ bookingId, booking }: ServicesTabProps) {
+export function ServicesTab({ bookingId, booking }: ServicesTabProps) {
   const { data: services = [], isLoading } = useBookingServices(bookingId);
   const [selectedType, setSelectedType] = useState<ServiceType | 'all'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'type' | 'price'>('date');

@@ -32,14 +32,14 @@ export function MetricsSection() {
   const { data: stats, isLoading, error, refetch } = useStats();
 
   /**
-   * Format number as USD currency
+   * Format number as EUR currency
    * @param value - Number to format
-   * @returns Formatted currency string (e.g., "$124,503")
+   * @returns Formatted currency string (e.g., "€124,503")
    */
   const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IE', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'EUR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
@@ -56,7 +56,7 @@ export function MetricsSection() {
   // Loading state - show skeleton cards
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Bookings"
           value="0"
@@ -120,7 +120,7 @@ export function MetricsSection() {
 
   // Success state - show metrics
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Total Bookings Card */}
       <div
         onClick={() => handleCardClick('/dashboard/bookings')}

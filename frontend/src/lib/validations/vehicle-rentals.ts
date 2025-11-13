@@ -21,7 +21,7 @@ export const vehicleRentalSchema = z.object({
     .length(3, 'Currency code must be 3 characters')
     .toUpperCase()
     .optional()
-    .default('TRY'),
+    .default('EUR'),
   notes: z.string().optional(),
   is_active: z.boolean().default(true),
 });
@@ -29,7 +29,7 @@ export const vehicleRentalSchema = z.object({
 export type VehicleRentalFormData = z.infer<typeof vehicleRentalSchema>;
 
 export const defaultVehicleRentalValues: Partial<VehicleRentalFormData> = {
-  currency: 'TRY',
+  currency: 'EUR',
   notes: '',
   is_active: true,
 };

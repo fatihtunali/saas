@@ -78,7 +78,7 @@ export function useEntranceFees(params?: QueryParams) {
   });
 
   return {
-    entranceFees: entranceFees?.data?.entrance_fees || [],
+    entranceFees: entranceFees?.data?.entranceFees || [],
     pagination: entranceFees?.data?.pagination,
     isLoading,
     error,

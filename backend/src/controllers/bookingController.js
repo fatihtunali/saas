@@ -5,6 +5,31 @@ const applyOperatorFilter = (req) => {
   return req.user.role === 'super_admin' ? null : req.user.operator_id;
 };
 
+// Helper function to convert snake_case to camelCase
+const toCamelCase = (str) => {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+};
+
+// Transform database row to camelCase and fix field mappings
+const transformBooking = (row) => {
+  const transformed = {};
+  for (const key in row) {
+    transformed[toCamelCase(key)] = row[key];
+  }
+
+  // Map destination_city_name to destination
+  if (row.destination_city_name) {
+    transformed.destination = row.destination_city_name;
+  }
+
+  // Convert status to uppercase to match frontend enum
+  if (transformed.status) {
+    transformed.status = transformed.status.toUpperCase();
+  }
+
+  return transformed;
+};
+
 // ============================================
 // BOOKINGS (Main booking table - CRUD)
 // ============================================
@@ -23,13 +48,30 @@ exports.getBookings = async (req, res) => {
     const sortByParam = req.query.sortBy || 'createdAt';
     const sortOrder = req.query.sortOrder || 'desc';
 
+    // Debug log query params
+    console.log('Query params received:', JSON.stringify(req.query, null, 2));
+
+    // Status filters - can be arrays
+    const statusFilter = req.query.status ? (Array.isArray(req.query.status) ? req.query.status : [req.query.status]) : [];
+    console.log('Status filter:', statusFilter);
+    const paymentStatusFilter = req.query.paymentStatus ? (Array.isArray(req.query.paymentStatus) ? req.query.paymentStatus : [req.query.paymentStatus]) : [];
+    const clientTypeFilter = req.query.clientType ? (Array.isArray(req.query.clientType) ? req.query.clientType : [req.query.clientType]) : [];
+    const destinationFilter = req.query.destination ? (Array.isArray(req.query.destination) ? req.query.destination : [req.query.destination]) : [];
+
+    // Date range filters
+    const travelStartDate = req.query.travelStartDate;
+    const travelEndDate = req.query.travelEndDate;
+    const bookingStartDate = req.query.bookingStartDate;
+    const bookingEndDate = req.query.bookingEndDate;
+
     // Map camelCase to snake_case for database columns
     const sortByMap = {
       'createdAt': 'created_at',
       'updatedAt': 'updated_at',
       'bookingCode': 'booking_code',
       'travelStartDate': 'travel_start_date',
-      'totalCost': 'total_cost'
+      'totalCost': 'total_cost',
+      'totalSellingPrice': 'total_selling_price'
     };
     const sortBy = sortByMap[sortByParam] || 'created_at';
 
@@ -56,6 +98,68 @@ exports.getBookings = async (req, res) => {
       paramIndex++;
     }
 
+    // Status filter - use ILIKE with lowercase (avoids Turkish locale İ/i issues)
+    if (statusFilter.length > 0) {
+      const statusConditions = statusFilter.map((_, i) => `b.status ILIKE $${paramIndex + i}`).join(' OR ');
+      whereConditions.push(`(${statusConditions})`);
+      statusFilter.forEach(status => params.push(status.toLowerCase()));
+      paramIndex += statusFilter.length;
+    }
+
+    // Payment status filter - use ILIKE with lowercase
+    if (paymentStatusFilter.length > 0) {
+      const paymentConditions = paymentStatusFilter.map((_, i) => `b.payment_status ILIKE $${paramIndex + i}`).join(' OR ');
+      whereConditions.push(`(${paymentConditions})`);
+      paymentStatusFilter.forEach(status => params.push(status.toLowerCase()));
+      paramIndex += paymentStatusFilter.length;
+    }
+
+    // Client type filter
+    if (clientTypeFilter.length > 0) {
+      const clientTypePlaceholders = clientTypeFilter.map((_, i) => `$${paramIndex + i}`).join(', ');
+      whereConditions.push(`(
+        (c.client_type IN (${clientTypePlaceholders})) OR
+        (oc.client_type IN (${clientTypePlaceholders}))
+      )`);
+      clientTypeFilter.forEach(type => {
+        params.push(type);
+        params.push(type);
+      });
+      paramIndex += clientTypeFilter.length * 2;
+    }
+
+    // Destination filter
+    if (destinationFilter.length > 0) {
+      const destPlaceholders = destinationFilter.map((_, i) => `$${paramIndex + i}`).join(', ');
+      whereConditions.push(`ci.name IN (${destPlaceholders})`);
+      destinationFilter.forEach(dest => params.push(dest));
+      paramIndex += destinationFilter.length;
+    }
+
+    // Travel date range filter
+    if (travelStartDate) {
+      whereConditions.push(`b.travel_start_date >= $${paramIndex}`);
+      params.push(travelStartDate);
+      paramIndex++;
+    }
+    if (travelEndDate) {
+      whereConditions.push(`b.travel_end_date <= $${paramIndex}`);
+      params.push(travelEndDate);
+      paramIndex++;
+    }
+
+    // Booking date range filter
+    if (bookingStartDate) {
+      whereConditions.push(`b.created_at >= $${paramIndex}`);
+      params.push(bookingStartDate);
+      paramIndex++;
+    }
+    if (bookingEndDate) {
+      whereConditions.push(`b.created_at <= $${paramIndex}`);
+      params.push(bookingEndDate);
+      paramIndex++;
+    }
+
     const whereClause = whereConditions.join(' AND ');
 
     // Count total records
@@ -67,6 +171,9 @@ exports.getBookings = async (req, res) => {
       LEFT JOIN cities ci ON b.destination_city_id = ci.id
       WHERE ${whereClause}
     `;
+
+    console.log('Count query:', countQuery);
+    console.log('Count params:', params);
 
     const countResult = await db.query(countQuery, params);
     const total = parseInt(countResult.rows[0].total);
@@ -92,9 +199,17 @@ exports.getBookings = async (req, res) => {
 
     const result = await db.query(dataQuery, params);
 
+    // Transform rows to camelCase
+    const transformedData = result.rows.map(transformBooking);
+
+    console.log(`Found ${transformedData.length} bookings (total: ${total})`);
+    if (transformedData.length > 0) {
+      console.log('First booking:', JSON.stringify(transformedData[0], null, 2));
+    }
+
     // Return paginated response
     res.json({
-      data: result.rows,
+      data: transformedData,
       total,
       page,
       limit,

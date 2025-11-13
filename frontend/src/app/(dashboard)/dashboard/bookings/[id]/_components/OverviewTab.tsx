@@ -210,7 +210,7 @@ export function OverviewTab({ booking }: OverviewTabProps) {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">
-                  Markup ({booking.markupPercentage.toFixed(1)}%)
+                  Markup ({Number(booking.markupPercentage).toFixed(1)}%)
                 </p>
                 <p className="text-lg font-semibold text-green-600">
                   +{formatCurrency(booking.profitAmount)}

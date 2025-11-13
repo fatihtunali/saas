@@ -18,7 +18,7 @@ export const entranceFeeSchema = z.object({
     .length(3, 'Currency code must be 3 characters')
     .toUpperCase()
     .optional()
-    .default('TRY'),
+    .default('EUR'),
   opening_hours: z.string().max(255, 'Opening hours text is too long').optional(),
   best_visit_time: z.string().max(255, 'Best visit time text is too long').optional(),
   picture_url: z
@@ -37,7 +37,7 @@ export const defaultEntranceFeeValues: Partial<EntranceFeeFormData> = {
   site_name: '',
   opening_hours: '',
   best_visit_time: '',
-  currency: 'TRY',
+  currency: 'EUR',
   picture_url: '',
   notes: '',
   is_active: true,

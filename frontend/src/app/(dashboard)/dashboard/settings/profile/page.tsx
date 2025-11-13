@@ -23,7 +23,7 @@ import { useProfile, useUpdateProfile } from '@/lib/hooks/use-profile';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileUpdateSchema, type ProfileUpdateFormData } from '@/lib/validations/users';
-import { ArrowLeft, Loader2, User, Mail, Phone, Shield, Calendar, Building2 } from 'lucide-react';
+import { ArrowLeft, Loader2, User, Mail, Phone, Shield, Calendar, Building2, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -206,7 +206,7 @@ export default function ProfilePage() {
 }
 
 interface InfoItemProps {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   label: string;
   value: React.ReactNode;
   description?: string;

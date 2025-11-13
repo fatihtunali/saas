@@ -335,7 +335,7 @@ interface PassengersTabProps {
   bookingId: string;
 }
 
-export default function PassengersTab({ bookingId }: PassengersTabProps) {
+export function PassengersTab({ bookingId }: PassengersTabProps) {
   const { data: passengers = [], isLoading } = useBookingPassengers(bookingId);
 
   // Calculate statistics

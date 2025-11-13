@@ -12,13 +12,56 @@ import { z } from 'zod';
  * Meal plan options
  */
 export const MEAL_PLANS = [
-  { value: 'BB', label: 'BB - Bed & Breakfast' },
-  { value: 'HB', label: 'HB - Half Board' },
-  { value: 'FB', label: 'FB - Full Board' },
-  { value: 'AI', label: 'AI - All Inclusive' },
-  { value: 'UAI', label: 'UAI - Ultra All Inclusive' },
-  { value: 'RO', label: 'RO - Room Only' },
+  { value: 'bed_breakfast', label: 'BB - Bed & Breakfast' },
+  { value: 'half_board', label: 'HB - Half Board' },
+  { value: 'full_board', label: 'FB - Full Board' },
+  { value: 'all_inclusive', label: 'AI - All Inclusive' },
+  { value: 'room_only', label: 'RO - Room Only' },
 ] as const;
+
+/**
+ * Map abbreviations to database values (for backward compatibility)
+ */
+export const MEAL_PLAN_MAP: Record<string, string> = {
+  'BB': 'bed_breakfast',
+  'HB': 'half_board',
+  'FB': 'full_board',
+  'AI': 'all_inclusive',
+  'UAI': 'all_inclusive',
+  'RO': 'room_only',
+  // Also handle the full names
+  'bed_breakfast': 'bed_breakfast',
+  'half_board': 'half_board',
+  'full_board': 'full_board',
+  'all_inclusive': 'all_inclusive',
+  'room_only': 'room_only',
+};
+
+/**
+ * Map database values to display labels
+ */
+export const MEAL_PLAN_LABELS: Record<string, string> = {
+  'bed_breakfast': 'BB - Bed & Breakfast',
+  'half_board': 'HB - Half Board',
+  'full_board': 'FB - Full Board',
+  'all_inclusive': 'AI - All Inclusive',
+  'room_only': 'RO - Room Only',
+  // Handle old abbreviations for display
+  'BB': 'BB - Bed & Breakfast',
+  'HB': 'HB - Half Board',
+  'FB': 'FB - Full Board',
+  'AI': 'AI - All Inclusive',
+  'UAI': 'AI - All Inclusive',
+  'RO': 'RO - Room Only',
+};
+
+/**
+ * Format meal plan value for display
+ */
+export function formatMealPlan(value: string | null | undefined): string {
+  if (!value) return 'N/A';
+  return MEAL_PLAN_LABELS[value] || value;
+}
 
 /**
  * Star rating options

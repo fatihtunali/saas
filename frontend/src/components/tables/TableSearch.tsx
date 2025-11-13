@@ -49,7 +49,7 @@ export function TableSearch({
   className,
 }: TableSearchProps) {
   const [localValue, setLocalValue] = React.useState(value);
-  const debounceRef = React.useRef<NodeJS.Timeout>();
+  const debounceRef = React.useRef<NodeJS.Timeout | null>(null);
 
   React.useEffect(() => {
     setLocalValue(value);

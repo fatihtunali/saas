@@ -49,9 +49,9 @@ export function BookingsChart() {
    * Format currency for display
    */
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IE', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'EUR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
@@ -155,7 +155,11 @@ export function BookingsChart() {
    * Center label showing total bookings
    */
   const CenterLabel = ({ viewBox, total }: any) => {
-    const { cx, cy } = viewBox;
+    const { cx, cy } = viewBox || {};
+
+    // Return null if viewBox values are not available
+    if (!cx || !cy) return null;
+
     return (
       <g>
         <text
@@ -237,7 +241,7 @@ export function BookingsChart() {
                   className="hover:opacity-80 transition-opacity"
                 />
               ))}
-              <Label content={<CenterLabel total={data.totalBookings} />} position="center" />
+              <Label content={<CenterLabel total={data.total} />} position="center" />
             </Pie>
             <Tooltip content={<CustomTooltip />} />
             <Legend content={<CustomLegend />} />

@@ -38,6 +38,7 @@ import {
   Calendar,
   Shield,
   Building2,
+  type LucideIcon,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -276,7 +277,7 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
 }
 
 interface InfoItemProps {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   label: string;
   value: React.ReactNode;
 }

@@ -47,10 +47,10 @@ import type {
  */
 export async function getBookings(params: BookingsQueryParams): Promise<PaginatedBookings> {
   try {
-    const response = await apiClient.get<BookingsApiResponse<PaginatedBookings>>('/bookings', {
+    const response = await apiClient.get<PaginatedBookings>('/bookings', {
       params,
     });
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error fetching bookings:', error);
     throw error;
@@ -72,8 +72,7 @@ export async function getBookings(params: BookingsQueryParams): Promise<Paginate
  */
 export async function getBooking(id: string): Promise<Booking> {
   try {
-    const response = await apiClient.get<BookingsApiResponse<Booking>>(`/bookings/${id}`);
-    return response.data;
+    return await apiClient.get<Booking>(`/bookings/${id}`);
   } catch (error) {
     console.error(`Error fetching booking ${id}:`, error);
     throw error;

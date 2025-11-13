@@ -48,7 +48,7 @@ export function Step2TripDetails() {
       travelStartDate: new Date(),
       travelEndDate: new Date(),
       destinationCityId: 0,
-      currency: 'USD',
+      currency: 'EUR',
       tripType: 'Package' as const,
       bookingSource: 'Website' as const,
       emergencyContactName: '',

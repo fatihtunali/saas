@@ -45,8 +45,8 @@ import {
 import type { BookingPayment, Booking } from '@/types/bookings';
 
 // Utility Functions
-function formatCurrency(amount: number, currency = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
+function formatCurrency(amount: number, currency = 'EUR'): string {
+  return new Intl.NumberFormat('en-IE', {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
@@ -318,7 +318,7 @@ interface PaymentsTabProps {
   bookingId: string;
 }
 
-export default function PaymentsTab({ bookingId }: PaymentsTabProps) {
+export function PaymentsTab({ bookingId }: PaymentsTabProps) {
   const { data: booking } = useBooking(bookingId);
   const { data: payments = [], isLoading } = useBookingPayments(bookingId);
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);

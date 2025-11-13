@@ -56,7 +56,7 @@ export interface MetricsSectionProps {
 
 function MetricsSection({ children, className }: MetricsSectionProps) {
   return (
-    <div className={cn('grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4', className)}>
+    <div className={cn('w-full', className)}>
       {children}
     </div>
   );

@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Shield,
   Clock,
+  type LucideIcon,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -150,7 +151,7 @@ export default function SettingsPage() {
 }
 
 interface SettingCardProps {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   title: string;
   description: string;
   href: string;

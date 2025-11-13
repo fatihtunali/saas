@@ -78,7 +78,7 @@ export function useExtras(params?: QueryParams) {
   });
 
   return {
-    extras: extras?.data?.extra_expenses || [],
+    extras: extras?.data?.extraExpenses || [],
     pagination: extras?.data?.pagination,
     isLoading,
     error,

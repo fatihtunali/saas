@@ -94,8 +94,8 @@ const DESTINATIONS = [
 ];
 
 // Utility Functions
-function formatCurrency(amount: number, currency = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
+function formatCurrency(amount: number, currency = 'EUR'): string {
+  return new Intl.NumberFormat('en-IE', {
     style: 'currency',
     currency,
     minimumFractionDigits: 0,
@@ -1112,18 +1112,71 @@ export default function BookingsPage() {
           All
           {selectedStatus.length === 0 && ` (${totalCount})`}
         </Button>
-        {(['DRAFT', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] as BookingStatus[]).map(
-          status => (
-            <Button
-              key={status}
-              variant={selectedStatus.includes(status) ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => toggleStatusFilter(status)}
-            >
-              {status.replace('_', ' ')}
-            </Button>
-          )
-        )}
+        {/* DRAFT - Gray */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleStatusFilter('DRAFT')}
+          className={
+            selectedStatus.includes('DRAFT')
+              ? 'bg-slate-500 text-white border-slate-500 hover:bg-slate-600 hover:text-white'
+              : 'border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-700'
+          }
+        >
+          DRAFT
+        </Button>
+        {/* CONFIRMED - Blue */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleStatusFilter('CONFIRMED')}
+          className={
+            selectedStatus.includes('CONFIRMED')
+              ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:text-white'
+              : 'border-blue-300 text-blue-600 hover:bg-blue-50 hover:text-blue-700'
+          }
+        >
+          CONFIRMED
+        </Button>
+        {/* IN_PROGRESS - Yellow */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleStatusFilter('IN_PROGRESS')}
+          className={
+            selectedStatus.includes('IN_PROGRESS')
+              ? 'bg-amber-500 text-white border-amber-500 hover:bg-amber-600 hover:text-white'
+              : 'border-amber-300 text-amber-600 hover:bg-amber-50 hover:text-amber-700'
+          }
+        >
+          IN PROGRESS
+        </Button>
+        {/* COMPLETED - Green */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleStatusFilter('COMPLETED')}
+          className={
+            selectedStatus.includes('COMPLETED')
+              ? 'bg-green-500 text-white border-green-500 hover:bg-green-600 hover:text-white'
+              : 'border-green-300 text-green-600 hover:bg-green-50 hover:text-green-700'
+          }
+        >
+          COMPLETED
+        </Button>
+        {/* CANCELLED - Red */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleStatusFilter('CANCELLED')}
+          className={
+            selectedStatus.includes('CANCELLED')
+              ? 'bg-red-500 text-white border-red-500 hover:bg-red-600 hover:text-white'
+              : 'border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700'
+          }
+        >
+          CANCELLED
+        </Button>
         {hasActiveFilters && (
           <Button
             variant="ghost"

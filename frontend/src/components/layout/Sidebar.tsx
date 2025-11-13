@@ -19,6 +19,7 @@ import {
   TrendingDown,
   RefreshCw,
   Percent,
+  type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,7 @@ import { Button } from '@/components/ui/button';
 interface NavItem {
   title: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   badge?: string;
   children?: NavItem[];
 }

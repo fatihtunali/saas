@@ -33,10 +33,11 @@ export function CitySelector({
     const fetchCities = async () => {
       try {
         setLoading(true);
-        const data = await api.get<{ data: City[] }>('/cities');
-        setCities(data.data);
+        const data = await api.get<City[]>('/cities');
+        setCities(data || []);
       } catch (error) {
         console.error('Failed to load cities:', error);
+        setCities([]);
       } finally {
         setLoading(false);
       }
@@ -58,7 +59,7 @@ export function CitySelector({
         <SelectContent>
           {cities.map(city => (
             <SelectItem key={city.id} value={city.id.toString()}>
-              {city.city_name}
+              {city.name}
             </SelectItem>
           ))}
         </SelectContent>

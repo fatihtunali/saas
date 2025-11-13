@@ -77,7 +77,7 @@ export function AutoComplete<T = any>({
 }: AutoCompleteProps<T>) {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
-  const debounceRef = React.useRef<NodeJS.Timeout>();
+  const debounceRef = React.useRef<NodeJS.Timeout | null>(null);
 
   React.useEffect(() => {
     if (value) {

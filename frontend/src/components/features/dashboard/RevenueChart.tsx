@@ -48,6 +48,9 @@ export function RevenueChart() {
    */
   const formatDate = React.useCallback(
     (dateString: string) => {
+      // Handle undefined or null dateString
+      if (!dateString) return 'N/A';
+
       try {
         switch (period) {
           case 'daily':
@@ -70,7 +73,7 @@ export function RevenueChart() {
         }
       } catch (error) {
         console.error('Error formatting date:', error, dateString);
-        return dateString;
+        return dateString || 'N/A';
       }
     },
     [period]

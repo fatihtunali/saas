@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { UsersList } from '@/components/features/users';
 import { useUserStatistics } from '@/lib/hooks/use-users';
 import { useCanCreate } from '@/lib/hooks/use-permissions';
-import { Users, UserPlus, UserCheck, UserX, Shield } from 'lucide-react';
+import { Users, UserPlus, UserCheck, UserX, Shield, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -95,7 +95,7 @@ export default function UsersPage() {
 interface StatCardProps {
   title: string;
   value?: number;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   loading?: boolean;
   className?: string;
   description?: string;

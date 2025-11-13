@@ -160,7 +160,7 @@ const DocumentCard: React.FC<{ document: Document; onDelete: (id: string) => voi
   );
 };
 
-export default function DocumentsTab({ bookingId }: DocumentsTabProps) {
+export function DocumentsTab({ bookingId }: DocumentsTabProps) {
   const { documents, isLoading, error } = useBookingDocuments(bookingId);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [uploading, setUploading] = useState(false);
