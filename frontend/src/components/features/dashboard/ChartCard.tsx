@@ -76,7 +76,7 @@ export function ChartCard({
   className,
 }: ChartCardProps) {
   return (
-    <Card className={cn('', className)}>
+    <Card className={cn('min-h-[400px] flex flex-col', className)}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
@@ -106,7 +106,7 @@ export function ChartCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="flex-1">{children}</CardContent>
     </Card>
   );
 }

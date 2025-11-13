@@ -41,7 +41,7 @@ export interface DashboardGridProps {
  * Main dashboard grid container
  */
 export function DashboardGrid({ children, className }: DashboardGridProps) {
-  return <div className={cn('space-y-6', className)}>{children}</div>;
+  return <div className={cn('space-y-8', className)}>{children}</div>;
 }
 
 /**
@@ -56,7 +56,7 @@ export interface MetricsSectionProps {
 
 function MetricsSection({ children, className }: MetricsSectionProps) {
   return (
-    <div className={cn('grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4', className)}>
+    <div className={cn('grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4', className)}>
       {children}
     </div>
   );
@@ -73,7 +73,7 @@ export interface ChartsSectionProps {
 }
 
 function ChartsSection({ children, className }: ChartsSectionProps) {
-  return <div className={cn('grid grid-cols-1 gap-6 lg:grid-cols-2', className)}>{children}</div>;
+  return <div className={cn('grid grid-cols-1 gap-8 lg:grid-cols-2', className)}>{children}</div>;
 }
 
 /**
@@ -88,7 +88,7 @@ export interface BottomSectionProps {
 }
 
 function BottomSection({ children, className }: BottomSectionProps) {
-  return <div className={cn('grid grid-cols-1 gap-6 lg:grid-cols-3', className)}>{children}</div>;
+  return <div className={cn('grid grid-cols-1 gap-8 lg:grid-cols-3', className)}>{children}</div>;
 }
 
 /**

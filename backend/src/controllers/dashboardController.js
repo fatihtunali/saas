@@ -248,20 +248,24 @@ exports.getBookingsChart = async (req, res) => {
       ? await db.query(bookingsQuery, [operatorId])
       : await db.query(bookingsQuery);
 
+    // Calculate totals first
+    const totalBookings = result.rows.reduce((sum, row) => sum + parseInt(row.count), 0);
+    const totalValue = result.rows.reduce((sum, row) => sum + parseFloat(row.total_value), 0);
+
+    // Map with percentage calculation
     const statusBreakdown = result.rows.map(row => ({
       status: row.status,
       count: parseInt(row.count),
-      value: parseFloat(row.total_value),
+      percentage: totalBookings > 0 ? (parseInt(row.count) / totalBookings) * 100 : 0,
+      revenue: parseFloat(row.total_value),
     }));
-
-    const totalBookings = statusBreakdown.reduce((sum, item) => sum + item.count, 0);
-    const totalValue = statusBreakdown.reduce((sum, item) => sum + item.value, 0);
 
     res.json({
       statusBreakdown,
       totalBookings,
       totalValue,
       currency: 'USD',
+      lastUpdated: new Date().toISOString(),
     });
   } catch (error) {
     console.error('Error fetching bookings chart:', error);

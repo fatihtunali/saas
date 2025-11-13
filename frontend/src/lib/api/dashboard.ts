@@ -31,8 +31,8 @@ import type {
  */
 export async function getDashboardStats(): Promise<DashboardStats> {
   try {
-    const response = await apiClient.get<DashboardApiResponse<DashboardStats>>('/dashboard/stats');
-    return response.data;
+    const response = await apiClient.get<DashboardStats>('/dashboard/stats');
+    return response;
   } catch (error) {
     console.error('Failed to fetch dashboard stats:', error);
     throw error;
@@ -56,10 +56,8 @@ export async function getRevenueChart(
   period: 'daily' | 'weekly' | 'monthly' | 'yearly'
 ): Promise<RevenueChartData> {
   try {
-    const response = await apiClient.get<DashboardApiResponse<RevenueChartData>>(
-      `/dashboard/revenue?period=${period}`
-    );
-    return response.data;
+    const response = await apiClient.get<RevenueChartData>(`/dashboard/revenue?period=${period}`);
+    return response;
   } catch (error) {
     console.error(`Failed to fetch revenue chart for period ${period}:`, error);
     throw error;
@@ -80,9 +78,8 @@ export async function getRevenueChart(
  */
 export async function getBookingsChart(): Promise<BookingsChartData> {
   try {
-    const response =
-      await apiClient.get<DashboardApiResponse<BookingsChartData>>('/dashboard/bookings');
-    return response.data;
+    const response = await apiClient.get<BookingsChartData>('/dashboard/bookings');
+    return response;
   } catch (error) {
     console.error('Failed to fetch bookings chart:', error);
     throw error;
@@ -112,10 +109,10 @@ export async function getRecentActivity(
   limit: number = 10
 ): Promise<RecentActivityData> {
   try {
-    const response = await apiClient.get<DashboardApiResponse<RecentActivityData>>(
+    const response = await apiClient.get<RecentActivityData>(
       `/dashboard/activity?type=${type}&limit=${limit}`
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error(`Failed to fetch recent activity for type ${type}:`, error);
     throw error;
@@ -139,10 +136,10 @@ export async function getRecentActivity(
  */
 export async function getUpcomingTours(limit: number = 5): Promise<UpcomingToursData> {
   try {
-    const response = await apiClient.get<DashboardApiResponse<UpcomingToursData>>(
+    const response = await apiClient.get<UpcomingToursData>(
       `/dashboard/upcoming-tours?limit=${limit}`
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Failed to fetch upcoming tours:', error);
     throw error;
@@ -167,10 +164,10 @@ export async function getUpcomingTours(limit: number = 5): Promise<UpcomingTours
  */
 export async function searchGlobal(query: string): Promise<GlobalSearchData> {
   try {
-    const response = await apiClient.get<DashboardApiResponse<GlobalSearchData>>(
+    const response = await apiClient.get<GlobalSearchData>(
       `/search?q=${encodeURIComponent(query)}&types=bookings,clients,quotations&limit=5`
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error(`Failed to search for "${query}":`, error);
     throw error;

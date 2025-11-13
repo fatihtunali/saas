@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Label } from 'recharts';
 import { useRouter } from 'next/navigation';
 import { ChartCard } from '@/components/features/dashboard/ChartCard';
 import { useBookingsChart } from '@/lib/hooks/useDashboard';
@@ -113,18 +113,20 @@ export function BookingsChart() {
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Count:{' '}
-          <span className="font-semibold text-gray-900 dark:text-gray-100">{data.count}</span>
+          <span className="font-semibold text-gray-900 dark:text-gray-100">{data.count || 0}</span>
         </p>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Percentage:{' '}
-          <span className="font-semibold text-gray-900 dark:text-gray-100">
-            {data.percentage.toFixed(1)}%
-          </span>
-        </p>
+        {data.percentage !== undefined && (
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Percentage:{' '}
+            <span className="font-semibold text-gray-900 dark:text-gray-100">
+              {data.percentage.toFixed(1)}%
+            </span>
+          </p>
+        )}
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Revenue:{' '}
           <span className="font-semibold text-gray-900 dark:text-gray-100">
-            {formatCurrency(data.revenue)}
+            {formatCurrency(data.revenue || 0)}
           </span>
         </p>
       </div>
@@ -235,7 +237,7 @@ export function BookingsChart() {
                   className="hover:opacity-80 transition-opacity"
                 />
               ))}
-              <CenterLabel viewBox={{ cx: '50%', cy: '50%' }} total={data.total} />
+              <Label content={<CenterLabel total={data.totalBookings} />} position="center" />
             </Pie>
             <Tooltip content={<CustomTooltip />} />
             <Legend content={<CustomLegend />} />

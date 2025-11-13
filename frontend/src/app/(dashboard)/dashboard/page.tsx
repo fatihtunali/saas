@@ -16,14 +16,14 @@ import { GlobalSearch } from '@/components/features/dashboard/GlobalSearch';
  */
 export default function DashboardPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-8">
       {/* Global Search Dialog - Accessible via Cmd+K or Ctrl+K */}
       <GlobalSearch />
 
       {/* Page Header */}
-      <div>
+      <div className="space-y-2">
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-gray-600">Welcome to your Tour Operations dashboard</p>
+        <p className="text-gray-600">Welcome to your Tour Operations dashboard</p>
       </div>
 
       {/* Dashboard Grid Layout */}

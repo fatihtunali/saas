@@ -48,18 +48,29 @@ export function RevenueChart() {
    */
   const formatDate = React.useCallback(
     (dateString: string) => {
-      const date = new Date(dateString);
-      switch (period) {
-        case 'daily':
-          return format(date, 'MMM dd');
-        case 'weekly':
-          return format(date, 'MMM dd');
-        case 'monthly':
-          return format(date, 'MMM yyyy');
-        case 'yearly':
-          return format(date, 'yyyy');
-        default:
-          return format(date, 'MMM dd');
+      try {
+        switch (period) {
+          case 'daily':
+            const dailyDate = new Date(dateString);
+            return format(dailyDate, 'MMM dd');
+          case 'weekly':
+            const weeklyDate = new Date(dateString);
+            return format(weeklyDate, 'MMM dd');
+          case 'monthly':
+            // Backend returns "YYYY-MM" format, convert to first day of month
+            const [year, month] = dateString.split('-');
+            const monthlyDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+            return format(monthlyDate, 'MMM yyyy');
+          case 'yearly':
+            // Backend returns "YYYY" format
+            return dateString;
+          default:
+            const defaultDate = new Date(dateString);
+            return format(defaultDate, 'MMM dd');
+        }
+      } catch (error) {
+        console.error('Error formatting date:', error, dateString);
+        return dateString;
       }
     },
     [period]
@@ -196,7 +207,7 @@ export function RevenueChart() {
       )}
 
       {/* Chart */}
-      {!isLoading && !error && data && data.data.length > 0 && (
+      {!isLoading && !error && data && data.data && data.data.length > 0 && (
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data.data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <defs>
