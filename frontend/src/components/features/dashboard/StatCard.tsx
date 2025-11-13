@@ -76,11 +76,11 @@ export function StatCard({
 
   return (
     <Card className={cn('', className)}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {Icon && <Icon className={cn('h-4 w-4', variantColors[variant])} />}
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
         {isLoading ? (
           <div className="py-4">
             <LoadingSpinner size="sm" />
@@ -88,9 +88,9 @@ export function StatCard({
         ) : (
           <>
             <div className="text-2xl font-bold">{value}</div>
-            {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
+            {description && <p className="text-xs text-muted-foreground">{description}</p>}
             {change !== undefined && (
-              <div className="flex items-center text-xs mt-2">
+              <div className="flex items-center text-xs">
                 {isPositiveChange && (
                   <>
                     <TrendingUp className="mr-1 h-3 w-3 text-green-600" />
