@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -9,18 +9,31 @@ import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, _hasHydrated } = useAuthStore();
+  const [isReady, setIsReady] = useState(false);
 
-  // Protect the dashboard - redirect to login if not authenticated
+  // Wait for hydration before checking auth
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, router]);
+    if (_hasHydrated) {
+      setIsReady(true);
 
-  // Don't render dashboard if not authenticated
-  if (!isAuthenticated) {
-    return null;
+      // Only redirect after hydration is complete
+      if (!isAuthenticated) {
+        router.push('/login');
+      }
+    }
+  }, [_hasHydrated, isAuthenticated, router]);
+
+  // Show nothing while hydrating or redirecting
+  if (!isReady || !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

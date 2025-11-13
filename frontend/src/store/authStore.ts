@@ -15,6 +15,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  _hasHydrated: boolean; // Track hydration state
 
   // Actions
   setUser: (user: User) => void;
@@ -22,19 +23,21 @@ interface AuthState {
   login: (user: User, token: string) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
+  setHasHydrated: (hasHydrated: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    set => ({
       user: null,
       token: null,
       isAuthenticated: false,
       isLoading: false,
+      _hasHydrated: false,
 
-      setUser: (user) => set({ user, isAuthenticated: true }),
+      setUser: user => set({ user, isAuthenticated: true }),
 
-      setToken: (token) => set({ token }),
+      setToken: token => set({ token }),
 
       login: (user, token) => {
         // Store token in localStorage for API client
@@ -53,16 +56,22 @@ export const useAuthStore = create<AuthState>()(
         set({ user: null, token: null, isAuthenticated: false });
       },
 
-      setLoading: (loading) => set({ isLoading: loading }),
+      setLoading: loading => set({ isLoading: loading }),
+
+      setHasHydrated: hasHydrated => set({ _hasHydrated: hasHydrated }),
     }),
     {
       name: 'auth-storage',
       // Only persist user and token
-      partialize: (state) => ({
+      partialize: state => ({
         user: state.user,
         token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => state => {
+        // Mark as hydrated when complete
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

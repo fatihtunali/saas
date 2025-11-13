@@ -1,9 +1,59 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
+}
+
+// Helper function to convert snake_case to camelCase
+function toCamelCase(str: string): string {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+// Helper function to convert camelCase to snake_case
+function toSnakeCase(str: string): string {
+  return str.replace(/[A-Z]/g, letter => '_' + letter.toLowerCase());
+}
+
+// Recursively transform object keys from snake_case to camelCase
+function transformKeysToCamelCase(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => transformKeysToCamelCase(item));
+  }
+
+  if (typeof obj === 'object' && obj.constructor === Object) {
+    const transformed: any = {};
+    Object.keys(obj).forEach(key => {
+      const camelKey = toCamelCase(key);
+      transformed[camelKey] = transformKeysToCamelCase(obj[key]);
+    });
+    return transformed;
+  }
+
+  return obj;
+}
+
+// Recursively transform object keys from camelCase to snake_case
+function transformKeysToSnakeCase(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => transformKeysToSnakeCase(item));
+  }
+
+  if (typeof obj === 'object' && obj.constructor === Object) {
+    const transformed: any = {};
+    Object.keys(obj).forEach(key => {
+      const snakeKey = toSnakeCase(key);
+      transformed[snakeKey] = transformKeysToSnakeCase(obj[key]);
+    });
+    return transformed;
+  }
+
+  return obj;
 }
 
 class ApiClient {
@@ -22,13 +72,24 @@ class ApiClient {
   }
 
   private setupInterceptors() {
-    // Request interceptor - Add auth token to requests
+    // Request interceptor - Add auth token and transform to snake_case
     this.client.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
         const token = this.getToken();
         if (token && config.headers) {
-          config.headers.Authorization = `Bearer ${token}`;
+          config.headers.Authorization = 'Bearer ' + token;
         }
+
+        // Transform request body to snake_case for backend
+        if (config.data && typeof config.data === 'object') {
+          config.data = transformKeysToSnakeCase(config.data);
+        }
+
+        // Transform query params to snake_case for backend
+        if (config.params && typeof config.params === 'object') {
+          config.params = transformKeysToSnakeCase(config.params);
+        }
+
         return config;
       },
       (error: AxiosError) => {
@@ -36,9 +97,15 @@ class ApiClient {
       }
     );
 
-    // Response interceptor - Handle errors and token refresh
+    // Response interceptor - Handle errors, token refresh, and transform to camelCase
     this.client.interceptors.response.use(
-      response => response,
+      (response: AxiosResponse) => {
+        // Transform response data from snake_case to camelCase for frontend
+        if (response.data && typeof response.data === 'object') {
+          response.data = transformKeysToCamelCase(response.data);
+        }
+        return response;
+      },
       async (error: AxiosError) => {
         const originalRequest = error.config as CustomAxiosRequestConfig;
 
@@ -59,7 +126,7 @@ class ApiClient {
 
               // Retry original request with new token
               if (originalRequest.headers) {
-                originalRequest.headers.Authorization = `Bearer ${token}`;
+                originalRequest.headers.Authorization = 'Bearer ' + token;
               }
               return this.client(originalRequest);
             }

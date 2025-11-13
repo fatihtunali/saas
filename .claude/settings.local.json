@@ -35,7 +35,9 @@
       "Bash(npx next lint:*)",
       "mcp__ide__getDiagnostics",
       "Bash(node -e:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(ssh:*)"
     ],
     "deny": [],
     "ask": []
