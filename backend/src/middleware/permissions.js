@@ -31,6 +31,17 @@ const PERMISSIONS_MATRIX = {
     users: ['view', 'create', 'edit', 'delete', 'export'],
     settings: ['view', 'create', 'edit', 'delete', 'export']
   },
+  operator: {
+    dashboard: ['view'],
+    bookings: ['view', 'create', 'edit'],
+    services: ['view'],
+    clients: ['view', 'create'],
+    payments: ['view'],
+    reports: ['view'],
+    operations: ['view'],
+    users: [],
+    settings: []
+  },
   operations_manager: {
     dashboard: ['view', 'create', 'export'],
     bookings: ['view', 'create', 'edit', 'delete', 'export'],
