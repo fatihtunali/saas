@@ -1,16 +1,109 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
+/**
+ * Tailwind 4 CSS-based configuration
+ * Using @theme directive instead of tailwind.config.js
+ */
+
+@theme {
+  /* Font Family */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Ocean Blue - Primary (Trust, Professionalism) */
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c4a6e;
+  --color-primary-950: #082f49;
+
+  /* Turquoise - Secondary (Travel, Adventure) */
+  --color-secondary-50: #f0fdfa;
+  --color-secondary-100: #ccfbf1;
+  --color-secondary-200: #99f6e4;
+  --color-secondary-300: #5eead4;
+  --color-secondary-400: #2dd4bf;
+  --color-secondary-500: #14b8a6;
+  --color-secondary-600: #0d9488;
+  --color-secondary-700: #0f766e;
+  --color-secondary-800: #115e59;
+  --color-secondary-900: #134e4a;
+  --color-secondary-950: #042f2e;
+
+  /* Coral - Accent (Energy, Sunsets) */
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-200: #fed7aa;
+  --color-accent-300: #fdba74;
+  --color-accent-400: #fb923c;
+  --color-accent-500: #f97316;
+  --color-accent-600: #ea580c;
+  --color-accent-700: #c2410c;
+  --color-accent-800: #9a3412;
+  --color-accent-900: #7c2d12;
+  --color-accent-950: #431407;
+
+  /* Success - Fresh Green */
+  --color-success-50: #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-200: #bbf7d0;
+  --color-success-300: #86efac;
+  --color-success-400: #4ade80;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+  --color-success-800: #166534;
+  --color-success-900: #14532d;
+  --color-success-950: #052e16;
+
+  /* Warning */
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+  --color-warning-950: #451a03;
+
+  /* Error/Destructive */
+  --color-error-50: #fef2f2;
+  --color-error-100: #fee2e2;
+  --color-error-200: #fecaca;
+  --color-error-300: #fca5a5;
+  --color-error-400: #f87171;
+  --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
+  --color-error-700: #b91c1c;
+  --color-error-800: #991b1b;
+  --color-error-900: #7f1d1d;
+  --color-error-950: #450a0a;
+
+  /* Border radius */
+  --radius: 0.5rem;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/**
+ * Design system CSS variables for component theming
+ */
 @layer base {
   :root {
-    /* Tourism-Themed Professional Color Palette */
-
-    /* Backgrounds - Soft, inviting */
+    /* Backgrounds */
     --background: 210 20% 98%;
     --foreground: 210 24% 16%;
 
-    /* Cards - Clean white with subtle shadow */
+    /* Cards */
     --card: 0 0% 100%;
     --card-foreground: 210 24% 16%;
 
@@ -18,27 +111,27 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 24% 16%;
 
-    /* Primary - Deep Ocean Blue (Trust, Professionalism) */
+    /* Primary - Ocean Blue */
     --primary: 199 89% 48%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Turquoise (Travel, Adventure) */
+    /* Secondary - Turquoise */
     --secondary: 172 66% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Muted - Subtle backgrounds */
+    /* Muted */
     --muted: 210 20% 95%;
     --muted-foreground: 210 12% 40%;
 
-    /* Accent - Warm Coral (Energy, Sunsets) */
+    /* Accent - Coral */
     --accent: 24 95% 53%;
     --accent-foreground: 0 0% 100%;
 
-    /* Destructive - Warm red */
+    /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Fresh Green (Nature, Confirmation) */
+    /* Success */
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
 
@@ -46,51 +139,37 @@
     --border: 210 20% 88%;
     --input: 210 20% 88%;
     --ring: 199 89% 48%;
-
-    /* Border radius - Slightly more rounded for modern feel */
-    --radius: 0.5rem;
   }
 
   .dark {
-    /* Dark Mode - Professional tourism theme */
-
-    /* Backgrounds - Deep blue-gray */
+    /* Dark Mode */
     --background: 210 30% 8%;
     --foreground: 210 20% 96%;
 
-    /* Cards - Elevated surfaces */
     --card: 210 25% 12%;
     --card-foreground: 210 20% 96%;
 
-    /* Popovers */
     --popover: 210 25% 12%;
     --popover-foreground: 210 20% 96%;
 
-    /* Primary - Bright Ocean Blue */
     --primary: 199 89% 58%;
     --primary-foreground: 210 30% 8%;
 
-    /* Secondary - Bright Turquoise */
     --secondary: 172 66% 55%;
     --secondary-foreground: 210 30% 8%;
 
-    /* Muted */
     --muted: 210 25% 16%;
     --muted-foreground: 210 15% 65%;
 
-    /* Accent - Vibrant Coral */
     --accent: 24 95% 58%;
     --accent-foreground: 210 30% 8%;
 
-    /* Destructive */
     --destructive: 0 72% 50%;
     --destructive-foreground: 210 20% 96%;
 
-    /* Success */
     --success: 142 71% 50%;
     --success-foreground: 210 30% 8%;
 
-    /* Borders & Inputs */
     --border: 210 25% 20%;
     --input: 210 25% 20%;
     --ring: 199 89% 58%;
