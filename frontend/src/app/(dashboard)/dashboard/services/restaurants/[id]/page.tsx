@@ -88,7 +88,7 @@ export default function RestaurantDetailsPage() {
     );
   }
 
-  const cuisineTypes = parseCuisineTypes(restaurant.cuisine_type);
+  const cuisineTypes = parseCuisineTypes(restaurant.cuisineType);
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -100,8 +100,8 @@ export default function RestaurantDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{restaurant.restaurant_name}</h1>
-              <StatusBadge status={restaurant.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{restaurant.restaurantName}</h1>
+              <StatusBadge status={restaurant.isActive ? 'Active' : 'Inactive'} />
             </div>
             {cuisineTypes.length > 0 && (
               <div className="flex gap-2 mt-2">
@@ -134,12 +134,12 @@ export default function RestaurantDetailsPage() {
       </div>
 
       {/* Restaurant Image */}
-      {restaurant.picture_url && (
+      {restaurant.pictureUrl && (
         <Card>
           <CardContent className="p-0">
             <img
-              src={restaurant.picture_url}
-              alt={restaurant.restaurant_name}
+              src={restaurant.pictureUrl}
+              alt={restaurant.restaurantName}
               className="w-full h-80 object-cover rounded-lg"
             />
           </CardContent>
@@ -158,7 +158,7 @@ export default function RestaurantDetailsPage() {
               <div>
                 <p className="font-medium">Location</p>
                 <p className="text-sm text-muted-foreground">
-                  {restaurant.city?.city_name || 'N/A'}
+                  {restaurant.cityName || 'N/A'}
                 </p>
                 {restaurant.address && (
                   <p className="text-sm text-muted-foreground mt-1">{restaurant.address}</p>
@@ -212,24 +212,24 @@ export default function RestaurantDetailsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {restaurant.lunch_price && (
+                {restaurant.lunchPrice && (
                   <TableRow>
                     <TableCell className="font-medium">Lunch</TableCell>
                     <TableCell className="text-right">
-                      {parseFloat(restaurant.lunch_price).toFixed(2)} {restaurant.currency || 'TRY'}
+                      {Number(restaurant.lunchPrice || 0).toFixed(2)} {restaurant.currency || 'TRY'}
                     </TableCell>
                   </TableRow>
                 )}
-                {restaurant.dinner_price && (
+                {restaurant.dinnerPrice && (
                   <TableRow>
                     <TableCell className="font-medium">Dinner</TableCell>
                     <TableCell className="text-right">
-                      {parseFloat(restaurant.dinner_price).toFixed(2)}{' '}
+                      {Number(restaurant.dinnerPrice || 0).toFixed(2)}{' '}
                       {restaurant.currency || 'TRY'}
                     </TableCell>
                   </TableRow>
                 )}
-                {!restaurant.lunch_price && !restaurant.dinner_price && (
+                {!restaurant.lunchPrice && !restaurant.dinnerPrice && (
                   <TableRow>
                     <TableCell colSpan={2} className="text-center text-muted-foreground">
                       No pricing information available
@@ -243,7 +243,7 @@ export default function RestaurantDetailsPage() {
       </div>
 
       {/* Menu Options */}
-      {restaurant.menu_options && (
+      {restaurant.menuOptions && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -252,7 +252,7 @@ export default function RestaurantDetailsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm whitespace-pre-wrap">{restaurant.menu_options}</p>
+            <p className="text-sm whitespace-pre-wrap">{restaurant.menuOptions}</p>
           </CardContent>
         </Card>
       )}

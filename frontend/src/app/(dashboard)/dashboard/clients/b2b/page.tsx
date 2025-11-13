@@ -35,13 +35,13 @@ export default function B2BClientsPage() {
 
   const columns: ColumnDef<B2BClient>[] = [
     {
-      accessorKey: 'full_name',
+      accessorKey: 'fullName',
       header: 'Full Name',
     },
     {
-      accessorKey: 'partner_company_name',
+      accessorKey: 'partnerCompanyName',
       header: 'Partner Company',
-      cell: ({ row }) => row.original.partner_company_name || '-',
+      cell: ({ row }) => row.original.partnerCompanyName || '-',
     },
     {
       accessorKey: 'email',
@@ -54,16 +54,16 @@ export default function B2BClientsPage() {
       cell: ({ row }) => row.original.phone || '-',
     },
     {
-      accessorKey: 'credit_limit',
+      accessorKey: 'creditLimit',
       header: 'Credit Status',
       cell: ({ row }) => {
-        const { credit_limit, credit_used } = row.original;
-        if (!credit_limit) return '-';
-        const usage = (credit_used / credit_limit) * 100;
+        const { creditLimit, creditUsed } = row.original;
+        if (!creditLimit) return '-';
+        const usage = (creditUsed / creditLimit) * 100;
         return (
           <div className="flex items-center gap-2">
             <span className="text-sm">
-              {credit_used.toFixed(0)} / {credit_limit.toFixed(0)}
+              {creditUsed.toFixed(0)} / {creditLimit.toFixed(0)}
             </span>
             {usage > 90 && <AlertCircle className="h-4 w-4 text-red-500" />}
           </div>
@@ -71,9 +71,9 @@ export default function B2BClientsPage() {
       },
     },
     {
-      accessorKey: 'is_active',
+      accessorKey: 'isActive',
       header: 'Status',
-      cell: ({ row }) => <StatusBadge status={row.original.is_active ? 'Active' : 'Inactive'} />,
+      cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'Active' : 'Inactive'} />,
     },
     {
       id: 'actions',

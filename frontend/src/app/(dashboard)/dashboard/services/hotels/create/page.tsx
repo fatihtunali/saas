@@ -53,25 +53,17 @@ export default function CreateHotelPage() {
     try {
       // Convert empty strings to undefined for optional fields
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || undefined,
-        star_rating: data.star_rating || undefined,
         address: data.address || undefined,
-        phone: data.phone || undefined,
-        email: data.email || undefined,
-        website: data.website || undefined,
-        price_per_person_double: data.price_per_person_double || undefined,
-        single_supplement: data.single_supplement || undefined,
-        price_per_person_triple: data.price_per_person_triple || undefined,
-        child_price_0_2: data.child_price_0_2 || undefined,
-        child_price_3_5: data.child_price_3_5 || undefined,
-        child_price_6_11: data.child_price_6_11 || undefined,
+        cityId: data.city_id,
         currency: data.currency || undefined,
-        meal_plan: data.meal_plan || undefined,
-        meal_plan_supplement: data.meal_plan_supplement || undefined,
-        facilities: data.facilities || undefined,
-        picture_url: data.picture_url || undefined,
+        email: data.email || undefined,
+        hotelName: data.hotel_name,
+        isActive: data.is_active,
         notes: data.notes || undefined,
+        phone: data.phone || undefined,
+        pictureUrl: data.picture_url || undefined,
+        starRating: data.star_rating || undefined,
+        website: data.website || undefined,
       };
 
       await createHotel(processedData);

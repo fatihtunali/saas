@@ -67,13 +67,13 @@ export default function ExtraExpenseDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{extra.expense_name}</h1>
-              <StatusBadge status={extra.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{extra.expenseName}</h1>
+              <StatusBadge status={extra.isActive ? 'Active' : 'Inactive'} />
             </div>
-            {extra.expense_category && (
+            {extra.expenseCategory && (
               <div className="flex items-center gap-2 mt-2">
                 <Tag className="h-4 w-4 text-muted-foreground" />
-                <Badge variant="outline">{extra.expense_category}</Badge>
+                <Badge variant="outline">{extra.expenseCategory}</Badge>
               </div>
             )}
           </div>
@@ -111,7 +111,7 @@ export default function ExtraExpenseDetailsPage() {
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Price</p>
                 <p className="text-2xl font-bold text-primary">
-                  {parseFloat(extra.price).toFixed(2)} {extra.currency || 'TRY'}
+                  {Number(extra.price || 0).toFixed(2)} {extra.currency || 'EUR'}
                 </p>
               </div>
             ) : (
@@ -129,10 +129,10 @@ export default function ExtraExpenseDetailsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {extra.expense_category ? (
+            {extra.expenseCategory ? (
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="text-base py-2 px-4">
-                  {extra.expense_category}
+                  {extra.expenseCategory}
                 </Badge>
               </div>
             ) : (
@@ -179,7 +179,7 @@ export default function ExtraExpenseDetailsPage() {
             <div>
               <p className="text-sm text-muted-foreground">Created At</p>
               <p className="text-sm font-medium">
-                {new Date(extra.created_at).toLocaleDateString('en-US', {
+                {new Date(extra.createdAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
@@ -191,7 +191,7 @@ export default function ExtraExpenseDetailsPage() {
             <div>
               <p className="text-sm text-muted-foreground">Last Updated</p>
               <p className="text-sm font-medium">
-                {new Date(extra.updated_at).toLocaleDateString('en-US', {
+                {new Date(extra.updatedAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
@@ -206,7 +206,7 @@ export default function ExtraExpenseDetailsPage() {
 
           <div>
             <p className="text-sm text-muted-foreground mb-2">Status</p>
-            <StatusBadge status={extra.is_active ? 'Active' : 'Inactive'} />
+            <StatusBadge status={extra.isActive ? 'Active' : 'Inactive'} />
           </div>
         </CardContent>
       </Card>

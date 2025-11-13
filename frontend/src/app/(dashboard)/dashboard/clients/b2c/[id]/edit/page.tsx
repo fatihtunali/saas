@@ -65,29 +65,30 @@ export default function EditB2CClientPage() {
   });
 
   useEffect(() => {
-    if (client) {
+    if (client?.data) {
+      const clientData = client.data;
       form.reset({
-        client_type: client.client_type || undefined,
-        full_name: client.full_name || '',
-        email: client.email || '',
-        phone: client.phone || '',
-        birth_date: client.birth_date || '',
-        nationality: client.nationality || '',
-        passport_number: client.passport_number || '',
-        passport_expiry_date: client.passport_expiry_date || '',
-        address: client.address || '',
-        city: client.city || '',
-        country: client.country || '',
-        emergency_contact_name: client.emergency_contact_name || '',
-        emergency_contact_phone: client.emergency_contact_phone || '',
-        dietary_requirements: client.dietary_requirements || '',
-        accessibility_needs: client.accessibility_needs || '',
-        medical_conditions: client.medical_conditions || '',
-        special_notes: client.special_notes || '',
-        payment_terms: client.payment_terms || '',
-        credit_limit: client.credit_limit || undefined,
-        credit_used: client.credit_used || 0,
-        is_active: client.is_active ?? true,
+        client_type: clientData.clientType || undefined,
+        full_name: clientData.fullName || '',
+        email: clientData.email || '',
+        phone: clientData.phone || '',
+        birth_date: clientData.birthDate || '',
+        nationality: clientData.nationality || '',
+        passport_number: clientData.passportNumber || '',
+        passport_expiry_date: clientData.passportExpiryDate || '',
+        address: clientData.address || '',
+        city: clientData.city || '',
+        country: clientData.country || '',
+        emergency_contact_name: clientData.emergencyContactName || '',
+        emergency_contact_phone: clientData.emergencyContactPhone || '',
+        dietary_requirements: clientData.dietaryRequirements || '',
+        accessibility_needs: clientData.accessibilityNeeds || '',
+        medical_conditions: clientData.medicalConditions || '',
+        special_notes: clientData.specialNotes || '',
+        payment_terms: clientData.paymentTerms || '',
+        credit_limit: clientData.creditLimit || undefined,
+        credit_used: clientData.creditUsed || 0,
+        is_active: clientData.isActive ?? true,
       } as any);
     }
   }, [client, form]);
@@ -95,25 +96,27 @@ export default function EditB2CClientPage() {
   const onSubmit = async (data: B2CClientFormData) => {
     try {
       const processedData = {
-        ...data,
-        client_type: data.client_type || undefined,
+        fullName: data.full_name,
+        clientType: data.client_type || undefined,
         email: data.email || undefined,
         phone: data.phone || undefined,
-        birth_date: data.birth_date || undefined,
+        birthDate: data.birth_date || undefined,
         nationality: data.nationality || undefined,
-        passport_number: data.passport_number || undefined,
-        passport_expiry_date: data.passport_expiry_date || undefined,
+        passportNumber: data.passport_number || undefined,
+        passportExpiryDate: data.passport_expiry_date || undefined,
         address: data.address || undefined,
         city: data.city || undefined,
         country: data.country || undefined,
-        emergency_contact_name: data.emergency_contact_name || undefined,
-        emergency_contact_phone: data.emergency_contact_phone || undefined,
-        dietary_requirements: data.dietary_requirements || undefined,
-        accessibility_needs: data.accessibility_needs || undefined,
-        medical_conditions: data.medical_conditions || undefined,
-        special_notes: data.special_notes || undefined,
-        payment_terms: data.payment_terms || undefined,
-        credit_limit: data.credit_limit || undefined,
+        emergencyContactName: data.emergency_contact_name || undefined,
+        emergencyContactPhone: data.emergency_contact_phone || undefined,
+        dietaryRequirements: data.dietary_requirements || undefined,
+        accessibilityNeeds: data.accessibility_needs || undefined,
+        medicalConditions: data.medical_conditions || undefined,
+        specialNotes: data.special_notes || undefined,
+        paymentTerms: data.payment_terms || undefined,
+        creditLimit: data.credit_limit || undefined,
+        creditUsed: data.credit_used || 0,
+        isActive: data.is_active,
       };
 
       await updateB2CClient({ id, data: processedData });

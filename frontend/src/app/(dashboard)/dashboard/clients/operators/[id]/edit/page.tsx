@@ -55,31 +55,35 @@ export default function EditOperatorPage() {
 
   // Load operator data when available
   useEffect(() => {
-    if (operator) {
+    if (operator?.data) {
+      const operatorData = operator.data;
       form.reset({
-        company_name: operator.company_name || '',
-        contact_email: operator.contact_email || '',
-        contact_phone: operator.contact_phone || '',
-        address: operator.address || '',
-        city: operator.city || '',
-        country: operator.country || '',
-        tax_id: operator.tax_id || '',
-        base_currency: operator.base_currency || 'TRY',
-        is_active: operator.is_active ?? true,
+        company_name: operatorData.companyName || '',
+        contact_email: operatorData.contactEmail || '',
+        contact_phone: operatorData.contactPhone || '',
+        address: operatorData.address || '',
+        city: operatorData.city || '',
+        country: operatorData.country || '',
+        tax_id: operatorData.taxId || '',
+        base_currency: operatorData.baseCurrency || 'TRY',
+        is_active: operatorData.isActive ?? true,
       } as any);
     }
   }, [operator, form]);
 
   const onSubmit = async (data: OperatorFormData) => {
     try {
-      // Convert empty strings to undefined for optional fields
+      // Transform snake_case form data to camelCase for API
       const processedData = {
-        ...data,
-        contact_phone: data.contact_phone || undefined,
+        companyName: data.company_name,
+        contactEmail: data.contact_email,
+        contactPhone: data.contact_phone || undefined,
         address: data.address || undefined,
         city: data.city || undefined,
         country: data.country || undefined,
-        tax_id: data.tax_id || undefined,
+        taxId: data.tax_id || undefined,
+        baseCurrency: data.base_currency,
+        isActive: data.is_active,
       };
 
       await updateOperator({ id, data: processedData });

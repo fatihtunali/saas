@@ -78,7 +78,7 @@ export function useVehicleTypes(params?: QueryParams) {
   });
 
   return {
-    vehicleTypes: vehicleTypes?.data?.vehicle_types || [],
+    vehicleTypes: vehicleTypes?.data?.vehicleTypes || [],
     pagination: vehicleTypes?.data?.pagination,
     isLoading,
     error,

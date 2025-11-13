@@ -69,8 +69,14 @@ export default function B2CClientDetailsPage() {
     );
   }
 
-  const creditUsagePercent = client.credit_limit
-    ? (client.credit_used / client.credit_limit) * 100
+  // Destructure client data
+  const clientData = client.data;
+  if (!clientData) {
+    return <div>Client not found</div>;
+  }
+
+  const creditUsagePercent = clientData.creditLimit
+    ? (clientData.creditUsed / clientData.creditLimit) * 100
     : 0;
 
   return (
@@ -82,12 +88,12 @@ export default function B2CClientDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{client.full_name}</h1>
-              <StatusBadge status={client.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{clientData.fullName}</h1>
+              <StatusBadge status={clientData.isActive ? 'Active' : 'Inactive'} />
               {creditUsagePercent > 90 && <Badge variant="destructive">Credit Limit Alert</Badge>}
             </div>
             <p className="text-sm text-muted-foreground mt-1">
-              {client.client_type && `Type: ${client.client_type}`}
+              {clientData.clientType && `Type: ${clientData.clientType}`}
             </p>
           </div>
         </div>
@@ -116,23 +122,23 @@ export default function B2CClientDetailsPage() {
             <CardTitle>Contact Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {client.email && (
+            {clientData.email && (
               <div className="flex items-start gap-3">
                 <Mail className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">Email</p>
-                  <p className="text-sm text-muted-foreground">{client.email}</p>
+                  <p className="text-sm text-muted-foreground">{clientData.email}</p>
                 </div>
               </div>
             )}
-            {client.phone && (
+            {clientData.phone && (
               <>
                 <Separator />
                 <div className="flex items-start gap-3">
                   <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Phone</p>
-                    <p className="text-sm text-muted-foreground">{client.phone}</p>
+                    <p className="text-sm text-muted-foreground">{clientData.phone}</p>
                   </div>
                 </div>
               </>
@@ -145,30 +151,30 @@ export default function B2CClientDetailsPage() {
             <CardTitle>Personal Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {client.birth_date && (
+            {clientData.birthDate && (
               <div>
                 <p className="font-medium">Birth Date</p>
-                <p className="text-sm text-muted-foreground">{formatDate(client.birth_date)}</p>
+                <p className="text-sm text-muted-foreground">{formatDate(clientData.birthDate)}</p>
               </div>
             )}
-            {client.nationality && (
+            {clientData.nationality && (
               <>
                 <Separator />
                 <div>
                   <p className="font-medium">Nationality</p>
-                  <p className="text-sm text-muted-foreground">{client.nationality}</p>
+                  <p className="text-sm text-muted-foreground">{clientData.nationality}</p>
                 </div>
               </>
             )}
-            {client.passport_number && (
+            {clientData.passportNumber && (
               <>
                 <Separator />
                 <div>
                   <p className="font-medium">Passport Number</p>
-                  <p className="text-sm text-muted-foreground">{client.passport_number}</p>
-                  {client.passport_expiry_date && (
+                  <p className="text-sm text-muted-foreground">{clientData.passportNumber}</p>
+                  {clientData.passportExpiryDate && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      Expires: {formatDate(client.passport_expiry_date)}
+                      Expires: {formatDate(clientData.passportExpiryDate)}
                     </p>
                   )}
                 </div>
@@ -177,20 +183,20 @@ export default function B2CClientDetailsPage() {
           </CardContent>
         </Card>
 
-        {(client.address || client.city || client.country) && (
+        {(clientData.address || clientData.city || clientData.country) && (
           <Card>
             <CardHeader>
               <CardTitle>Address</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {client.address && (
+              {clientData.address && (
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
-                    <p className="text-sm text-muted-foreground">{client.address}</p>
-                    {(client.city || client.country) && (
+                    <p className="text-sm text-muted-foreground">{clientData.address}</p>
+                    {(clientData.city || clientData.country) && (
                       <p className="text-sm text-muted-foreground mt-1">
-                        {[client.city, client.country].filter(Boolean).join(', ')}
+                        {[clientData.city, clientData.country].filter(Boolean).join(', ')}
                       </p>
                     )}
                   </div>
@@ -200,25 +206,25 @@ export default function B2CClientDetailsPage() {
           </Card>
         )}
 
-        {(client.emergency_contact_name || client.emergency_contact_phone) && (
+        {(clientData.emergencyContactName || clientData.emergencyContactPhone) && (
           <Card>
             <CardHeader>
               <CardTitle>Emergency Contact</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {client.emergency_contact_name && (
+              {clientData.emergencyContactName && (
                 <div>
                   <p className="font-medium">Name</p>
-                  <p className="text-sm text-muted-foreground">{client.emergency_contact_name}</p>
+                  <p className="text-sm text-muted-foreground">{clientData.emergencyContactName}</p>
                 </div>
               )}
-              {client.emergency_contact_phone && (
+              {clientData.emergencyContactPhone && (
                 <>
                   <Separator />
                   <div>
                     <p className="font-medium">Phone</p>
                     <p className="text-sm text-muted-foreground">
-                      {client.emergency_contact_phone}
+                      {clientData.emergencyContactPhone}
                     </p>
                   </div>
                 </>
@@ -227,40 +233,40 @@ export default function B2CClientDetailsPage() {
           </Card>
         )}
 
-        {(client.dietary_requirements ||
-          client.accessibility_needs ||
-          client.medical_conditions) && (
+        {(clientData.dietaryRequirements ||
+          clientData.accessibilityNeeds ||
+          clientData.medicalConditions) && (
           <Card>
             <CardHeader>
               <CardTitle>Special Requirements</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {client.dietary_requirements && (
+              {clientData.dietaryRequirements && (
                 <div className="flex items-start gap-3">
                   <Utensils className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Dietary</p>
-                    <p className="text-sm text-muted-foreground">{client.dietary_requirements}</p>
+                    <p className="text-sm text-muted-foreground">{clientData.dietaryRequirements}</p>
                   </div>
                 </div>
               )}
-              {client.accessibility_needs && (
+              {clientData.accessibilityNeeds && (
                 <>
                   <Separator />
                   <div>
                     <p className="font-medium">Accessibility</p>
-                    <p className="text-sm text-muted-foreground">{client.accessibility_needs}</p>
+                    <p className="text-sm text-muted-foreground">{clientData.accessibilityNeeds}</p>
                   </div>
                 </>
               )}
-              {client.medical_conditions && (
+              {clientData.medicalConditions && (
                 <>
                   <Separator />
                   <div className="flex items-start gap-3">
                     <Heart className="h-5 w-5 text-muted-foreground mt-0.5" />
                     <div>
                       <p className="font-medium">Medical</p>
-                      <p className="text-sm text-muted-foreground">{client.medical_conditions}</p>
+                      <p className="text-sm text-muted-foreground">{clientData.medicalConditions}</p>
                     </div>
                   </div>
                 </>
@@ -274,13 +280,13 @@ export default function B2CClientDetailsPage() {
             <CardTitle>Financial Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {client.credit_limit && (
+            {clientData.creditLimit && (
               <div className="flex items-start gap-3">
                 <CreditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div className="flex-1">
                   <p className="font-medium">Credit Limit</p>
                   <p className="text-sm text-muted-foreground">
-                    Used: {client.credit_used.toFixed(2)} / {client.credit_limit.toFixed(2)}
+                    Used: {clientData.creditUsed.toFixed(2)} / {clientData.creditLimit.toFixed(2)}
                   </p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                     <div
@@ -291,25 +297,25 @@ export default function B2CClientDetailsPage() {
                 </div>
               </div>
             )}
-            {client.payment_terms && (
+            {clientData.paymentTerms && (
               <>
                 <Separator />
                 <div>
                   <p className="font-medium">Payment Terms</p>
-                  <p className="text-sm text-muted-foreground">{client.payment_terms}</p>
+                  <p className="text-sm text-muted-foreground">{clientData.paymentTerms}</p>
                 </div>
               </>
             )}
           </CardContent>
         </Card>
 
-        {client.special_notes && (
+        {clientData.specialNotes && (
           <Card>
             <CardHeader>
               <CardTitle>Notes</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">{client.special_notes}</p>
+              <p className="text-sm text-muted-foreground">{clientData.specialNotes}</p>
             </CardContent>
           </Card>
         )}
@@ -320,7 +326,7 @@ export default function B2CClientDetailsPage() {
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
         title="Delete Client"
-        description={`Are you sure you want to delete ${client.full_name}? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${clientData.fullName}? This action cannot be undone.`}
         confirmText="Delete"
       />
     </div>

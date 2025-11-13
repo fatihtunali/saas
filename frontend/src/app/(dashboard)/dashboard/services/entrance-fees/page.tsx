@@ -36,13 +36,13 @@ export default function EntranceFeesPage() {
 
   const columns: ColumnDef<EntranceFee>[] = [
     {
-      accessorKey: 'site_name',
+      accessorKey: 'siteName',
       header: 'Site Name',
     },
     {
-      accessorKey: 'is_active',
+      accessorKey: 'isActive',
       header: 'Status',
-      cell: ({ row }) => <StatusBadge status={row.original.is_active ? 'Active' : 'Inactive'} />,
+      cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'Active' : 'Inactive'} />,
     },
     {
       id: 'actions',

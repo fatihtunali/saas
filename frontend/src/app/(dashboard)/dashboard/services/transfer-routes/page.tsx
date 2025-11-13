@@ -36,13 +36,13 @@ export default function TransferRoutesPage() {
 
   const columns: ColumnDef<TransferRoute>[] = [
     {
-      accessorKey: 'from_city_id',
+      accessorKey: 'fromCityId',
       header: 'From City Id',
     },
     {
-      accessorKey: 'is_active',
+      accessorKey: 'isActive',
       header: 'Status',
-      cell: ({ row }) => <StatusBadge status={row.original.is_active ? 'Active' : 'Inactive'} />,
+      cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'Active' : 'Inactive'} />,
     },
     {
       id: 'actions',

@@ -48,20 +48,20 @@ export default function CreateGuidePage() {
   const onSubmit = async (data: GuideFormData) => {
     try {
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || undefined,
-        phone: data.phone || undefined,
-        email: data.email || undefined,
-        languages: data.languages || undefined,
-        daily_rate: data.daily_rate || undefined,
-        half_day_rate: data.half_day_rate || undefined,
-        night_rate: data.night_rate || undefined,
-        transfer_rate: data.transfer_rate || undefined,
         currency: data.currency || undefined,
-        specializations: data.specializations || undefined,
-        license_number: data.license_number || undefined,
-        profile_picture_url: data.profile_picture_url || undefined,
+        dailyRate: data.daily_rate || undefined,
+        email: data.email || undefined,
+        guideName: data.guide_name,
+        halfDayRate: data.half_day_rate || undefined,
+        isActive: data.is_active,
+        languages: data.languages,
+        licenseNumber: data.license_number,
+        nightRate: data.night_rate || undefined,
         notes: data.notes || undefined,
+        phone: data.phone || undefined,
+        profilePictureUrl: data.profile_picture_url,
+        specializations: data.specializations,
+        transferRate: data.transfer_rate || undefined,
       };
 
       await createGuide(processedData);

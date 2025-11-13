@@ -63,22 +63,23 @@ export default function EditGuidePage() {
 
   useEffect(() => {
     if (guide) {
+      const itemData = guide;
       const formData = {
-        guide_name: guide.guide_name,
-        supplier_id: guide.supplier_id ?? null,
-        phone: guide.phone || '',
-        email: guide.email || '',
-        languages: guide.languages || '',
-        daily_rate: guide.daily_rate ?? null,
-        half_day_rate: guide.half_day_rate ?? null,
-        night_rate: guide.night_rate ?? null,
-        transfer_rate: guide.transfer_rate ?? null,
-        currency: guide.currency || 'TRY',
-        specializations: guide.specializations || '',
-        license_number: guide.license_number || '',
-        profile_picture_url: guide.profile_picture_url || '',
-        notes: guide.notes || '',
-        is_active: guide.is_active,
+        guide_name: itemData.guideName,
+        supplier_id: itemData.supplierId ?? null,
+        phone: itemData.phone || '',
+        email: itemData.email || '',
+        languages: itemData.languages || '',
+        daily_rate: itemData.dailyRate ? Number(itemData.dailyRate) : null,
+        half_day_rate: itemData.halfDayRate ? Number(itemData.halfDayRate) : null,
+        night_rate: itemData.nightRate ? Number(itemData.nightRate) : null,
+        transfer_rate: itemData.transferRate ? Number(itemData.transferRate) : null,
+        currency: itemData.currency || 'TRY',
+        specializations: itemData.specializations || '',
+        license_number: itemData.licenseNumber || '',
+        profile_picture_url: itemData.profilePictureUrl || '',
+        notes: itemData.notes || '',
+        is_active: itemData.isActive,
       } as any;
       form.reset(formData);
     }
@@ -87,19 +88,18 @@ export default function EditGuidePage() {
   const onSubmit = async (data: GuideFormData) => {
     try {
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || null,
-        phone: data.phone || null,
+        dailyRate: data.daily_rate ? Number(data.daily_rate) : null,
         email: data.email || null,
+        halfDayRate: data.half_day_rate ? Number(data.half_day_rate) : null,
         languages: data.languages || null,
-        daily_rate: data.daily_rate || null,
-        half_day_rate: data.half_day_rate || null,
-        night_rate: data.night_rate || null,
-        transfer_rate: data.transfer_rate || null,
-        specializations: data.specializations || null,
-        license_number: data.license_number || null,
-        profile_picture_url: data.profile_picture_url || null,
+        licenseNumber: data.license_number || null,
+        nightRate: data.night_rate ? Number(data.night_rate) : null,
         notes: data.notes || null,
+        phone: data.phone || null,
+        profilePictureUrl: data.profile_picture_url || null,
+        specializations: data.specializations || null,
+        supplierId: data.supplier_id || null,
+        transferRate: data.transfer_rate ? Number(data.transfer_rate) : null,
       };
 
       // @ts-expect-error - Type mismatch between form data and API schema

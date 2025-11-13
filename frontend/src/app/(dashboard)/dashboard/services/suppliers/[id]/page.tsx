@@ -78,12 +78,12 @@ export default function SupplierDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{supplier.company_name}</h1>
-              <StatusBadge status={supplier.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{supplier.data.companyName}</h1>
+              <StatusBadge status={supplier.data.isActive ? 'Active' : 'Inactive'} />
             </div>
-            {supplier.supplier_type && (
+            {supplier.data.supplierType && (
               <div className="flex gap-2 mt-2">
-                <Badge variant="outline">{supplier.supplier_type}</Badge>
+                <Badge variant="outline">{supplier.data.supplierType}</Badge>
               </div>
             )}
           </div>
@@ -114,43 +114,43 @@ export default function SupplierDetailsPage() {
             <CardTitle>Contact Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {supplier.contact_person && (
+            {supplier.data.contactPerson && (
               <>
                 <div className="flex items-start gap-3">
                   <User className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Contact Person</p>
-                    <p className="text-sm text-muted-foreground">{supplier.contact_person}</p>
+                    <p className="text-sm text-muted-foreground">{supplier.data.contactPerson}</p>
                   </div>
                 </div>
                 <Separator />
               </>
             )}
 
-            {supplier.email && (
+            {supplier.data.email && (
               <>
                 <div className="flex items-start gap-3">
                   <Mail className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Email</p>
-                    <p className="text-sm text-muted-foreground">{supplier.email}</p>
+                    <p className="text-sm text-muted-foreground">{supplier.data.email}</p>
                   </div>
                 </div>
                 <Separator />
               </>
             )}
 
-            {supplier.phone && (
+            {supplier.data.phone && (
               <div className="flex items-start gap-3">
                 <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">Phone</p>
-                  <p className="text-sm text-muted-foreground">{supplier.phone}</p>
+                  <p className="text-sm text-muted-foreground">{supplier.data.phone}</p>
                 </div>
               </div>
             )}
 
-            {!supplier.contact_person && !supplier.email && !supplier.phone && (
+            {!supplier.data.contactPerson && !supplier.data.email && !supplier.data.phone && (
               <p className="text-sm text-muted-foreground">No contact information available</p>
             )}
           </CardContent>
@@ -162,32 +162,32 @@ export default function SupplierDetailsPage() {
             <CardTitle>Location</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {supplier.city && (
+            {supplier.data.city && (
               <>
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">City</p>
                     <p className="text-sm text-muted-foreground">
-                      {supplier.city?.city_name || 'N/A'}
+                      {supplier.data.city?.cityName || 'N/A'}
                     </p>
                   </div>
                 </div>
-                {supplier.address && <Separator />}
+                {supplier.data.address && <Separator />}
               </>
             )}
 
-            {supplier.address && (
+            {supplier.data.address && (
               <div className="flex items-start gap-3">
                 <Building2 className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">Address</p>
-                  <p className="text-sm text-muted-foreground">{supplier.address}</p>
+                  <p className="text-sm text-muted-foreground">{supplier.data.address}</p>
                 </div>
               </div>
             )}
 
-            {!supplier.city && !supplier.address && (
+            {!supplier.data.city && !supplier.data.address && (
               <p className="text-sm text-muted-foreground">No location information available</p>
             )}
           </CardContent>
@@ -195,7 +195,7 @@ export default function SupplierDetailsPage() {
       </div>
 
       {/* Financial Information */}
-      {(supplier.tax_id || supplier.bank_account_info || supplier.payment_terms) && (
+      {(supplier.data.taxId || supplier.data.bankAccountInfo || supplier.data.paymentTerms) && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -204,30 +204,30 @@ export default function SupplierDetailsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {supplier.tax_id && (
+            {supplier.data.taxId && (
               <div>
                 <p className="text-sm font-medium mb-1">Tax ID</p>
-                <p className="text-sm text-muted-foreground">{supplier.tax_id}</p>
+                <p className="text-sm text-muted-foreground">{supplier.data.taxId}</p>
               </div>
             )}
 
-            {supplier.payment_terms && (
+            {supplier.data.paymentTerms && (
               <>
-                {supplier.tax_id && <Separator />}
+                {supplier.data.taxId && <Separator />}
                 <div>
                   <p className="text-sm font-medium mb-1">Payment Terms</p>
-                  <p className="text-sm text-muted-foreground">{supplier.payment_terms}</p>
+                  <p className="text-sm text-muted-foreground">{supplier.data.paymentTerms}</p>
                 </div>
               </>
             )}
 
-            {supplier.bank_account_info && (
+            {supplier.data.bankAccountInfo && (
               <>
-                {(supplier.tax_id || supplier.payment_terms) && <Separator />}
+                {(supplier.data.taxId || supplier.data.paymentTerms) && <Separator />}
                 <div>
                   <p className="text-sm font-medium mb-1">Bank Account Information</p>
                   <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {supplier.bank_account_info}
+                    {supplier.data.bankAccountInfo}
                   </p>
                 </div>
               </>
@@ -237,7 +237,7 @@ export default function SupplierDetailsPage() {
       )}
 
       {/* Notes */}
-      {supplier.notes && (
+      {supplier.data.notes && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -246,7 +246,7 @@ export default function SupplierDetailsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{supplier.notes}</p>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{supplier.data.notes}</p>
           </CardContent>
         </Card>
       )}

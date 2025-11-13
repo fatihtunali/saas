@@ -36,13 +36,13 @@ export default function TourCompaniesPage() {
 
   const columns: ColumnDef<TourCompany>[] = [
     {
-      accessorKey: 'company_name',
+      accessorKey: 'companyName',
       header: 'Company Name',
     },
     {
-      accessorKey: 'is_active',
+      accessorKey: 'isActive',
       header: 'Status',
-      cell: ({ row }) => <StatusBadge status={row.original.is_active ? 'Active' : 'Inactive'} />,
+      cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'Active' : 'Inactive'} />,
     },
     {
       id: 'actions',

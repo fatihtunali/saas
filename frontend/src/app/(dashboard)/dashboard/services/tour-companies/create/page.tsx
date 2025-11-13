@@ -50,26 +50,15 @@ export default function CreateTourCompanyPage() {
     try {
       // Convert empty strings to undefined for optional fields
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || undefined,
-        tour_name: data.tour_name || undefined,
-        tour_type: data.tour_type || undefined,
-        duration_days: data.duration_days || undefined,
-        duration_hours: data.duration_hours || undefined,
-        sic_price: data.sic_price || undefined,
-        pvt_price_2_pax: data.pvt_price_2_pax || undefined,
-        pvt_price_4_pax: data.pvt_price_4_pax || undefined,
-        pvt_price_6_pax: data.pvt_price_6_pax || undefined,
-        pvt_price_8_pax: data.pvt_price_8_pax || undefined,
-        pvt_price_10_pax: data.pvt_price_10_pax || undefined,
-        currency: data.currency || 'TRY',
-        min_passengers: data.min_passengers || undefined,
-        max_passengers: data.max_passengers || undefined,
-        itinerary: data.itinerary || undefined,
-        inclusions: data.inclusions || undefined,
-        exclusions: data.exclusions || undefined,
-        picture_url: data.picture_url || undefined,
+        companyName: data.company_name,
+        currency: data.currency,
+        durationDays: data.duration_days,
+        durationHours: data.duration_hours,
+        isActive: data.is_active,
         notes: data.notes || undefined,
+        pictureUrl: data.picture_url || undefined,
+        tourName: data.tour_name || undefined,
+        tourType: data.tour_type || undefined,
       };
 
       await createTourCompany(processedData);

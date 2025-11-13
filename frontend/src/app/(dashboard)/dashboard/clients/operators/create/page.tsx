@@ -45,14 +45,17 @@ export default function CreateOperatorPage() {
 
   const onSubmit = async (data: OperatorFormData) => {
     try {
-      // Convert empty strings to undefined for optional fields
+      // Transform snake_case form data to camelCase for API
       const processedData = {
-        ...data,
-        contact_phone: data.contact_phone || undefined,
+        companyName: data.company_name,
+        contactEmail: data.contact_email,
+        contactPhone: data.contact_phone || undefined,
         address: data.address || undefined,
         city: data.city || undefined,
         country: data.country || undefined,
-        tax_id: data.tax_id || undefined,
+        taxId: data.tax_id || undefined,
+        baseCurrency: data.base_currency,
+        isActive: data.is_active,
       };
 
       await createOperator(processedData);

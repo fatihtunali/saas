@@ -49,18 +49,19 @@ export default function CreateRestaurantPage() {
   const onSubmit = async (data: RestaurantFormData) => {
     try {
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || undefined,
         address: data.address || undefined,
-        phone: data.phone || undefined,
-        lunch_price: data.lunch_price || undefined,
-        dinner_price: data.dinner_price || undefined,
-        currency: data.currency || undefined,
         capacity: data.capacity || undefined,
-        cuisine_type: data.cuisine_type || undefined,
-        menu_options: data.menu_options || undefined,
-        picture_url: data.picture_url || undefined,
+        cityId: data.city_id,
+        cuisineType: data.cuisine_type || undefined,
+        currency: data.currency || undefined,
+        dinnerPrice: data.dinner_price,
+        isActive: data.is_active,
+        lunchPrice: data.lunch_price,
+        menuOptions: data.menu_options,
         notes: data.notes || undefined,
+        phone: data.phone || undefined,
+        pictureUrl: data.picture_url || undefined,
+        restaurantName: data.restaurant_name,
       };
 
       await createRestaurant(processedData);

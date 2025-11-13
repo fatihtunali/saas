@@ -78,7 +78,7 @@ export function useVehicleRentals(params?: QueryParams) {
   });
 
   return {
-    vehicleRentals: vehicleRentals?.data?.vehicle_rentals || [],
+    vehicleRentals: vehicleRentals?.data?.vehicleRentals || [],
     pagination: vehicleRentals?.data?.pagination,
     isLoading,
     error,

@@ -47,14 +47,14 @@ export default function CreateExtraExpensePage() {
   const onSubmit = async (data: ExtraExpenseFormData) => {
     try {
       // Convert empty strings to undefined for optional fields
-      const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || undefined,
-        expense_category: data.expense_category || undefined,
+            const processedData = {
+        expenseName: data.expense_name,
+        expenseCategory: data.expense_category || undefined,
         price: data.price || undefined,
         currency: data.currency || undefined,
         description: data.description || undefined,
         notes: data.notes || undefined,
+        supplierId: data.supplier_id || undefined,
       };
 
       await createExtra(processedData);

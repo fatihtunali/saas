@@ -78,7 +78,7 @@ export function useVehicleCompanies(params?: QueryParams) {
   });
 
   return {
-    vehicleCompanies: vehicleCompanies?.data?.vehicle_companies || [],
+    vehicleCompanies: vehicleCompanies?.data?.vehicleCompanies || [],
     pagination: vehicleCompanies?.data?.pagination,
     isLoading,
     error,

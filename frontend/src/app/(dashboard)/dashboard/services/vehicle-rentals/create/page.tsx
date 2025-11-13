@@ -67,19 +67,11 @@ export default function CreateVehicleRentalPage() {
     try {
       // Convert empty strings to undefined for optional fields
       const processedData = {
-        ...data,
-        full_day_price: data.full_day_price || undefined,
-        full_day_hours: data.full_day_hours || undefined,
-        full_day_km: data.full_day_km || undefined,
-        half_day_price: data.half_day_price || undefined,
-        half_day_hours: data.half_day_hours || undefined,
-        half_day_km: data.half_day_km || undefined,
-        night_rental_price: data.night_rental_price || undefined,
-        night_rental_hours: data.night_rental_hours || undefined,
-        night_rental_km: data.night_rental_km || undefined,
-        extra_hour_rate: data.extra_hour_rate || undefined,
-        extra_km_rate: data.extra_km_rate || undefined,
+        currency: data.currency,
+        isActive: data.is_active,
         notes: data.notes || undefined,
+        vehicleCompanyId: data.vehicle_company_id,
+        vehicleTypeId: data.vehicle_type_id,
       };
 
       await createVehicleRental(processedData);
@@ -132,7 +124,7 @@ export default function CreateVehicleRentalPage() {
                       <SelectContent>
                         {vehicleCompanies?.map((company: any) => (
                           <SelectItem key={company.id} value={company.id.toString()}>
-                            {company.company_name}
+                            {company.companyName}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -160,7 +152,7 @@ export default function CreateVehicleRentalPage() {
                       <SelectContent>
                         {vehicleTypes?.map((type: any) => (
                           <SelectItem key={type.id} value={type.id.toString()}>
-                            {type.vehicle_type} ({type.capacity} pax)
+                            {type.vehicleType} ({type.capacity} pax)
                           </SelectItem>
                         ))}
                       </SelectContent>

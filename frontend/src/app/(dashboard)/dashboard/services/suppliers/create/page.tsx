@@ -13,6 +13,7 @@ import {
 } from '@/lib/validations/suppliers';
 import { useSuppliers } from '@/hooks/use-suppliers';
 import { useCities } from '@/lib/hooks/useBookingWizard';
+import { CreateSupplierDto } from '@/types/services';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -47,17 +48,18 @@ export default function CreateSupplierPage() {
 
   const onSubmit = async (data: SupplierFormData) => {
     try {
-      // Convert empty strings to undefined for optional fields
-      const processedData = {
-        ...data,
-        contact_person: data.contact_person || undefined,
+      // Convert empty strings to undefined and transform to camelCase for API
+      const processedData: CreateSupplierDto = {
+        supplierType: data.supplier_type,
+        companyName: data.company_name,
+        contactPerson: data.contact_person || undefined,
         email: data.email || undefined,
         phone: data.phone || undefined,
         address: data.address || undefined,
-        city_id: data.city_id || undefined,
-        tax_id: data.tax_id || undefined,
-        payment_terms: data.payment_terms || undefined,
-        bank_account_info: data.bank_account_info || undefined,
+        cityId: data.city_id || undefined,
+        taxId: data.tax_id || undefined,
+        paymentTerms: data.payment_terms || undefined,
+        bankAccountInfo: data.bank_account_info || undefined,
         notes: data.notes || undefined,
       };
 

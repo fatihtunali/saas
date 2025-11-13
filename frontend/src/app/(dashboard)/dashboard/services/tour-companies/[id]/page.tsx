@@ -86,20 +86,20 @@ export default function TourCompanyDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{tourCompany.company_name}</h1>
-              <StatusBadge status={tourCompany.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{tourCompany.data.companyName}</h1>
+              <StatusBadge status={tourCompany.data.isActive ? 'Active' : 'Inactive'} />
             </div>
-            {tourCompany.tour_name && (
-              <p className="text-muted-foreground mt-1">{tourCompany.tour_name}</p>
+            {tourCompany.data.tourName && (
+              <p className="text-muted-foreground mt-1">{tourCompany.data.tourName}</p>
             )}
             <div className="flex gap-2 mt-2">
-              {tourCompany.tour_type && <Badge variant="outline">{tourCompany.tour_type}</Badge>}
-              {(tourCompany.duration_days || tourCompany.duration_hours) && (
+              {tourCompany.data.tourType && <Badge variant="outline">{tourCompany.data.tourType}</Badge>}
+              {(tourCompany.data.durationDays || tourCompany.data.durationHours) && (
                 <Badge variant="secondary">
                   <Clock className="h-3 w-3 mr-1" />
-                  {tourCompany.duration_days && `${tourCompany.duration_days}d`}
-                  {tourCompany.duration_days && tourCompany.duration_hours && ' '}
-                  {tourCompany.duration_hours && `${tourCompany.duration_hours}h`}
+                  {tourCompany.data.durationDays && `${tourCompany.data.durationDays}d`}
+                  {tourCompany.data.durationDays && tourCompany.data.durationHours && ' '}
+                  {tourCompany.data.durationHours && `${tourCompany.data.durationHours}h`}
                 </Badge>
               )}
             </div>
@@ -125,12 +125,12 @@ export default function TourCompanyDetailsPage() {
       </div>
 
       {/* Tour Image */}
-      {tourCompany.picture_url && (
+      {tourCompany.data.pictureUrl && (
         <Card>
           <CardContent className="p-0">
             <img
-              src={tourCompany.picture_url}
-              alt={tourCompany.tour_name || tourCompany.company_name}
+              src={tourCompany.data.pictureUrl}
+              alt={tourCompany.data.tourName || tourCompany.data.companyName}
               className="w-full h-80 object-cover rounded-lg"
             />
           </CardContent>
@@ -147,33 +147,33 @@ export default function TourCompanyDetailsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {tourCompany.min_passengers && (
+            {tourCompany.data.minPassengers && (
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Minimum Passengers</p>
-                <p className="text-lg font-semibold">{tourCompany.min_passengers}</p>
+                <p className="text-lg font-semibold">{tourCompany.data.minPassengers}</p>
               </div>
             )}
-            {tourCompany.max_passengers && (
+            {tourCompany.data.maxPassengers && (
               <>
-                {tourCompany.min_passengers && <Separator />}
+                {tourCompany.data.minPassengers && <Separator />}
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Maximum Passengers</p>
-                  <p className="text-lg font-semibold">{tourCompany.max_passengers}</p>
+                  <p className="text-lg font-semibold">{tourCompany.data.maxPassengers}</p>
                 </div>
               </>
             )}
-            {tourCompany.current_bookings !== null && (
+            {tourCompany.data.currentBookings !== null && (
               <>
-                {(tourCompany.min_passengers || tourCompany.max_passengers) && <Separator />}
+                {(tourCompany.data.minPassengers || tourCompany.data.maxPassengers) && <Separator />}
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Current Bookings</p>
-                  <p className="text-lg font-semibold">{tourCompany.current_bookings}</p>
+                  <p className="text-lg font-semibold">{tourCompany.data.currentBookings}</p>
                 </div>
               </>
             )}
-            {!tourCompany.min_passengers &&
-              !tourCompany.max_passengers &&
-              tourCompany.current_bookings === null && (
+            {!tourCompany.data.minPassengers &&
+              !tourCompany.data.maxPassengers &&
+              tourCompany.data.currentBookings === null && (
                 <p className="text-sm text-muted-foreground">No capacity information available</p>
               )}
           </CardContent>
@@ -187,14 +187,14 @@ export default function TourCompanyDetailsPage() {
               SIC Pricing
             </CardTitle>
             <CardDescription>
-              Seat-in-Coach pricing in {tourCompany.currency || 'TRY'}
+              Seat-in-Coach pricing in {tourCompany.data.currency || 'TRY'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {tourCompany.sic_price ? (
+            {tourCompany.data.sicPrice ? (
               <div>
                 <p className="text-3xl font-bold text-primary">
-                  {parseFloat(tourCompany.sic_price).toFixed(2)} {tourCompany.currency || 'TRY'}
+                  {Number(tourCompany.data.sicPrice).toFixed(2)} {tourCompany.data.currency || 'TRY'}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">per person</p>
               </div>
@@ -206,18 +206,18 @@ export default function TourCompanyDetailsPage() {
       </div>
 
       {/* Private Tour Pricing */}
-      {(tourCompany.pvt_price_2_pax ||
-        tourCompany.pvt_price_4_pax ||
-        tourCompany.pvt_price_6_pax ||
-        tourCompany.pvt_price_8_pax ||
-        tourCompany.pvt_price_10_pax) && (
+      {(tourCompany.data.pvtPrice2Pax ||
+        tourCompany.data.pvtPrice4Pax ||
+        tourCompany.data.pvtPrice6Pax ||
+        tourCompany.data.pvtPrice8Pax ||
+        tourCompany.data.pvtPrice10Pax) && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5" />
               Private Tour Pricing
             </CardTitle>
-            <CardDescription>Per vehicle rates in {tourCompany.currency || 'TRY'}</CardDescription>
+            <CardDescription>Per vehicle rates in {tourCompany.data.currency || 'TRY'}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -228,48 +228,48 @@ export default function TourCompanyDetailsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tourCompany.pvt_price_2_pax && (
+                {tourCompany.data.pvtPrice2Pax && (
                   <TableRow>
                     <TableCell className="font-medium">2 Passengers</TableCell>
                     <TableCell className="text-right">
-                      {parseFloat(tourCompany.pvt_price_2_pax).toFixed(2)}{' '}
-                      {tourCompany.currency || 'TRY'}
+                      {Number(tourCompany.data.pvtPrice2Pax).toFixed(2)}{' '}
+                      {tourCompany.data.currency || 'TRY'}
                     </TableCell>
                   </TableRow>
                 )}
-                {tourCompany.pvt_price_4_pax && (
+                {tourCompany.data.pvtPrice4Pax && (
                   <TableRow>
                     <TableCell className="font-medium">4 Passengers</TableCell>
                     <TableCell className="text-right">
-                      {parseFloat(tourCompany.pvt_price_4_pax).toFixed(2)}{' '}
-                      {tourCompany.currency || 'TRY'}
+                      {Number(tourCompany.data.pvtPrice4Pax).toFixed(2)}{' '}
+                      {tourCompany.data.currency || 'TRY'}
                     </TableCell>
                   </TableRow>
                 )}
-                {tourCompany.pvt_price_6_pax && (
+                {tourCompany.data.pvtPrice6Pax && (
                   <TableRow>
                     <TableCell className="font-medium">6 Passengers</TableCell>
                     <TableCell className="text-right">
-                      {parseFloat(tourCompany.pvt_price_6_pax).toFixed(2)}{' '}
-                      {tourCompany.currency || 'TRY'}
+                      {Number(tourCompany.data.pvtPrice6Pax).toFixed(2)}{' '}
+                      {tourCompany.data.currency || 'TRY'}
                     </TableCell>
                   </TableRow>
                 )}
-                {tourCompany.pvt_price_8_pax && (
+                {tourCompany.data.pvtPrice8Pax && (
                   <TableRow>
                     <TableCell className="font-medium">8 Passengers</TableCell>
                     <TableCell className="text-right">
-                      {parseFloat(tourCompany.pvt_price_8_pax).toFixed(2)}{' '}
-                      {tourCompany.currency || 'TRY'}
+                      {Number(tourCompany.data.pvtPrice8Pax).toFixed(2)}{' '}
+                      {tourCompany.data.currency || 'TRY'}
                     </TableCell>
                   </TableRow>
                 )}
-                {tourCompany.pvt_price_10_pax && (
+                {tourCompany.data.pvtPrice10Pax && (
                   <TableRow>
                     <TableCell className="font-medium">10 Passengers</TableCell>
                     <TableCell className="text-right">
-                      {parseFloat(tourCompany.pvt_price_10_pax).toFixed(2)}{' '}
-                      {tourCompany.currency || 'TRY'}
+                      {Number(tourCompany.data.pvtPrice10Pax).toFixed(2)}{' '}
+                      {tourCompany.data.currency || 'TRY'}
                     </TableCell>
                   </TableRow>
                 )}
@@ -280,7 +280,7 @@ export default function TourCompanyDetailsPage() {
       )}
 
       {/* Itinerary */}
-      {tourCompany.itinerary && (
+      {tourCompany.data.itinerary && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -289,14 +289,14 @@ export default function TourCompanyDetailsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm whitespace-pre-wrap">{tourCompany.itinerary}</p>
+            <p className="text-sm whitespace-pre-wrap">{tourCompany.data.itinerary}</p>
           </CardContent>
         </Card>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Inclusions */}
-        {tourCompany.inclusions && (
+        {tourCompany.data.inclusions && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -305,13 +305,13 @@ export default function TourCompanyDetailsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm whitespace-pre-wrap">{tourCompany.inclusions}</p>
+              <p className="text-sm whitespace-pre-wrap">{tourCompany.data.inclusions}</p>
             </CardContent>
           </Card>
         )}
 
         {/* Exclusions */}
-        {tourCompany.exclusions && (
+        {tourCompany.data.exclusions && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -320,20 +320,20 @@ export default function TourCompanyDetailsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm whitespace-pre-wrap">{tourCompany.exclusions}</p>
+              <p className="text-sm whitespace-pre-wrap">{tourCompany.data.exclusions}</p>
             </CardContent>
           </Card>
         )}
       </div>
 
       {/* Notes */}
-      {tourCompany.notes && (
+      {tourCompany.data.notes && (
         <Card>
           <CardHeader>
             <CardTitle>Internal Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{tourCompany.notes}</p>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{tourCompany.data.notes}</p>
           </CardContent>
         </Card>
       )}

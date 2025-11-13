@@ -1,12 +1,15 @@
 'use client';
 //ft
 
-import { useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, Save } from 'lucide-react';
-import { vehicleCompanySchema, VehicleCompanyFormData } from '@/lib/validations/vehicle-companies';
+import {
+  vehicleCompanySchema,
+  defaultVehicleCompanyValues,
+  VehicleCompanyFormData,
+} from '@/lib/validations/vehicle-companies';
 import { useVehicleCompanies } from '@/hooks/use-vehicle-companies';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,92 +24,35 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Skeleton } from '@/components/ui/skeleton';
 import { PhoneInput } from '@/components/forms/PhoneInput';
 
-export default function EditVehicleCompanyPage() {
+export default function CreateVehicleCompanyPage() {
   const router = useRouter();
-  const params = useParams();
-  const companyId = parseInt(params.id as string);
-  const { updateVehicleCompany, isUpdating, useVehicleCompany } = useVehicleCompanies();
-  const { data: company, isLoading } = useVehicleCompany(companyId);
+  const { createVehicleCompany, isCreating } = useVehicleCompanies();
 
   const form = useForm({
     resolver: zodResolver(vehicleCompanySchema) as any,
-    defaultValues: {
-      company_name: '',
-      supplier_id: null,
-      contact_person: '',
-      phone: '',
-      email: '',
-      is_active: true,
-    },
+    defaultValues: defaultVehicleCompanyValues,
   });
-
-  // Populate form when company data is loaded
-  useEffect(() => {
-    if (company) {
-      const itemData = company;
-      const formData = {
-        company_name: itemData.companyName,
-        supplier_id: itemData.supplierId ?? null,
-        contact_person: itemData.contactPerson || '',
-        phone: itemData.phone || '',
-        email: itemData.email || '',
-        is_active: itemData.isActive,
-      } as any;
-      form.reset(formData);
-    }
-  }, [company, form]);
 
   const onSubmit = async (data: VehicleCompanyFormData) => {
     try {
-      // Convert empty strings to null for optional fields
+      // Convert empty strings to undefined for optional fields
       const processedData = {
-        contactPerson: data.contact_person || null,
-        email: data.email || null,
-        phone: data.phone || null,
-        supplierId: data.supplier_id || null,
+        companyName: data.company_name,
+        contactPerson: data.contact_person || undefined,
+        email: data.email || undefined,
+        isActive: data.is_active,
+        phone: data.phone || undefined,
       };
 
-      // @ts-expect-error - Type mismatch between form data and API schema
-      await updateVehicleCompany({ id: companyId, data: processedData });
-      router.push(`/dashboard/services/vehicle-companies/${companyId}`);
+      await createVehicleCompany(processedData);
+      router.push('/dashboard/services/vehicles');
     } catch (error) {
       // Error handled by useVehicleCompanies hook
-      console.error('Failed to update vehicle company:', error);
+      console.error('Failed to create vehicle company:', error);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto py-6 space-y-6">
-        <Skeleton className="h-12 w-64" />
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-6 w-48" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!company) {
-    return (
-      <div className="container mx-auto py-6">
-        <Card>
-          <CardContent className="py-10">
-            <p className="text-center text-muted-foreground">Vehicle company not found</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -116,8 +62,8 @@ export default function EditVehicleCompanyPage() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold">Edit Vehicle Company</h1>
-          <p className="text-muted-foreground">Update vehicle company information</p>
+          <h1 className="text-3xl font-bold">Add New Vehicle Company</h1>
+          <p className="text-muted-foreground">Create a new vehicle company in your inventory</p>
         </div>
       </div>
 
@@ -221,13 +167,13 @@ export default function EditVehicleCompanyPage() {
               type="button"
               variant="outline"
               onClick={() => router.back()}
-              disabled={isUpdating}
+              disabled={isCreating}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isUpdating}>
+            <Button type="submit" disabled={isCreating}>
               <Save className="mr-2 h-4 w-4" />
-              {isUpdating ? 'Updating...' : 'Update Vehicle Company'}
+              {isCreating ? 'Creating...' : 'Create Vehicle Company'}
             </Button>
           </div>
         </form>

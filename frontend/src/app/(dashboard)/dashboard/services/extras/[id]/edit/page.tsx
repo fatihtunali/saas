@@ -49,7 +49,7 @@ export default function EditExtraExpensePage() {
       expense_name: '',
       expense_category: '',
       price: null,
-      currency: 'TRY',
+      currency: 'EUR',
       description: '',
       notes: '',
       is_active: true,
@@ -59,14 +59,15 @@ export default function EditExtraExpensePage() {
   // Populate form when extra expense data is loaded
   useEffect(() => {
     if (extra) {
+      const itemData = extra;
       const formData = {
-        expense_name: extra.expense_name,
-        expense_category: extra.expense_category || '',
-        price: extra.price ?? null,
-        currency: extra.currency || 'TRY',
-        description: extra.description || '',
-        notes: extra.notes || '',
-        is_active: extra.is_active,
+        expense_name: itemData.expenseName,
+        expense_category: itemData.expenseCategory || '',
+        price: itemData.price ? Number(itemData.price) : null,
+        currency: itemData.currency || 'EUR',
+        description: itemData.description || '',
+        notes: itemData.notes || '',
+        is_active: itemData.isActive,
       } as any;
       form.reset(formData);
     }
@@ -76,11 +77,9 @@ export default function EditExtraExpensePage() {
     try {
       // Convert empty strings to null for optional fields
       const processedData = {
-        ...data,
-        expense_category: data.expense_category || null,
-        price: data.price || null,
         description: data.description || null,
         notes: data.notes || null,
+        price: data.price ? Number(data.price) : null,
       };
 
       // @ts-expect-error - Type mismatch between form data and API schema
@@ -92,7 +91,7 @@ export default function EditExtraExpensePage() {
     }
   };
 
-  const currency = form.watch('currency') || 'TRY';
+  const currency = form.watch('currency') || 'EUR';
 
   if (isLoading) {
     return (

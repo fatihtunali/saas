@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -10,11 +9,7 @@ import {
   UtensilsCrossed,
   Ticket,
   Package,
-  Building2,
   Truck,
-  Bus,
-  KeyRound,
-  Route,
   Flag,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -52,28 +47,10 @@ const servicesNav = [
     description: 'Additional costs',
   },
   {
-    title: 'Vehicle Companies',
-    href: '/dashboard/services/vehicle-companies',
-    icon: Building2,
-    description: 'Vehicle service providers',
-  },
-  {
-    title: 'Vehicle Types',
-    href: '/dashboard/services/vehicle-types',
+    title: 'Vehicles',
+    href: '/dashboard/services/vehicles',
     icon: Car,
-    description: 'Vehicle categories and specs',
-  },
-  {
-    title: 'Vehicle Rentals',
-    href: '/dashboard/services/vehicle-rentals',
-    icon: KeyRound,
-    description: 'Rental pricing and terms',
-  },
-  {
-    title: 'Transfer Routes',
-    href: '/dashboard/services/transfer-routes',
-    icon: Route,
-    description: 'City-to-city transfers',
+    description: 'Fleet and pricing management',
   },
   {
     title: 'Tour Companies',

@@ -63,12 +63,16 @@ export default function CreateTransferRoutePage() {
     try {
       // Convert empty strings to undefined for optional fields
       const processedData = {
-        ...data,
-        vehicle_type_id: data.vehicle_type_id || undefined,
-        price_per_vehicle: data.price_per_vehicle || undefined,
-        duration_hours: data.duration_hours || undefined,
-        distance_km: data.distance_km || undefined,
+        currency: data.currency,
+        distanceKm: data.distance_km,
+        durationHours: data.duration_hours,
+        fromCityId: data.from_city_id,
+        isActive: data.is_active,
         notes: data.notes || undefined,
+        pricePerVehicle: data.price_per_vehicle,
+        toCityId: data.to_city_id,
+        vehicleCompanyId: data.vehicle_company_id,
+        vehicleTypeId: data.vehicle_type_id,
       };
 
       await createTransferRoute(processedData);

@@ -55,7 +55,7 @@ export default function EditEntranceFeePage() {
       child_price: null,
       student_price: null,
       senior_price: null,
-      currency: 'TRY',
+      currency: 'EUR',
       opening_hours: '',
       best_visit_time: '',
       picture_url: '',
@@ -67,40 +67,44 @@ export default function EditEntranceFeePage() {
   // Populate form when entrance fee data is loaded
   useEffect(() => {
     if (entranceFee) {
+      const itemData = entranceFee;
       const formData = {
-        site_name: entranceFee.site_name,
-        supplier_id: entranceFee.supplier_id ?? null,
-        city_id: entranceFee.city_id,
-        adult_price: entranceFee.adult_price ?? null,
-        child_price: entranceFee.child_price ?? null,
-        student_price: entranceFee.student_price ?? null,
-        senior_price: entranceFee.senior_price ?? null,
-        currency: entranceFee.currency || 'TRY',
-        opening_hours: entranceFee.opening_hours || '',
-        best_visit_time: entranceFee.best_visit_time || '',
-        picture_url: entranceFee.picture_url || '',
-        notes: entranceFee.notes || '',
-        is_active: entranceFee.is_active,
+        site_name: itemData.siteName,
+        supplier_id: itemData.supplierId ?? null,
+        city_id: itemData.cityId,
+        adult_price: itemData.adultPrice ? Number(itemData.adultPrice) : null,
+        child_price: itemData.childPrice ? Number(itemData.childPrice) : null,
+        student_price: itemData.studentPrice ? Number(itemData.studentPrice) : null,
+        senior_price: itemData.seniorPrice ? Number(itemData.seniorPrice) : null,
+        currency: itemData.currency || 'EUR',
+        opening_hours: itemData.openingHours || '',
+        best_visit_time: itemData.bestVisitTime || '',
+        picture_url: itemData.pictureUrl || '',
+        notes: itemData.notes || '',
+        is_active: itemData.isActive,
       } as any;
       form.reset(formData);
     }
   }, [entranceFee, form]);
 
-  const onSubmit = async (data: EntranceFeeFormData) => {
+    const onSubmit = async (data: EntranceFeeFormData) => {
     try {
-      // Convert empty strings to null for optional fields
+      // Convert empty strings to null for optional fields and transform to camelCase
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || null,
-        adult_price: data.adult_price || null,
-        child_price: data.child_price || null,
-        student_price: data.student_price || null,
-        senior_price: data.senior_price || null,
-        opening_hours: data.opening_hours || null,
-        best_visit_time: data.best_visit_time || null,
-        picture_url: data.picture_url || null,
+        adultPrice: data.adult_price ? Number(data.adult_price) : null,
+        bestVisitTime: data.best_visit_time || null,
+        childPrice: data.child_price ? Number(data.child_price) : null,
+        cityId: data.city_id,
+        currency: data.currency,
+        isActive: data.is_active,
         notes: data.notes || null,
-      };
+        openingHours: data.opening_hours || null,
+        pictureUrl: data.picture_url || null,
+        seniorPrice: data.senior_price ? Number(data.senior_price) : null,
+        siteName: data.site_name,
+        studentPrice: data.student_price ? Number(data.student_price) : null,
+        supplierId: data.supplier_id || null,
+      };;
 
       // @ts-expect-error - Type mismatch between form data and API schema
       await updateEntranceFee({ id: entranceFeeId, data: processedData });
@@ -111,7 +115,7 @@ export default function EditEntranceFeePage() {
     }
   };
 
-  const currency = form.watch('currency') || 'TRY';
+  const currency = form.watch('currency') || 'EUR';
 
   if (isLoading) {
     return (
@@ -214,7 +218,7 @@ export default function EditEntranceFeePage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Currency</FormLabel>
-                    <Select value={field.value || 'TRY'} onValueChange={field.onChange}>
+                    <Select value={field.value || 'EUR'} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-32">
                           <SelectValue />

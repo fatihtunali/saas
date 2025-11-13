@@ -49,10 +49,12 @@ export default function CreateVehicleTypePage() {
     try {
       // Convert empty strings to undefined for optional fields
       const processedData = {
-        ...data,
         capacity: data.capacity || undefined,
-        luggage_capacity: data.luggage_capacity || undefined,
+        isActive: data.is_active,
+        luggageCapacity: data.luggage_capacity || undefined,
         notes: data.notes || undefined,
+        vehicleCompanyId: data.vehicle_company_id,
+        vehicleType: data.vehicle_type,
       };
 
       await createVehicleType(processedData);
@@ -104,7 +106,7 @@ export default function CreateVehicleTypePage() {
                       <SelectContent>
                         {vehicleCompanies?.map((company: any) => (
                           <SelectItem key={company.id} value={company.id.toString()}>
-                            {company.company_name}
+                            {company.companyName}
                           </SelectItem>
                         ))}
                       </SelectContent>

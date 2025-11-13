@@ -67,6 +67,8 @@ export default function OperatorDetailsPage() {
     );
   }
 
+  const operatorData = operator.data;
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
@@ -77,10 +79,10 @@ export default function OperatorDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{operator.company_name}</h1>
-              <StatusBadge status={operator.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{operatorData.companyName}</h1>
+              <StatusBadge status={operatorData.isActive ? 'Active' : 'Inactive'} />
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Operator ID: {operator.id}</p>
+            <p className="text-sm text-muted-foreground mt-1">Operator ID: {operatorData.id}</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -113,18 +115,18 @@ export default function OperatorDetailsPage() {
               <Mail className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="font-medium">Email</p>
-                <p className="text-sm text-muted-foreground">{operator.contact_email}</p>
+                <p className="text-sm text-muted-foreground">{operatorData.contactEmail}</p>
               </div>
             </div>
 
-            {operator.contact_phone && (
+            {operatorData.contactPhone && (
               <>
                 <Separator />
                 <div className="flex items-start gap-3">
                   <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Phone</p>
-                    <p className="text-sm text-muted-foreground">{operator.contact_phone}</p>
+                    <p className="text-sm text-muted-foreground">{operatorData.contactPhone}</p>
                   </div>
                 </div>
               </>
@@ -138,17 +140,17 @@ export default function OperatorDetailsPage() {
             <CardTitle>Location</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {operator.address && (
+            {operatorData.address && (
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">Address</p>
-                  <p className="text-sm text-muted-foreground">{operator.address}</p>
+                  <p className="text-sm text-muted-foreground">{operatorData.address}</p>
                 </div>
               </div>
             )}
 
-            {(operator.city || operator.country) && (
+            {(operatorData.city || operatorData.country) && (
               <>
                 <Separator />
                 <div className="flex items-start gap-3">
@@ -156,7 +158,7 @@ export default function OperatorDetailsPage() {
                   <div>
                     <p className="font-medium">City & Country</p>
                     <p className="text-sm text-muted-foreground">
-                      {[operator.city, operator.country].filter(Boolean).join(', ') || '-'}
+                      {[operatorData.city, operatorData.country].filter(Boolean).join(', ') || '-'}
                     </p>
                   </div>
                 </div>
@@ -171,12 +173,12 @@ export default function OperatorDetailsPage() {
             <CardTitle>Financial Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {operator.tax_id && (
+            {operatorData.taxId && (
               <div className="flex items-start gap-3">
                 <CreditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">Tax ID</p>
-                  <p className="text-sm text-muted-foreground">{operator.tax_id}</p>
+                  <p className="text-sm text-muted-foreground">{operatorData.taxId}</p>
                 </div>
               </div>
             )}
@@ -186,7 +188,7 @@ export default function OperatorDetailsPage() {
               <DollarSign className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="font-medium">Base Currency</p>
-                <p className="text-sm text-muted-foreground">{operator.base_currency}</p>
+                <p className="text-sm text-muted-foreground">{operatorData.baseCurrency}</p>
               </div>
             </div>
           </CardContent>
@@ -200,12 +202,12 @@ export default function OperatorDetailsPage() {
           <CardContent className="space-y-4">
             <div>
               <p className="font-medium">Created At</p>
-              <p className="text-sm text-muted-foreground">{formatDate(operator.created_at)}</p>
+              <p className="text-sm text-muted-foreground">{formatDate(operatorData.createdAt)}</p>
             </div>
             <Separator />
             <div>
               <p className="font-medium">Last Updated</p>
-              <p className="text-sm text-muted-foreground">{formatDate(operator.updated_at)}</p>
+              <p className="text-sm text-muted-foreground">{formatDate(operatorData.updatedAt)}</p>
             </div>
           </CardContent>
         </Card>
@@ -217,7 +219,7 @@ export default function OperatorDetailsPage() {
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
         title="Delete Operator"
-        description={`Are you sure you want to delete ${operator.company_name}? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${operatorData.companyName}? This action cannot be undone.`}
         confirmText="Delete"
       />
     </div>

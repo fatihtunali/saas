@@ -24,6 +24,7 @@ import { Separator } from '@/components/ui/separator';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatMealPlan } from '@/lib/validations/hotels';
 import {
   Table,
   TableBody,
@@ -87,12 +88,12 @@ export default function HotelDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{hotel.hotel_name}</h1>
-              <StatusBadge status={hotel.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{hotel.hotelName}</h1>
+              <StatusBadge status={hotel.isActive ? 'Active' : 'Inactive'} />
             </div>
-            {hotel.star_rating && (
+            {hotel.starRating && (
               <div className="flex items-center gap-1 mt-2">
-                {Array.from({ length: parseInt(hotel.star_rating) }).map((_, i) => (
+                {Array.from({ length: Number(hotel.starRating || 0) }).map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" />
                 ))}
               </div>
@@ -119,12 +120,12 @@ export default function HotelDetailsPage() {
       </div>
 
       {/* Hotel Image */}
-      {hotel.picture_url && (
+      {hotel.pictureUrl && (
         <Card>
           <CardContent className="p-0">
             <img
-              src={hotel.picture_url}
-              alt={hotel.hotel_name}
+              src={hotel.pictureUrl}
+              alt={hotel.hotelName}
               className="w-full h-80 object-cover rounded-lg"
             />
           </CardContent>
@@ -142,7 +143,7 @@ export default function HotelDetailsPage() {
               <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="font-medium">Location</p>
-                <p className="text-sm text-muted-foreground">{hotel.city?.city_name || 'N/A'}</p>
+                <p className="text-sm text-muted-foreground">{hotel.cityName || 'N/A'}</p>
                 {hotel.address && (
                   <p className="text-sm text-muted-foreground mt-1">{hotel.address}</p>
                 )}
@@ -202,25 +203,25 @@ export default function HotelDetailsPage() {
             <CardTitle>Meal Plan</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {hotel.meal_plan ? (
+            {hotel.mealPlan ? (
               <>
                 <div className="flex items-start gap-3">
                   <UtensilsCrossed className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Meal Plan Type</p>
                     <Badge variant="outline" className="mt-1">
-                      {hotel.meal_plan}
+                      {formatMealPlan(hotel.mealPlan)}
                     </Badge>
                   </div>
                 </div>
 
-                {hotel.meal_plan_supplement && (
+                {hotel.mealPlanSupplement && (
                   <>
                     <Separator />
                     <div>
                       <p className="font-medium">Meal Plan Supplement</p>
                       <p className="text-lg font-semibold text-primary mt-1">
-                        {parseFloat(hotel.meal_plan_supplement).toFixed(2)}{' '}
+                        {Number(hotel.mealPlanSupplement || 0).toFixed(2)}{' '}
                         {hotel.currency || 'TRY'} / person
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
@@ -255,31 +256,31 @@ export default function HotelDetailsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {hotel.price_per_person_double && (
+              {hotel.pricePerPersonDouble && (
                 <TableRow>
-                  <TableCell className="font-medium">Double Room</TableCell>
+                  <TableCell className="font-medium">Per person in a double room</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(hotel.price_per_person_double).toFixed(2)} {hotel.currency || 'TRY'}
+                    {Number(hotel.pricePerPersonDouble).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {hotel.single_supplement && (
+              {hotel.singleSupplement && (
                 <TableRow>
                   <TableCell className="font-medium">Single Supplement</TableCell>
                   <TableCell className="text-right">
-                    +{parseFloat(hotel.single_supplement).toFixed(2)} {hotel.currency || 'TRY'}
+                    +{Number(hotel.singleSupplement).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {hotel.price_per_person_triple && (
+              {hotel.pricePerPersonTriple && (
                 <TableRow>
-                  <TableCell className="font-medium">Triple Room</TableCell>
+                  <TableCell className="font-medium">Per person in a triple room</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(hotel.price_per_person_triple).toFixed(2)} {hotel.currency || 'TRY'}
+                    {Number(hotel.pricePerPersonTriple).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {(hotel.child_price_0_2 || hotel.child_price_3_5 || hotel.child_price_6_11) && (
+              {(hotel.childPrice02 || hotel.childPrice35 || hotel.childPrice611) && (
                 <TableRow>
                   <TableCell colSpan={2} className="bg-muted/50">
                     <div className="flex items-center gap-2">
@@ -289,27 +290,27 @@ export default function HotelDetailsPage() {
                   </TableCell>
                 </TableRow>
               )}
-              {hotel.child_price_0_2 !== null && (
+              {hotel.childPrice02 !== null && (
                 <TableRow>
                   <TableCell className="pl-8">Child (0-2 years)</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(hotel.child_price_0_2).toFixed(2)} {hotel.currency || 'TRY'}
+                    {Number(hotel.childPrice02 || 0).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {hotel.child_price_3_5 !== null && (
+              {hotel.childPrice35 !== null && (
                 <TableRow>
                   <TableCell className="pl-8">Child (3-5 years)</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(hotel.child_price_3_5).toFixed(2)} {hotel.currency || 'TRY'}
+                    {Number(hotel.childPrice35 || 0).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {hotel.child_price_6_11 !== null && (
+              {hotel.childPrice611 !== null && (
                 <TableRow>
                   <TableCell className="pl-8">Child (6-11 years)</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(hotel.child_price_6_11).toFixed(2)} {hotel.currency || 'TRY'}
+                    {Number(hotel.childPrice611 || 0).toFixed(2)} {hotel.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}

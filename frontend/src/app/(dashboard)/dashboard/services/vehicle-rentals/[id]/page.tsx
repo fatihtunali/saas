@@ -76,7 +76,7 @@ export default function VehicleRentalDetailsPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold">Vehicle Rental #{rental.id}</h1>
-              <StatusBadge status={rental.is_active ? 'Active' : 'Inactive'} />
+              <StatusBadge status={rental.isActive ? 'Active' : 'Inactive'} />
             </div>
             <p className="text-muted-foreground mt-1">Rental Details</p>
           </div>
@@ -109,24 +109,24 @@ export default function VehicleRentalDetailsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {rental.vehicle_company && (
+          {rental.vehicleCompany && (
             <div>
               <p className="text-sm text-muted-foreground mb-1">Vehicle Company</p>
               <Badge variant="secondary" className="text-base py-1 px-3">
-                {rental.vehicle_company.company_name}
+                {rental.vehicleCompany.companyName}
               </Badge>
             </div>
           )}
-          {rental.vehicle_type && rental.vehicle_company && <Separator />}
-          {rental.vehicle_type && (
+          {rental.vehicleType && rental.vehicleCompany && <Separator />}
+          {rental.vehicleType && (
             <div>
               <p className="text-sm text-muted-foreground mb-1">Vehicle Type</p>
               <Badge variant="outline" className="text-base py-1 px-3">
-                {rental.vehicle_type.vehicle_type}
+                {rental.vehicleType.vehicleType}
               </Badge>
             </div>
           )}
-          {!rental.vehicle_company && !rental.vehicle_type && (
+          {!rental.vehicleCompany && !rental.vehicleType && (
             <p className="text-sm text-muted-foreground">No vehicle information available</p>
           )}
         </CardContent>
@@ -152,41 +152,41 @@ export default function VehicleRentalDetailsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rental.full_day_price && (
+              {rental.fullDayPrice && (
                 <TableRow>
                   <TableCell className="font-medium">Full Day</TableCell>
-                  <TableCell>{rental.full_day_hours ? `${rental.full_day_hours}h` : '-'}</TableCell>
-                  <TableCell>{rental.full_day_km ? `${rental.full_day_km} km` : '-'}</TableCell>
+                  <TableCell>{rental.fullDayHours ? `${rental.fullDayHours}h` : '-'}</TableCell>
+                  <TableCell>{rental.fullDayKm ? `${rental.fullDayKm} km` : '-'}</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(rental.full_day_price).toFixed(2)} {rental.currency || 'TRY'}
+                    {parseFloat(rental.fullDayPrice.toString()).toFixed(2)} {rental.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {rental.half_day_price && (
+              {rental.halfDayPrice && (
                 <TableRow>
                   <TableCell className="font-medium">Half Day</TableCell>
-                  <TableCell>{rental.half_day_hours ? `${rental.half_day_hours}h` : '-'}</TableCell>
-                  <TableCell>{rental.half_day_km ? `${rental.half_day_km} km` : '-'}</TableCell>
+                  <TableCell>{rental.halfDayHours ? `${rental.halfDayHours}h` : '-'}</TableCell>
+                  <TableCell>{rental.halfDayKm ? `${rental.halfDayKm} km` : '-'}</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(rental.half_day_price).toFixed(2)} {rental.currency || 'TRY'}
+                    {parseFloat(rental.halfDayPrice.toString()).toFixed(2)} {rental.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {rental.night_rental_price && (
+              {rental.nightRentalPrice && (
                 <TableRow>
                   <TableCell className="font-medium">Night Rental</TableCell>
                   <TableCell>
-                    {rental.night_rental_hours ? `${rental.night_rental_hours}h` : '-'}
+                    {rental.nightRentalHours ? `${rental.nightRentalHours}h` : '-'}
                   </TableCell>
                   <TableCell>
-                    {rental.night_rental_km ? `${rental.night_rental_km} km` : '-'}
+                    {rental.nightRentalKm ? `${rental.nightRentalKm} km` : '-'}
                   </TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(rental.night_rental_price).toFixed(2)} {rental.currency || 'TRY'}
+                    {parseFloat(rental.nightRentalPrice.toString()).toFixed(2)} {rental.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {!rental.full_day_price && !rental.half_day_price && !rental.night_rental_price && (
+              {!rental.fullDayPrice && !rental.halfDayPrice && !rental.nightRentalPrice && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground">
                     No rental pricing available
@@ -199,7 +199,7 @@ export default function VehicleRentalDetailsPage() {
       </Card>
 
       {/* Extra Charges */}
-      {(rental.extra_hour_rate || rental.extra_km_rate) && (
+      {(rental.extraHourRate || rental.extraKmRate) && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -208,26 +208,26 @@ export default function VehicleRentalDetailsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {rental.extra_hour_rate && (
+            {rental.extraHourRate && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium">Extra Hour Rate</span>
                 </div>
                 <span className="font-semibold">
-                  {parseFloat(rental.extra_hour_rate).toFixed(2)} {rental.currency || 'TRY'} / hour
+                  {parseFloat(rental.extraHourRate.toString()).toFixed(2)} {rental.currency || 'TRY'} / hour
                 </span>
               </div>
             )}
-            {rental.extra_hour_rate && rental.extra_km_rate && <Separator />}
-            {rental.extra_km_rate && (
+            {rental.extraHourRate && rental.extraKmRate && <Separator />}
+            {rental.extraKmRate && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Navigation2 className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium">Extra Kilometer Rate</span>
                 </div>
                 <span className="font-semibold">
-                  {parseFloat(rental.extra_km_rate).toFixed(2)} {rental.currency || 'TRY'} / km
+                  {parseFloat(rental.extraKmRate.toString()).toFixed(2)} {rental.currency || 'TRY'} / km
                 </span>
               </div>
             )}

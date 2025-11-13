@@ -36,13 +36,19 @@ export default function VehicleRentalsPage() {
 
   const columns: ColumnDef<VehicleRental>[] = [
     {
-      accessorKey: 'vehicle_type_id',
-      header: 'Vehicle Type Id',
+      id: 'vehicleCompany',
+      header: 'Vehicle Company',
+      cell: ({ row }) => row.original.vehicleCompany?.companyName || '-',
     },
     {
-      accessorKey: 'is_active',
+      id: 'vehicleType',
+      header: 'Vehicle Type',
+      cell: ({ row }) => row.original.vehicleType?.vehicleType || '-',
+    },
+    {
+      accessorKey: 'isActive',
       header: 'Status',
-      cell: ({ row }) => <StatusBadge status={row.original.is_active ? 'Active' : 'Inactive'} />,
+      cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'Active' : 'Inactive'} />,
     },
     {
       id: 'actions',

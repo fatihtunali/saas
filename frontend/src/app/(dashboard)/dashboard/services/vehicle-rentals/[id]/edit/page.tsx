@@ -50,43 +50,46 @@ export default function EditVehicleRentalPage() {
     resolver: zodResolver(vehicleRentalSchema) as any,
     values: rental
       ? {
-          vehicle_company_id: rental.vehicle_company_id,
-          vehicle_type_id: rental.vehicle_type_id,
-          full_day_price: rental.full_day_price || 0,
-          full_day_hours: rental.full_day_hours || 8,
-          full_day_km: rental.full_day_km || 80,
-          half_day_price: rental.half_day_price || 0,
-          half_day_hours: rental.half_day_hours || 4,
-          half_day_km: rental.half_day_km || 40,
-          night_rental_price: rental.night_rental_price || 0,
-          night_rental_hours: rental.night_rental_hours || 10,
-          night_rental_km: rental.night_rental_km || 100,
-          extra_hour_rate: rental.extra_hour_rate || 0,
-          extra_km_rate: rental.extra_km_rate || 0,
-          currency: rental.currency || 'TRY',
+          vehicle_company_id: rental.vehicleCompanyId,
+          vehicle_type_id: rental.vehicleTypeId,
+          full_day_price: rental.fullDayPrice ? Number(rental.fullDayPrice) : 0,
+          full_day_hours: rental.fullDayHours || 8,
+          full_day_km: rental.fullDayKm || 80,
+          half_day_price: rental.halfDayPrice ? Number(rental.halfDayPrice) : 0,
+          half_day_hours: rental.halfDayHours || 4,
+          half_day_km: rental.halfDayKm || 40,
+          night_rental_price: rental.nightRentalPrice ? Number(rental.nightRentalPrice) : 0,
+          night_rental_hours: rental.nightRentalHours || 10,
+          night_rental_km: rental.nightRentalKm || 100,
+          extra_hour_rate: rental.extraHourRate ? Number(rental.extraHourRate) : 0,
+          extra_km_rate: rental.extraKmRate ? Number(rental.extraKmRate) : 0,
+          currency: rental.currency || 'EUR',
           notes: rental.notes || '',
-          is_active: rental.is_active ?? true,
+          is_active: rental.isActive ?? true,
         }
       : undefined,
   });
 
   const onSubmit = async (data: VehicleRentalFormData) => {
     try {
-      // Convert empty strings to undefined for optional fields
+      // Convert form data to API format with camelCase and proper types
       const processedData = {
-        ...data,
-        full_day_price: data.full_day_price || undefined,
-        full_day_hours: data.full_day_hours || undefined,
-        full_day_km: data.full_day_km || undefined,
-        half_day_price: data.half_day_price || undefined,
-        half_day_hours: data.half_day_hours || undefined,
-        half_day_km: data.half_day_km || undefined,
-        night_rental_price: data.night_rental_price || undefined,
-        night_rental_hours: data.night_rental_hours || undefined,
-        night_rental_km: data.night_rental_km || undefined,
-        extra_hour_rate: data.extra_hour_rate || undefined,
-        extra_km_rate: data.extra_km_rate || undefined,
-        notes: data.notes || undefined,
+        vehicleCompanyId: data.vehicle_company_id,
+        vehicleTypeId: data.vehicle_type_id,
+        fullDayPrice: data.full_day_price ? Number(data.full_day_price) : null,
+        fullDayHours: data.full_day_hours || null,
+        fullDayKm: data.full_day_km || null,
+        halfDayPrice: data.half_day_price ? Number(data.half_day_price) : null,
+        halfDayHours: data.half_day_hours || null,
+        halfDayKm: data.half_day_km || null,
+        nightRentalPrice: data.night_rental_price ? Number(data.night_rental_price) : null,
+        nightRentalHours: data.night_rental_hours || null,
+        nightRentalKm: data.night_rental_km || null,
+        extraHourRate: data.extra_hour_rate ? Number(data.extra_hour_rate) : null,
+        extraKmRate: data.extra_km_rate ? Number(data.extra_km_rate) : null,
+        currency: data.currency || 'EUR',
+        notes: data.notes || null,
+        isActive: data.is_active,
       };
 
       await updateVehicleRental({ id: rentalId, data: processedData });
@@ -97,7 +100,7 @@ export default function EditVehicleRentalPage() {
     }
   };
 
-  const currency = form.watch('currency') || 'TRY';
+  const currency = form.watch('currency') || 'EUR';
 
   if (isLoadingRental) {
     return (
@@ -160,7 +163,7 @@ export default function EditVehicleRentalPage() {
                       <SelectContent>
                         {vehicleCompanies?.map((company: any) => (
                           <SelectItem key={company.id} value={company.id.toString()}>
-                            {company.company_name}
+                            {company.companyName}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -188,7 +191,7 @@ export default function EditVehicleRentalPage() {
                       <SelectContent>
                         {vehicleTypes?.map((type: any) => (
                           <SelectItem key={type.id} value={type.id.toString()}>
-                            {type.vehicle_type} ({type.capacity} pax)
+                            {type.vehicleType} ({type.capacity} pax)
                           </SelectItem>
                         ))}
                       </SelectContent>

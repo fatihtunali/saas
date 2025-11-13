@@ -59,13 +59,14 @@ export default function EditVehicleTypePage() {
   // Populate form when vehicle type data is loaded
   useEffect(() => {
     if (vehicleType) {
+      const itemData = vehicleType;
       const formData = {
-        vehicle_company_id: vehicleType.vehicle_company_id,
-        vehicle_type: vehicleType.vehicle_type,
-        capacity: vehicleType.capacity ?? undefined,
-        luggage_capacity: vehicleType.luggage_capacity ?? undefined,
-        notes: vehicleType.notes || '',
-        is_active: vehicleType.is_active,
+        vehicle_company_id: itemData.vehicleCompanyId,
+        vehicle_type: itemData.vehicleType,
+        capacity: itemData.capacity ?? undefined,
+        luggage_capacity: itemData.luggageCapacity ?? undefined,
+        notes: itemData.notes || '',
+        is_active: itemData.isActive,
       } as any;
       form.reset(formData);
     }
@@ -75,9 +76,8 @@ export default function EditVehicleTypePage() {
     try {
       // Convert empty strings to null for optional fields
       const processedData = {
-        ...data,
         capacity: data.capacity || null,
-        luggage_capacity: data.luggage_capacity || null,
+        luggageCapacity: data.luggage_capacity || null,
         notes: data.notes || null,
       };
 
@@ -161,7 +161,7 @@ export default function EditVehicleTypePage() {
                       <SelectContent>
                         {vehicleCompanies?.map((company: any) => (
                           <SelectItem key={company.id} value={company.id.toString()}>
-                            {company.company_name}
+                            {company.companyName}
                           </SelectItem>
                         ))}
                       </SelectContent>

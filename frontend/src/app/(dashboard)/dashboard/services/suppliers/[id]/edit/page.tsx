@@ -8,6 +8,7 @@ import { ArrowLeft, Save } from 'lucide-react';
 import { supplierSchema, SUPPLIER_TYPES, SupplierFormData } from '@/lib/validations/suppliers';
 import { useSuppliers } from '@/hooks/use-suppliers';
 import { useCities } from '@/lib/hooks/useBookingWizard';
+import { UpdateSupplierDto } from '@/types/services';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -60,37 +61,39 @@ export default function EditSupplierPage() {
 
   // Load supplier data when available
   useEffect(() => {
-    if (supplier) {
+    if (supplier?.data) {
+      const supplierData = supplier.data;
       form.reset({
-        supplier_type: supplier.supplier_type || '',
-        company_name: supplier.company_name || '',
-        contact_person: supplier.contact_person || '',
-        email: supplier.email || '',
-        phone: supplier.phone || '',
-        address: supplier.address || '',
-        city_id: supplier.city_id || undefined,
-        tax_id: supplier.tax_id || '',
-        payment_terms: supplier.payment_terms || '',
-        bank_account_info: supplier.bank_account_info || '',
-        notes: supplier.notes || '',
-        is_active: supplier.is_active ?? true,
+        supplier_type: supplierData.supplierType || '',
+        company_name: supplierData.companyName || '',
+        contact_person: supplierData.contactPerson || '',
+        email: supplierData.email || '',
+        phone: supplierData.phone || '',
+        address: supplierData.address || '',
+        city_id: supplierData.cityId || undefined,
+        tax_id: supplierData.taxId || '',
+        payment_terms: supplierData.paymentTerms || '',
+        bank_account_info: supplierData.bankAccountInfo || '',
+        notes: supplierData.notes || '',
+        is_active: supplierData.isActive ?? true,
       } as any);
     }
   }, [supplier, form]);
 
   const onSubmit = async (data: SupplierFormData) => {
     try {
-      // Convert empty strings to undefined for optional fields
-      const processedData = {
-        ...data,
-        contact_person: data.contact_person || undefined,
+      // Convert empty strings to undefined and transform to camelCase for API
+      const processedData: UpdateSupplierDto = {
+        supplierType: data.supplier_type,
+        companyName: data.company_name,
+        contactPerson: data.contact_person || undefined,
         email: data.email || undefined,
         phone: data.phone || undefined,
         address: data.address || undefined,
-        city_id: data.city_id || undefined,
-        tax_id: data.tax_id || undefined,
-        payment_terms: data.payment_terms || undefined,
-        bank_account_info: data.bank_account_info || undefined,
+        cityId: data.city_id || undefined,
+        taxId: data.tax_id || undefined,
+        paymentTerms: data.payment_terms || undefined,
+        bankAccountInfo: data.bank_account_info || undefined,
         notes: data.notes || undefined,
       };
 
@@ -112,7 +115,7 @@ export default function EditSupplierPage() {
     );
   }
 
-  if (!supplier) {
+  if (!supplier?.data) {
     return (
       <div className="container mx-auto py-6">
         <div className="flex items-center justify-center h-96">

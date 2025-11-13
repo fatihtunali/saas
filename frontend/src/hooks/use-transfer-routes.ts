@@ -78,7 +78,7 @@ export function useTransferRoutes(params?: QueryParams) {
   });
 
   return {
-    transferRoutes: transferRoutes?.data?.transfer_routes || [],
+    transferRoutes: transferRoutes?.data?.transferRoutes || [],
     pagination: transferRoutes?.data?.pagination,
     isLoading,
     error,

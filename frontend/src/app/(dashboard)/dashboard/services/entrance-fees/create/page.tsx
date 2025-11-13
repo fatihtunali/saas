@@ -50,17 +50,18 @@ export default function CreateEntranceFeePage() {
     try {
       // Convert empty strings to undefined for optional fields
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || undefined,
-        adult_price: data.adult_price || undefined,
-        child_price: data.child_price || undefined,
-        student_price: data.student_price || undefined,
-        senior_price: data.senior_price || undefined,
+        siteName: data.site_name,
+        cityId: data.city_id,
+        adultPrice: data.adult_price || undefined,
+        bestVisitTime: data.best_visit_time || undefined,
+        childPrice: data.child_price || undefined,
         currency: data.currency || undefined,
-        opening_hours: data.opening_hours || undefined,
-        best_visit_time: data.best_visit_time || undefined,
-        picture_url: data.picture_url || undefined,
         notes: data.notes || undefined,
+        openingHours: data.opening_hours || undefined,
+        pictureUrl: data.picture_url || undefined,
+        seniorPrice: data.senior_price || undefined,
+        studentPrice: data.student_price || undefined,
+        supplierId: data.supplier_id || undefined,
       };
 
       await createEntranceFee(processedData);
@@ -71,7 +72,7 @@ export default function CreateEntranceFeePage() {
     }
   };
 
-  const currency = form.watch('currency') || 'TRY';
+  const currency = form.watch('currency') || 'EUR';
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -144,7 +145,7 @@ export default function CreateEntranceFeePage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Currency</FormLabel>
-                    <Select value={field.value || 'TRY'} onValueChange={field.onChange}>
+                    <Select value={field.value || 'EUR'} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger className="w-32">
                           <SelectValue />

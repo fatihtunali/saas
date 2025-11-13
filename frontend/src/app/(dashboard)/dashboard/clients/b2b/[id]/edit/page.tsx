@@ -67,29 +67,30 @@ export default function EditB2BClientPage() {
   });
 
   useEffect(() => {
-    if (client) {
+    if (client?.data) {
+      const clientData = client.data;
       form.reset({
-        partner_operator_id: client.partner_operator_id || undefined,
-        full_name: client.full_name || '',
-        email: client.email || '',
-        phone: client.phone || '',
-        birth_date: client.birth_date || '',
-        nationality: client.nationality || '',
-        passport_number: client.passport_number || '',
-        passport_expiry_date: client.passport_expiry_date || '',
-        address: client.address || '',
-        city: client.city || '',
-        country: client.country || '',
-        emergency_contact_name: client.emergency_contact_name || '',
-        emergency_contact_phone: client.emergency_contact_phone || '',
-        dietary_requirements: client.dietary_requirements || '',
-        accessibility_needs: client.accessibility_needs || '',
-        medical_conditions: client.medical_conditions || '',
-        special_notes: client.special_notes || '',
-        payment_terms: client.payment_terms || '',
-        credit_limit: client.credit_limit || undefined,
-        credit_used: client.credit_used || 0,
-        is_active: client.is_active ?? true,
+        partner_operator_id: clientData.partnerOperatorId || undefined,
+        full_name: clientData.fullName || '',
+        email: clientData.email || '',
+        phone: clientData.phone || '',
+        birth_date: clientData.birthDate || '',
+        nationality: clientData.nationality || '',
+        passport_number: clientData.passportNumber || '',
+        passport_expiry_date: clientData.passportExpiryDate || '',
+        address: clientData.address || '',
+        city: clientData.city || '',
+        country: clientData.country || '',
+        emergency_contact_name: clientData.emergencyContactName || '',
+        emergency_contact_phone: clientData.emergencyContactPhone || '',
+        dietary_requirements: clientData.dietaryRequirements || '',
+        accessibility_needs: clientData.accessibilityNeeds || '',
+        medical_conditions: clientData.medicalConditions || '',
+        special_notes: clientData.specialNotes || '',
+        payment_terms: clientData.paymentTerms || '',
+        credit_limit: clientData.creditLimit || undefined,
+        credit_used: clientData.creditUsed || 0,
+        is_active: clientData.isActive ?? true,
       } as any);
     }
   }, [client, form]);

@@ -67,8 +67,8 @@ export default function VehicleTypeDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{vehicleType.vehicle_type}</h1>
-              <StatusBadge status={vehicleType.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{vehicleType.vehicleType}</h1>
+              <StatusBadge status={vehicleType.isActive ? 'Active' : 'Inactive'} />
             </div>
             <p className="text-muted-foreground mt-1">Vehicle Type Details</p>
           </div>
@@ -102,9 +102,9 @@ export default function VehicleTypeDetailsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {vehicleType.vehicle_company ? (
+            {vehicleType.vehicleCompany ? (
               <Badge variant="secondary" className="text-base py-2 px-4">
-                {vehicleType.vehicle_company.company_name}
+                {vehicleType.vehicleCompany.companyName}
               </Badge>
             ) : (
               <p className="text-sm text-muted-foreground">No company information available</p>
@@ -130,17 +130,17 @@ export default function VehicleTypeDetailsPage() {
                 <span className="text-lg font-semibold">{vehicleType.capacity} persons</span>
               </div>
             )}
-            {vehicleType.capacity && vehicleType.luggage_capacity && <Separator />}
-            {vehicleType.luggage_capacity && (
+            {vehicleType.capacity && vehicleType.luggageCapacity && <Separator />}
+            {vehicleType.luggageCapacity && (
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground flex items-center gap-2">
                   <Briefcase className="h-4 w-4" />
                   Luggage Capacity
                 </span>
-                <span className="text-lg font-semibold">{vehicleType.luggage_capacity} pieces</span>
+                <span className="text-lg font-semibold">{vehicleType.luggageCapacity} pieces</span>
               </div>
             )}
-            {!vehicleType.capacity && !vehicleType.luggage_capacity && (
+            {!vehicleType.capacity && !vehicleType.luggageCapacity && (
               <p className="text-sm text-muted-foreground">No capacity information available</p>
             )}
           </CardContent>

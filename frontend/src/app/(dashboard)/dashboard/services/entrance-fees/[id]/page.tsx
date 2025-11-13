@@ -75,8 +75,8 @@ export default function EntranceFeeDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{entranceFee.site_name}</h1>
-              <StatusBadge status={entranceFee.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{entranceFee.siteName}</h1>
+              <StatusBadge status={entranceFee.isActive ? 'Active' : 'Inactive'} />
             </div>
             <p className="text-muted-foreground mt-1">Entrance Fee Details</p>
           </div>
@@ -101,12 +101,12 @@ export default function EntranceFeeDetailsPage() {
       </div>
 
       {/* Site Image */}
-      {entranceFee.picture_url && (
+      {entranceFee.pictureUrl && (
         <Card>
           <CardContent className="p-0">
             <img
-              src={entranceFee.picture_url}
-              alt={entranceFee.site_name}
+              src={entranceFee.pictureUrl}
+              alt={entranceFee.siteName}
               className="w-full h-80 object-cover rounded-lg"
             />
           </CardContent>
@@ -125,7 +125,7 @@ export default function EntranceFeeDetailsPage() {
               <div>
                 <p className="font-medium">Location</p>
                 <p className="text-sm text-muted-foreground">
-                  {entranceFee.city?.city_name || 'N/A'}
+                  {entranceFee.cityName || 'N/A'}
                 </p>
               </div>
             </div>
@@ -138,30 +138,30 @@ export default function EntranceFeeDetailsPage() {
             <CardTitle>Visit Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {entranceFee.opening_hours && (
+            {entranceFee.openingHours && (
               <>
                 <div className="flex items-start gap-3">
                   <Clock className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Opening Hours</p>
-                    <p className="text-sm text-muted-foreground">{entranceFee.opening_hours}</p>
+                    <p className="text-sm text-muted-foreground">{entranceFee.openingHours}</p>
                   </div>
                 </div>
                 <Separator />
               </>
             )}
 
-            {entranceFee.best_visit_time && (
+            {entranceFee.bestVisitTime && (
               <div className="flex items-start gap-3">
                 <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">Best Visit Time</p>
-                  <p className="text-sm text-muted-foreground">{entranceFee.best_visit_time}</p>
+                  <p className="text-sm text-muted-foreground">{entranceFee.bestVisitTime}</p>
                 </div>
               </div>
             )}
 
-            {!entranceFee.opening_hours && !entranceFee.best_visit_time && (
+            {!entranceFee.openingHours && !entranceFee.bestVisitTime && (
               <p className="text-sm text-muted-foreground">No visit information available</p>
             )}
           </CardContent>
@@ -175,7 +175,7 @@ export default function EntranceFeeDetailsPage() {
             <Ticket className="h-5 w-5" />
             Pricing Information
           </CardTitle>
-          <CardDescription>Entry prices in {entranceFee.currency || 'TRY'}</CardDescription>
+          <CardDescription>Entry prices in {entranceFee.currency || 'EUR'}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -186,44 +186,44 @@ export default function EntranceFeeDetailsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {entranceFee.adult_price !== null && (
+              {entranceFee.adultPrice !== null && (
                 <TableRow>
                   <TableCell className="font-medium">Adult</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(entranceFee.adult_price).toFixed(2)} {entranceFee.currency || 'TRY'}
+                    {Number(entranceFee.adultPrice || 0).toFixed(2)} {entranceFee.currency || 'EUR'}
                   </TableCell>
                 </TableRow>
               )}
-              {entranceFee.child_price !== null && (
+              {entranceFee.childPrice !== null && (
                 <TableRow>
                   <TableCell className="font-medium">Child</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(entranceFee.child_price).toFixed(2)} {entranceFee.currency || 'TRY'}
+                    {Number(entranceFee.childPrice || 0).toFixed(2)} {entranceFee.currency || 'EUR'}
                   </TableCell>
                 </TableRow>
               )}
-              {entranceFee.student_price !== null && (
+              {entranceFee.studentPrice !== null && (
                 <TableRow>
                   <TableCell className="font-medium">Student</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(entranceFee.student_price).toFixed(2)}{' '}
-                    {entranceFee.currency || 'TRY'}
+                    {Number(entranceFee.studentPrice || 0).toFixed(2)}{' '}
+                    {entranceFee.currency || 'EUR'}
                   </TableCell>
                 </TableRow>
               )}
-              {entranceFee.senior_price !== null && (
+              {entranceFee.seniorPrice !== null && (
                 <TableRow>
                   <TableCell className="font-medium">Senior</TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(entranceFee.senior_price).toFixed(2)}{' '}
-                    {entranceFee.currency || 'TRY'}
+                    {Number(entranceFee.seniorPrice || 0).toFixed(2)}{' '}
+                    {entranceFee.currency || 'EUR'}
                   </TableCell>
                 </TableRow>
               )}
-              {entranceFee.adult_price === null &&
-                entranceFee.child_price === null &&
-                entranceFee.student_price === null &&
-                entranceFee.senior_price === null && (
+              {entranceFee.adultPrice === null &&
+                entranceFee.childPrice === null &&
+                entranceFee.studentPrice === null &&
+                entranceFee.seniorPrice === null && (
                   <TableRow>
                     <TableCell colSpan={2} className="text-center text-muted-foreground">
                       No pricing information available

@@ -34,17 +34,17 @@ export default function OperatorsPage() {
 
   const columns: ColumnDef<Operator>[] = [
     {
-      accessorKey: 'company_name',
+      accessorKey: 'companyName',
       header: 'Company Name',
     },
     {
-      accessorKey: 'contact_email',
+      accessorKey: 'contactEmail',
       header: 'Email',
     },
     {
-      accessorKey: 'contact_phone',
+      accessorKey: 'contactPhone',
       header: 'Phone',
-      cell: ({ row }) => row.original.contact_phone || '-',
+      cell: ({ row }) => row.original.contactPhone || '-',
     },
     {
       accessorKey: 'city',
@@ -52,13 +52,13 @@ export default function OperatorsPage() {
       cell: ({ row }) => row.original.city || '-',
     },
     {
-      accessorKey: 'base_currency',
+      accessorKey: 'baseCurrency',
       header: 'Currency',
     },
     {
-      accessorKey: 'is_active',
+      accessorKey: 'isActive',
       header: 'Status',
-      cell: ({ row }) => <StatusBadge status={row.original.is_active ? 'Active' : 'Inactive'} />,
+      cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'Active' : 'Inactive'} />,
     },
     {
       id: 'actions',

@@ -36,13 +36,13 @@ export default function GuidesPage() {
 
   const columns: ColumnDef<Guide>[] = [
     {
-      accessorKey: 'guide_name',
+      accessorKey: 'guideName',
       header: 'Guide Name',
     },
     {
-      accessorKey: 'is_active',
+      accessorKey: 'isActive',
       header: 'Status',
-      cell: ({ row }) => <StatusBadge status={row.original.is_active ? 'Active' : 'Inactive'} />,
+      cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'Active' : 'Inactive'} />,
     },
     {
       id: 'actions',

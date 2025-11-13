@@ -74,28 +74,29 @@ export default function EditTourCompanyPage() {
 
   // Load tour company data when available
   useEffect(() => {
-    if (tourCompany) {
+    if (tourCompany?.data) {
+      const tcData = tourCompany.data;
       form.reset({
-        company_name: tourCompany.company_name || '',
-        tour_name: tourCompany.tour_name || '',
-        tour_type: tourCompany.tour_type || '',
-        duration_days: tourCompany.duration_days ?? undefined,
-        duration_hours: tourCompany.duration_hours ?? undefined,
-        sic_price: tourCompany.sic_price ?? undefined,
-        pvt_price_2_pax: tourCompany.pvt_price_2_pax ?? undefined,
-        pvt_price_4_pax: tourCompany.pvt_price_4_pax ?? undefined,
-        pvt_price_6_pax: tourCompany.pvt_price_6_pax ?? undefined,
-        pvt_price_8_pax: tourCompany.pvt_price_8_pax ?? undefined,
-        pvt_price_10_pax: tourCompany.pvt_price_10_pax ?? undefined,
-        currency: tourCompany.currency || 'TRY',
-        min_passengers: tourCompany.min_passengers ?? undefined,
-        max_passengers: tourCompany.max_passengers ?? undefined,
-        itinerary: tourCompany.itinerary || '',
-        inclusions: tourCompany.inclusions || '',
-        exclusions: tourCompany.exclusions || '',
-        picture_url: tourCompany.picture_url || '',
-        notes: tourCompany.notes || '',
-        is_active: tourCompany.is_active ?? true,
+        company_name: tcData.companyName || '',
+        tour_name: tcData.tourName || '',
+        tour_type: tcData.tourType || '',
+        duration_days: tcData.durationDays ?? undefined,
+        duration_hours: tcData.durationHours ?? undefined,
+        sic_price: tcData.sicPrice ?? undefined,
+        pvt_price_2_pax: tcData.pvtPrice2Pax ?? undefined,
+        pvt_price_4_pax: tcData.pvtPrice4Pax ?? undefined,
+        pvt_price_6_pax: tcData.pvtPrice6Pax ?? undefined,
+        pvt_price_8_pax: tcData.pvtPrice8Pax ?? undefined,
+        pvt_price_10_pax: tcData.pvtPrice10Pax ?? undefined,
+        currency: tcData.currency || 'TRY',
+        min_passengers: tcData.minPassengers ?? undefined,
+        max_passengers: tcData.maxPassengers ?? undefined,
+        itinerary: tcData.itinerary || '',
+        inclusions: tcData.inclusions || '',
+        exclusions: tcData.exclusions || '',
+        picture_url: tcData.pictureUrl || '',
+        notes: tcData.notes || '',
+        is_active: tcData.isActive ?? true,
       } as any);
     }
   }, [tourCompany, form]);
@@ -104,26 +105,12 @@ export default function EditTourCompanyPage() {
     try {
       // Convert empty strings to undefined for optional fields
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || undefined,
-        tour_name: data.tour_name || undefined,
-        tour_type: data.tour_type || undefined,
-        duration_days: data.duration_days || undefined,
-        duration_hours: data.duration_hours || undefined,
-        sic_price: data.sic_price || undefined,
-        pvt_price_2_pax: data.pvt_price_2_pax || undefined,
-        pvt_price_4_pax: data.pvt_price_4_pax || undefined,
-        pvt_price_6_pax: data.pvt_price_6_pax || undefined,
-        pvt_price_8_pax: data.pvt_price_8_pax || undefined,
-        pvt_price_10_pax: data.pvt_price_10_pax || undefined,
-        currency: data.currency || 'TRY',
-        min_passengers: data.min_passengers || undefined,
-        max_passengers: data.max_passengers || undefined,
-        itinerary: data.itinerary || undefined,
-        inclusions: data.inclusions || undefined,
-        exclusions: data.exclusions || undefined,
-        picture_url: data.picture_url || undefined,
+        currency: data.currency,
         notes: data.notes || undefined,
+        pictureUrl: data.picture_url || undefined,
+        supplierId: data.supplier_id || undefined,
+        tourName: data.tour_name || undefined,
+        tourType: data.tour_type || undefined,
       };
 
       await updateTourCompany({ id, data: processedData });

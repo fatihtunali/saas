@@ -63,21 +63,22 @@ export default function EditRestaurantPage() {
 
   useEffect(() => {
     if (restaurant) {
+      const itemData = restaurant;
       const formData = {
-        restaurant_name: restaurant.restaurant_name,
-        city_id: restaurant.city_id,
-        supplier_id: restaurant.supplier_id ?? null,
-        address: restaurant.address || '',
-        phone: restaurant.phone || '',
-        lunch_price: restaurant.lunch_price ?? null,
-        dinner_price: restaurant.dinner_price ?? null,
-        currency: restaurant.currency || 'TRY',
-        capacity: restaurant.capacity ?? null,
-        cuisine_type: restaurant.cuisine_type || '',
-        menu_options: restaurant.menu_options || '',
-        picture_url: restaurant.picture_url || '',
-        notes: restaurant.notes || '',
-        is_active: restaurant.is_active,
+        restaurant_name: itemData.restaurantName,
+        city_id: itemData.cityId,
+        supplier_id: itemData.supplierId ?? null,
+        address: itemData.address || '',
+        phone: itemData.phone || '',
+        lunch_price: itemData.lunchPrice ? Number(itemData.lunchPrice) : null,
+        dinner_price: itemData.dinnerPrice ? Number(itemData.dinnerPrice) : null,
+        currency: itemData.currency || 'TRY',
+        capacity: itemData.capacity ?? null,
+        cuisine_type: itemData.cuisineType || '',
+        menu_options: itemData.menuOptions || '',
+        picture_url: itemData.pictureUrl || '',
+        notes: itemData.notes || '',
+        is_active: itemData.isActive,
       } as any;
       form.reset(formData);
     }
@@ -86,17 +87,16 @@ export default function EditRestaurantPage() {
   const onSubmit = async (data: RestaurantFormData) => {
     try {
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || null,
         address: data.address || null,
-        phone: data.phone || null,
-        lunch_price: data.lunch_price || null,
-        dinner_price: data.dinner_price || null,
         capacity: data.capacity || null,
-        cuisine_type: data.cuisine_type || null,
-        menu_options: data.menu_options || null,
-        picture_url: data.picture_url || null,
+        cuisineType: data.cuisine_type || null,
+        dinnerPrice: data.dinner_price ? Number(data.dinner_price) : null,
+        lunchPrice: data.lunch_price ? Number(data.lunch_price) : null,
+        menuOptions: data.menu_options || null,
         notes: data.notes || null,
+        phone: data.phone || null,
+        pictureUrl: data.picture_url || null,
+        supplierId: data.supplier_id || null,
       };
 
       // @ts-expect-error - Type mismatch between form data and API schema

@@ -106,11 +106,11 @@ export default function GuideDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{guide.guide_name}</h1>
-              <StatusBadge status={guide.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{guide.guideName}</h1>
+              <StatusBadge status={guide.isActive ? 'Active' : 'Inactive'} />
             </div>
-            {guide.license_number && (
-              <p className="text-sm text-muted-foreground mt-1">License: {guide.license_number}</p>
+            {guide.licenseNumber && (
+              <p className="text-sm text-muted-foreground mt-1">License: {guide.licenseNumber}</p>
             )}
           </div>
         </div>
@@ -134,12 +134,12 @@ export default function GuideDetailsPage() {
       </div>
 
       {/* Profile Picture */}
-      {guide.profile_picture_url && (
+      {guide.profilePictureUrl && (
         <Card>
           <CardContent className="p-0">
             <img
-              src={guide.profile_picture_url}
-              alt={guide.guide_name}
+              src={guide.profilePictureUrl}
+              alt={guide.guideName}
               className="w-full h-80 object-cover rounded-lg"
             />
           </CardContent>
@@ -241,7 +241,7 @@ export default function GuideDetailsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {guide.daily_rate && (
+              {guide.dailyRate && (
                 <TableRow>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
@@ -250,11 +250,11 @@ export default function GuideDetailsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(guide.daily_rate).toFixed(2)} {guide.currency || 'TRY'}
+                    {Number(guide.dailyRate || 0).toFixed(2)} {guide.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {guide.half_day_rate && (
+              {guide.halfDayRate && (
                 <TableRow>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
@@ -263,11 +263,11 @@ export default function GuideDetailsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(guide.half_day_rate).toFixed(2)} {guide.currency || 'TRY'}
+                    {Number(guide.halfDayRate || 0).toFixed(2)} {guide.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {guide.night_rate && (
+              {guide.nightRate && (
                 <TableRow>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
@@ -276,11 +276,11 @@ export default function GuideDetailsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(guide.night_rate).toFixed(2)} {guide.currency || 'TRY'}
+                    {Number(guide.nightRate || 0).toFixed(2)} {guide.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}
-              {guide.transfer_rate && (
+              {guide.transferRate && (
                 <TableRow>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
@@ -289,7 +289,7 @@ export default function GuideDetailsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {parseFloat(guide.transfer_rate).toFixed(2)} {guide.currency || 'TRY'}
+                    {Number(guide.transferRate || 0).toFixed(2)} {guide.currency || 'TRY'}
                   </TableCell>
                 </TableRow>
               )}

@@ -39,11 +39,11 @@ export default function CreateVehicleCompanyPage() {
     try {
       // Convert empty strings to undefined for optional fields
       const processedData = {
-        ...data,
-        supplier_id: data.supplier_id || undefined,
-        contact_person: data.contact_person || undefined,
-        phone: data.phone || undefined,
+        companyName: data.company_name,
+        contactPerson: data.contact_person || undefined,
         email: data.email || undefined,
+        isActive: data.is_active,
+        phone: data.phone || undefined,
       };
 
       await createVehicleCompany(processedData);

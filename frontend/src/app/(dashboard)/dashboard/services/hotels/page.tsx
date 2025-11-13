@@ -29,7 +29,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { STAR_RATINGS } from '@/lib/validations/hotels';
+import { STAR_RATINGS, formatMealPlan } from '@/lib/validations/hotels';
 
 export default function HotelsPage() {
   const router = useRouter();
@@ -47,8 +47,8 @@ export default function HotelsPage() {
     page,
     limit: pageSize,
     search: search || undefined,
-    city_id: cityFilter !== 'all' ? parseInt(cityFilter) : undefined,
-    star_rating: starFilter !== 'all' ? parseInt(starFilter) : undefined,
+    cityId: cityFilter !== 'all' ? parseInt(cityFilter) : undefined,
+    starRating: starFilter !== 'all' ? parseInt(starFilter) : undefined,
     status: statusFilter !== 'all' ? (statusFilter as 'Active' | 'Inactive') : undefined,
   };
 
@@ -64,16 +64,16 @@ export default function HotelsPage() {
 
   const columns: ColumnDef<Hotel>[] = [
     {
-      accessorKey: 'hotel_name',
+      accessorKey: 'hotelName',
       header: 'Hotel Name',
       cell: ({ row }) => {
         const hotel = row.original;
         return (
           <div className="flex flex-col">
-            <span className="font-medium">{hotel.hotel_name}</span>
-            {hotel.star_rating && (
+            <span className="font-medium">{hotel.hotelName}</span>
+            {hotel.starRating && (
               <div className="flex items-center gap-1 mt-1">
-                {Array.from({ length: hotel.star_rating }).map((_, i) => (
+                {Array.from({ length: hotel.starRating }).map((_, i) => (
                   <span key={i} className="text-yellow-500 text-xs">
                     ★
                   </span>
@@ -85,9 +85,9 @@ export default function HotelsPage() {
       },
     },
     {
-      accessorKey: 'city',
+      accessorKey: 'cityName',
       header: 'City',
-      cell: ({ row }) => row.original.city?.city_name || 'N/A',
+      cell: ({ row }) => row.original.cityName || 'N/A',
     },
     {
       accessorKey: 'phone',
@@ -102,31 +102,31 @@ export default function HotelsPage() {
       ),
     },
     {
-      accessorKey: 'price_per_person_double',
+      accessorKey: 'pricePerPersonDouble',
       header: 'Price (DBL)',
       cell: ({ row }) => {
         const hotel = row.original;
-        if (!hotel.price_per_person_double) return 'N/A';
+        if (!hotel.pricePerPersonDouble) return 'N/A';
         return (
           <div className="text-right font-medium">
-            {Number(hotel.price_per_person_double).toFixed(2)} {hotel.currency || 'TRY'}
+            {Number(hotel.pricePerPersonDouble).toFixed(2)} {hotel.currency || 'TRY'}
           </div>
         );
       },
     },
     {
-      accessorKey: 'meal_plan',
+      accessorKey: 'mealPlan',
       header: 'Meal Plan',
       cell: ({ row }) => {
-        const mealPlan = row.original.meal_plan;
+        const mealPlan = row.original.mealPlan;
         if (!mealPlan) return 'N/A';
-        return <Badge variant="outline">{mealPlan}</Badge>;
+        return <Badge variant="outline">{formatMealPlan(mealPlan)}</Badge>;
       },
     },
     {
-      accessorKey: 'is_active',
+      accessorKey: 'isActive',
       header: 'Status',
-      cell: ({ row }) => <StatusBadge status={row.original.is_active ? 'Active' : 'Inactive'} />,
+      cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'Active' : 'Inactive'} />,
     },
     {
       id: 'actions',

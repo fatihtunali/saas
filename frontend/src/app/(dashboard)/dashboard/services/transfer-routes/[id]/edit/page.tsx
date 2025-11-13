@@ -14,6 +14,7 @@ import { useTransferRoutes } from '@/hooks/use-transfer-routes';
 import { useVehicleCompanies } from '@/hooks/use-vehicle-companies';
 import { useVehicleTypes } from '@/hooks/use-vehicle-types';
 import { useCities } from '@/lib/hooks/useBookingWizard';
+import { UpdateTransferRouteDto } from '@/types/services';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -50,31 +51,34 @@ export default function EditTransferRoutePage() {
 
   const form = useForm({
     resolver: zodResolver(transferRouteSchema) as any,
-    values: route
+    values: route?.data
       ? {
-          vehicle_company_id: route.vehicle_company_id,
-          vehicle_type_id: route.vehicle_type_id || undefined,
-          from_city_id: route.from_city_id,
-          to_city_id: route.to_city_id,
-          price_per_vehicle: route.price_per_vehicle || 0,
-          currency: route.currency || 'TRY',
-          duration_hours: route.duration_hours || 0,
-          distance_km: route.distance_km || 0,
-          notes: route.notes || '',
-          is_active: route.is_active ?? true,
+          vehicle_company_id: route.data.vehicleCompanyId,
+          vehicle_type_id: route.data.vehicleTypeId || undefined,
+          from_city_id: route.data.fromCityId,
+          to_city_id: route.data.toCityId,
+          price_per_vehicle: route.data.pricePerVehicle || 0,
+          currency: route.data.currency || 'TRY',
+          duration_hours: route.data.durationHours || 0,
+          distance_km: route.data.distanceKm || 0,
+          notes: route.data.notes || '',
+          is_active: route.data.isActive ?? true,
         }
       : undefined,
   });
 
   const onSubmit = async (data: TransferRouteFormData) => {
     try {
-      // Convert empty strings to undefined for optional fields
-      const processedData = {
-        ...data,
-        vehicle_type_id: data.vehicle_type_id || undefined,
-        price_per_vehicle: data.price_per_vehicle || undefined,
-        duration_hours: data.duration_hours || undefined,
-        distance_km: data.distance_km || undefined,
+      // Convert empty strings to undefined and transform to camelCase for API
+      const processedData: UpdateTransferRouteDto = {
+        vehicleCompanyId: data.vehicle_company_id,
+        vehicleTypeId: data.vehicle_type_id || undefined,
+        fromCityId: data.from_city_id,
+        toCityId: data.to_city_id,
+        pricePerVehicle: data.price_per_vehicle || undefined,
+        currency: data.currency,
+        durationHours: data.duration_hours || undefined,
+        distanceKm: data.distance_km || undefined,
         notes: data.notes || undefined,
       };
 

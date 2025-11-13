@@ -67,8 +67,8 @@ export default function TransferRouteDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">Transfer Route #{route.id}</h1>
-              <StatusBadge status={route.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">Transfer Route #{route.data.id}</h1>
+              <StatusBadge status={route.data.isActive ? 'Active' : 'Inactive'} />
             </div>
             <p className="text-muted-foreground mt-1">Route Details</p>
           </div>
@@ -107,7 +107,7 @@ export default function TransferRouteDetailsPage() {
               <div className="flex-1">
                 <p className="font-medium mb-2">From</p>
                 <Badge variant="outline" className="text-base py-1 px-3">
-                  {route.from_city?.city_name || 'N/A'}
+                  {route.data.fromCity?.cityName || 'N/A'}
                 </Badge>
               </div>
             </div>
@@ -121,22 +121,22 @@ export default function TransferRouteDetailsPage() {
               <div className="flex-1">
                 <p className="font-medium mb-2">To</p>
                 <Badge variant="outline" className="text-base py-1 px-3">
-                  {route.to_city?.city_name || 'N/A'}
+                  {route.data.toCity?.cityName || 'N/A'}
                 </Badge>
               </div>
             </div>
 
-            {route.distance_km && (
+            {route.data.distanceKm && (
               <>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Distance</span>
-                  <span className="font-semibold">{route.distance_km} km</span>
+                  <span className="font-semibold">{route.data.distanceKm} km</span>
                 </div>
               </>
             )}
 
-            {route.duration_hours && (
+            {route.data.durationHours && (
               <>
                 <Separator />
                 <div className="flex items-center justify-between">
@@ -144,7 +144,7 @@ export default function TransferRouteDetailsPage() {
                     <Clock className="h-4 w-4" />
                     Duration
                   </span>
-                  <span className="font-semibold">{route.duration_hours} hours</span>
+                  <span className="font-semibold">{route.data.durationHours} hours</span>
                 </div>
               </>
             )}
@@ -158,13 +158,13 @@ export default function TransferRouteDetailsPage() {
               <DollarSign className="h-5 w-5" />
               Pricing Information
             </CardTitle>
-            <CardDescription>Price in {route.currency || 'TRY'}</CardDescription>
+            <CardDescription>Price in {route.data.currency || 'TRY'}</CardDescription>
           </CardHeader>
           <CardContent>
-            {route.price_per_vehicle ? (
+            {route.data.pricePerVehicle ? (
               <div>
                 <p className="text-3xl font-bold text-primary">
-                  {parseFloat(route.price_per_vehicle).toFixed(2)} {route.currency || 'TRY'}
+                  {parseFloat(route.data.pricePerVehicle.toString()).toFixed(2)} {route.data.currency || 'TRY'}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">per vehicle</p>
               </div>
@@ -184,37 +184,37 @@ export default function TransferRouteDetailsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {route.vehicle_company && (
+          {route.data.vehicleCompany && (
             <div>
               <p className="text-sm text-muted-foreground mb-1">Vehicle Company</p>
               <Badge variant="secondary" className="text-base py-1 px-3">
-                {route.vehicle_company.company_name}
+                {route.data.vehicleCompany.companyName}
               </Badge>
             </div>
           )}
-          {route.vehicle_type && route.vehicle_company && <Separator />}
-          {route.vehicle_type && (
+          {route.data.vehicleType && route.data.vehicleCompany && <Separator />}
+          {route.data.vehicleType && (
             <div>
               <p className="text-sm text-muted-foreground mb-1">Vehicle Type</p>
               <Badge variant="outline" className="text-base py-1 px-3">
-                {route.vehicle_type.vehicle_type}
+                {route.data.vehicleType.vehicleType}
               </Badge>
             </div>
           )}
-          {!route.vehicle_company && !route.vehicle_type && (
+          {!route.data.vehicleCompany && !route.data.vehicleType && (
             <p className="text-sm text-muted-foreground">No vehicle information available</p>
           )}
         </CardContent>
       </Card>
 
       {/* Notes */}
-      {route.notes && (
+      {route.data.notes && (
         <Card>
           <CardHeader>
             <CardTitle>Internal Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{route.notes}</p>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{route.data.notes}</p>
           </CardContent>
         </Card>
       )}

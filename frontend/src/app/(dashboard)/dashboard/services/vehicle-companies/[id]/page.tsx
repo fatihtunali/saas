@@ -66,8 +66,8 @@ export default function VehicleCompanyDetailsPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{company.company_name}</h1>
-              <StatusBadge status={company.is_active ? 'Active' : 'Inactive'} />
+              <h1 className="text-3xl font-bold">{company.companyName}</h1>
+              <StatusBadge status={company.isActive ? 'Active' : 'Inactive'} />
             </div>
             <p className="text-muted-foreground mt-1">Vehicle Company Details</p>
           </div>
@@ -97,13 +97,13 @@ export default function VehicleCompanyDetailsPage() {
           <CardTitle>Contact Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {company.contact_person && (
+          {company.contactPerson && (
             <>
               <div className="flex items-start gap-3">
                 <User className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">Contact Person</p>
-                  <p className="text-sm text-muted-foreground">{company.contact_person}</p>
+                  <p className="text-sm text-muted-foreground">{company.contactPerson}</p>
                 </div>
               </div>
               <Separator />
@@ -133,7 +133,7 @@ export default function VehicleCompanyDetailsPage() {
             </div>
           )}
 
-          {!company.contact_person && !company.phone && !company.email && (
+          {!company.contactPerson && !company.phone && !company.email && (
             <p className="text-sm text-muted-foreground">No contact information available</p>
           )}
         </CardContent>
