@@ -436,10 +436,18 @@ exports.getTransferRoutes = async (req, res) => {
     params.push(limit, offset);
 
     const result = await db.query(query, params);
+
+    // Transform data to match frontend expectations
+    const transformedRoutes = result.rows.map(row => ({
+      ...row,
+      fromCity: row.from_city_name ? { name: row.from_city_name } : null,
+      toCity: row.to_city_name ? { name: row.to_city_name } : null,
+    }));
+
     res.json({
       success: true,
       data: {
-        transfer_routes: result.rows,
+        transferRoutes: transformedRoutes,
         pagination: {
           page,
           limit,
@@ -485,7 +493,15 @@ exports.getTransferRouteById = async (req, res) => {
       return res.status(404).json({ error: 'Transfer route not found' });
     }
 
-    res.json(result.rows[0]);
+    // Transform data to match frontend expectations
+    const route = result.rows[0];
+    const transformedRoute = {
+      ...route,
+      fromCity: route.from_city_name ? { name: route.from_city_name } : null,
+      toCity: route.to_city_name ? { name: route.to_city_name } : null,
+    };
+
+    res.json(transformedRoute);
   } catch (error) {
     console.error('Error fetching transfer route:', error);
     res.status(500).json({ error: 'Failed to fetch transfer route' });
@@ -499,7 +515,7 @@ exports.createTransferRoute = async (req, res) => {
       : (req.body.operator_id || req.user.operator_id);
 
     const {
-      vehicle_company_id, vehicle_type_id, from_city_id, to_city_id,
+      vehicle_company_id, vehicle_type_id, from_city_id, from_location_type, to_city_id, to_location_type,
       price_per_vehicle, currency, duration_hours, distance_km, notes, is_active
     } = req.body;
 
@@ -510,15 +526,15 @@ exports.createTransferRoute = async (req, res) => {
 
     const query = `
       INSERT INTO transfer_routes (
-        operator_id, vehicle_company_id, vehicle_type_id, from_city_id, to_city_id,
+        operator_id, vehicle_company_id, vehicle_type_id, from_city_id, from_location_type, to_city_id, to_location_type,
         price_per_vehicle, currency, duration_hours, distance_km, notes, is_active
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *
     `;
 
     const result = await db.query(query, [
-      operatorId, vehicle_company_id, vehicle_type_id, from_city_id, to_city_id,
+      operatorId, vehicle_company_id, vehicle_type_id, from_city_id, from_location_type, to_city_id, to_location_type,
       price_per_vehicle, currency, duration_hours, distance_km, notes, is_active !== false
     ]);
 
@@ -535,7 +551,7 @@ exports.updateTransferRoute = async (req, res) => {
     const operatorId = applyOperatorFilter(req);
 
     const {
-      vehicle_company_id, vehicle_type_id, from_city_id, to_city_id,
+      vehicle_company_id, vehicle_type_id, from_city_id, from_location_type, to_city_id, to_location_type,
       price_per_vehicle, currency, duration_hours, distance_km, notes, is_active
     } = req.body;
 
@@ -544,18 +560,20 @@ exports.updateTransferRoute = async (req, res) => {
       SET vehicle_company_id = COALESCE($2, vehicle_company_id),
           vehicle_type_id = COALESCE($3, vehicle_type_id),
           from_city_id = COALESCE($4, from_city_id),
-          to_city_id = COALESCE($5, to_city_id),
-          price_per_vehicle = COALESCE($6, price_per_vehicle),
-          currency = COALESCE($7, currency),
-          duration_hours = COALESCE($8, duration_hours),
-          distance_km = COALESCE($9, distance_km),
-          notes = COALESCE($10, notes),
-          is_active = COALESCE($11, is_active),
+          from_location_type = COALESCE($5, from_location_type),
+          to_city_id = COALESCE($6, to_city_id),
+          to_location_type = COALESCE($7, to_location_type),
+          price_per_vehicle = COALESCE($8, price_per_vehicle),
+          currency = COALESCE($9, currency),
+          duration_hours = COALESCE($10, duration_hours),
+          distance_km = COALESCE($11, distance_km),
+          notes = COALESCE($12, notes),
+          is_active = COALESCE($13, is_active),
           updated_at = CURRENT_TIMESTAMP
       WHERE id = $1 AND deleted_at IS NULL
     `;
     const params = [
-      id, vehicle_company_id, vehicle_type_id, from_city_id, to_city_id,
+      id, vehicle_company_id, vehicle_type_id, from_city_id, from_location_type, to_city_id, to_location_type,
       price_per_vehicle, currency, duration_hours, distance_km, notes, is_active
     ];
 

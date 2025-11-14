@@ -40,6 +40,24 @@ export default function TourCompaniesPage() {
       header: 'Company Name',
     },
     {
+      accessorKey: 'tourName',
+      header: 'Tour Name',
+    },
+    {
+      accessorKey: 'tourType',
+      header: 'Type',
+      cell: ({ row }) => <span className="text-sm">{row.original.tourType}</span>,
+    },
+    {
+      accessorKey: 'durationDays',
+      header: 'Duration',
+      cell: ({ row }) => (
+        <span className="text-sm">
+          {row.original.durationDays}d {row.original.durationHours ? `${row.original.durationHours}h` : ''}
+        </span>
+      ),
+    },
+    {
       accessorKey: 'isActive',
       header: 'Status',
       cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'Active' : 'Inactive'} />,

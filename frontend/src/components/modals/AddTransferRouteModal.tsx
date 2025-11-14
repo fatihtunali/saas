@@ -1,8 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { transferRouteSchema, CURRENCIES } from '@/lib/validations/transfer-routes';
+import { transferRouteSchema, CURRENCIES, LOCATION_TYPES } from '@/lib/validations/transfer-routes';
 import { useTransferRoutes } from '@/hooks/use-transfer-routes';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +40,8 @@ interface AddTransferRouteModalProps {
   onOpenChange: (open: boolean) => void;
   vehicleCompanyId: number;
   vehicleTypeId: number;
+  routeId?: number;
+  existingData?: any;
   onSuccess?: () => void;
 }
 
@@ -47,9 +50,12 @@ export function AddTransferRouteModal({
   onOpenChange,
   vehicleCompanyId,
   vehicleTypeId,
+  routeId,
+  existingData,
   onSuccess,
 }: AddTransferRouteModalProps) {
-  const { createTransferRoute, isCreating } = useTransferRoutes();
+  const { createTransferRoute, updateTransferRoute, isCreating, isUpdating } = useTransferRoutes();
+  const isEditMode = !!routeId;
 
   const form = useForm({
     resolver: zodResolver(transferRouteSchema) as any,
@@ -57,7 +63,9 @@ export function AddTransferRouteModal({
       vehicle_company_id: vehicleCompanyId,
       vehicle_type_id: vehicleTypeId,
       from_city_id: undefined as number | undefined,
+      from_location_type: '',
       to_city_id: undefined as number | undefined,
+      to_location_type: '',
       price_per_vehicle: undefined as number | undefined,
       currency: 'EUR',
       duration_hours: undefined as number | undefined,
@@ -67,13 +75,51 @@ export function AddTransferRouteModal({
     },
   });
 
+  // Load existing data when editing
+  useEffect(() => {
+    if (existingData && isEditMode) {
+      form.reset({
+        vehicle_company_id: vehicleCompanyId,
+        vehicle_type_id: vehicleTypeId,
+        from_city_id: existingData.fromCityId || undefined,
+        from_location_type: existingData.fromLocationType || '',
+        to_city_id: existingData.toCityId || undefined,
+        to_location_type: existingData.toLocationType || '',
+        price_per_vehicle: existingData.pricePerVehicle ? Number(existingData.pricePerVehicle) : undefined,
+        currency: existingData.currency || 'EUR',
+        duration_hours: existingData.durationHours ? Number(existingData.durationHours) : undefined,
+        distance_km: existingData.distanceKm || undefined,
+        notes: existingData.notes || '',
+        is_active: existingData.isActive !== false,
+      });
+    } else if (!open) {
+      // Reset form when modal closes
+      form.reset({
+        vehicle_company_id: vehicleCompanyId,
+        vehicle_type_id: vehicleTypeId,
+        from_city_id: undefined,
+        from_location_type: '',
+        to_city_id: undefined,
+        to_location_type: '',
+        price_per_vehicle: undefined,
+        currency: 'EUR',
+        duration_hours: undefined,
+        distance_km: undefined,
+        notes: '',
+        is_active: true,
+      });
+    }
+  }, [existingData, isEditMode, open, form, vehicleCompanyId, vehicleTypeId]);
+
   const onSubmit = async (data: any) => {
     try {
       const processedData = {
         vehicleCompanyId: vehicleCompanyId,
         vehicleTypeId: vehicleTypeId,
         fromCityId: data.from_city_id,
+        fromLocationType: data.from_location_type || null,
         toCityId: data.to_city_id,
+        toLocationType: data.to_location_type || null,
         pricePerVehicle: data.price_per_vehicle ? Number(data.price_per_vehicle) : null,
         currency: data.currency || 'EUR',
         durationHours: data.duration_hours ? Number(data.duration_hours) : null,
@@ -82,64 +128,129 @@ export function AddTransferRouteModal({
         isActive: data.is_active,
       };
 
-      await createTransferRoute(processedData);
+      if (isEditMode && routeId) {
+        await updateTransferRoute({ id: routeId, data: processedData });
+      } else {
+        await createTransferRoute(processedData);
+      }
+
       form.reset();
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      console.error('Failed to create transfer route:', error);
+      console.error(`Failed to ${isEditMode ? 'update' : 'create'} transfer route:`, error);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto !bg-white !text-gray-900">
         <DialogHeader>
-          <DialogTitle>Add Transfer Route</DialogTitle>
-          <DialogDescription>
-            Add a new transfer route for this vehicle type
+          <DialogTitle className="!text-gray-900">{isEditMode ? 'Edit' : 'Add'} Transfer Route</DialogTitle>
+          <DialogDescription className="!text-gray-600">
+            {isEditMode ? 'Update' : 'Add a new'} transfer route for this vehicle type
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 !text-gray-900">
             {/* Route Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="from_city_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>From City *</FormLabel>
-                    <FormControl>
-                      <CitySelector
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Select departure city"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="from_city_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>From City *</FormLabel>
+                      <FormControl>
+                        <CitySelector
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select departure city"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="to_city_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>To City *</FormLabel>
-                    <FormControl>
-                      <CitySelector
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Select arrival city"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="from_location_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>From Location Type</FormLabel>
+                      <Select value={field.value || ''} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select location type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {LOCATION_TYPES.map(type => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription className="text-xs">
+                        e.g., Airport, Hotel, City Center
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="to_city_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>To City *</FormLabel>
+                      <FormControl>
+                        <CitySelector
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select arrival city"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="to_location_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>To Location Type</FormLabel>
+                      <Select value={field.value || ''} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select location type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {LOCATION_TYPES.map(type => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription className="text-xs">
+                        e.g., Airport, Hotel, City Center
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             {/* Route Details */}
@@ -288,8 +399,8 @@ export function AddTransferRouteModal({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isCreating}>
-                {isCreating ? 'Adding...' : 'Add Transfer Route'}
+              <Button type="submit" disabled={isCreating || isUpdating}>
+                {isCreating || isUpdating ? (isEditMode ? 'Updating...' : 'Adding...') : (isEditMode ? 'Update Transfer Route' : 'Add Transfer Route')}
               </Button>
             </DialogFooter>
           </form>

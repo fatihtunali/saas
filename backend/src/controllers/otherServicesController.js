@@ -696,10 +696,42 @@ exports.getTourCompanies = async (req, res) => {
     params.push(limit, offset);
 
     const result = await db.query(query, params);
+
+    // Transform snake_case to camelCase for frontend
+    const transformedData = result.rows.map(row => ({
+      id: row.id,
+      operatorId: row.operator_id,
+      supplierId: row.supplier_id,
+      companyName: row.company_name,
+      tourName: row.tour_name,
+      tourType: row.tour_type,
+      durationDays: row.duration_days,
+      durationHours: row.duration_hours,
+      sicPrice: row.sic_price,
+      pvtPrice2Pax: row.pvt_price_2_pax,
+      pvtPrice4Pax: row.pvt_price_4_pax,
+      pvtPrice6Pax: row.pvt_price_6_pax,
+      pvtPrice8Pax: row.pvt_price_8_pax,
+      pvtPrice10Pax: row.pvt_price_10_pax,
+      currency: row.currency,
+      minPassengers: row.min_passengers,
+      maxPassengers: row.max_passengers,
+      currentBookings: row.current_bookings,
+      itinerary: row.itinerary,
+      inclusions: row.inclusions,
+      exclusions: row.exclusions,
+      pictureUrl: row.picture_url,
+      notes: row.notes,
+      isActive: row.is_active,
+      supplierName: row.supplier_name,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+
     res.json({
       success: true,
       data: {
-        tour_companies: result.rows,
+        tour_companies: transformedData,
         pagination: {
           page,
           limit,
@@ -738,7 +770,39 @@ exports.getTourCompanyById = async (req, res) => {
       return res.status(404).json({ error: 'Tour company not found' });
     }
 
-    res.json(result.rows[0]);
+    // Transform snake_case to camelCase for frontend
+    const row = result.rows[0];
+    const transformedData = {
+      id: row.id,
+      operatorId: row.operator_id,
+      supplierId: row.supplier_id,
+      companyName: row.company_name,
+      tourName: row.tour_name,
+      tourType: row.tour_type,
+      durationDays: row.duration_days,
+      durationHours: row.duration_hours,
+      sicPrice: row.sic_price,
+      pvtPrice2Pax: row.pvt_price_2_pax,
+      pvtPrice4Pax: row.pvt_price_4_pax,
+      pvtPrice6Pax: row.pvt_price_6_pax,
+      pvtPrice8Pax: row.pvt_price_8_pax,
+      pvtPrice10Pax: row.pvt_price_10_pax,
+      currency: row.currency,
+      minPassengers: row.min_passengers,
+      maxPassengers: row.max_passengers,
+      currentBookings: row.current_bookings,
+      itinerary: row.itinerary,
+      inclusions: row.inclusions,
+      exclusions: row.exclusions,
+      pictureUrl: row.picture_url,
+      notes: row.notes,
+      isActive: row.is_active,
+      supplierName: row.supplier_name,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+
+    res.json({ data: transformedData });
   } catch (error) {
     console.error('Error fetching tour company:', error);
     res.status(500).json({ error: 'Failed to fetch tour company' });

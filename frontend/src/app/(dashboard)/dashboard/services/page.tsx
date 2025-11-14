@@ -11,7 +11,6 @@ import {
   UtensilsCrossed,
   Ticket,
   Package,
-  Truck,
   Flag,
   ArrowRight,
 } from 'lucide-react';
@@ -22,7 +21,6 @@ import { useEntranceFees } from '@/hooks/use-entrance-fees';
 import { useExtras } from '@/hooks/use-extras';
 import { useVehicleCompanies } from '@/hooks/use-vehicle-companies';
 import { useTourCompanies } from '@/hooks/use-tour-companies';
-import { useSuppliers } from '@/hooks/use-suppliers';
 
 export default function ServicesPage() {
   // Fetch data with limit 1 to get pagination info (total count)
@@ -33,7 +31,6 @@ export default function ServicesPage() {
   const { pagination: extrasPagination, isLoading: extrasLoading } = useExtras({ limit: 1 });
   const { pagination: vehiclesPagination, isLoading: vehiclesLoading } = useVehicleCompanies({ limit: 1 });
   const { pagination: toursPagination, isLoading: toursLoading } = useTourCompanies({ limit: 1 });
-  const { pagination: suppliersPagination, isLoading: suppliersLoading } = useSuppliers({ limit: 1 });
 
   const services = [
     {
@@ -112,17 +109,6 @@ export default function ServicesPage() {
         active: toursPagination?.total || 0,
       },
       isLoading: toursLoading,
-    },
-    {
-      title: 'Suppliers',
-      description: 'Manage all third-party service suppliers',
-      icon: Truck,
-      href: '/dashboard/services/suppliers',
-      stats: {
-        total: suppliersPagination?.total || 0,
-        active: suppliersPagination?.total || 0,
-      },
-      isLoading: suppliersLoading,
     },
   ];
 

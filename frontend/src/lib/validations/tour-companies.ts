@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CURRENCIES = ['TRY', 'USD', 'EUR', 'GBP'];
+export const CURRENCIES = ['EUR', 'USD', 'TRY', 'GBP'];
 
 export const TOUR_TYPES = [
   'City Tour',
@@ -37,7 +37,7 @@ export const tourCompanySchema = z.object({
     .length(3, 'Currency code must be 3 characters')
     .toUpperCase()
     .optional()
-    .default('TRY'),
+    .default('EUR'),
   min_passengers: z.number().int().min(1, 'Min passengers must be at least 1').optional(),
   max_passengers: z.number().int().min(1, 'Max passengers must be at least 1').optional(),
   itinerary: z.string().optional(),
@@ -68,7 +68,7 @@ export const defaultTourCompanyValues: Partial<TourCompanyFormData> = {
   pvt_price_6_pax: undefined,
   pvt_price_8_pax: undefined,
   pvt_price_10_pax: undefined,
-  currency: 'TRY',
+  currency: 'EUR',
   min_passengers: undefined,
   max_passengers: undefined,
   itinerary: '',

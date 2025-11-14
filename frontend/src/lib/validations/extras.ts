@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CURRENCIES = ['TRY', 'USD', 'EUR', 'GBP'];
+export const CURRENCIES = ['EUR', 'USD', 'TRY', 'GBP'];
 
 export const EXPENSE_CATEGORIES = [
   'Transportation',
@@ -28,7 +28,7 @@ export const extraExpenseSchema = z.object({
     .length(3, 'Currency code must be 3 characters')
     .toUpperCase()
     .optional()
-    .default('TRY'),
+    .default('EUR'),
   description: z.string().optional(),
   notes: z.string().optional(),
   is_active: z.boolean().default(true),
@@ -40,7 +40,7 @@ export const defaultExtraExpenseValues: Partial<ExtraExpenseFormData> = {
   expense_name: '',
   expense_category: '',
   description: '',
-  currency: 'TRY',
+  currency: 'EUR',
   notes: '',
   is_active: true,
 };

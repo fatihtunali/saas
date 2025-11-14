@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { vehicleRentalSchema, CURRENCIES } from '@/lib/validations/vehicle-rentals';
 import { useVehicleRentals } from '@/hooks/use-vehicle-rentals';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,8 @@ interface AddRentalPricingModalProps {
   onOpenChange: (open: boolean) => void;
   vehicleCompanyId: number;
   vehicleTypeId: number;
+  rentalId?: number;
+  existingData?: any;
   onSuccess?: () => void;
 }
 
@@ -47,9 +50,12 @@ export function AddRentalPricingModal({
   onOpenChange,
   vehicleCompanyId,
   vehicleTypeId,
+  rentalId,
+  existingData,
   onSuccess,
 }: AddRentalPricingModalProps) {
-  const { createVehicleRental, isCreating } = useVehicleRentals();
+  const { createVehicleRental, updateVehicleRental, isCreating, isUpdating } = useVehicleRentals();
+  const isEditMode = !!rentalId;
 
   const form = useForm({
     resolver: zodResolver(vehicleRentalSchema) as any,
@@ -73,6 +79,50 @@ export function AddRentalPricingModal({
     },
   });
 
+  // Load existing data when editing
+  useEffect(() => {
+    if (existingData && isEditMode) {
+      form.reset({
+        vehicle_company_id: vehicleCompanyId,
+        vehicle_type_id: vehicleTypeId,
+        full_day_price: existingData.fullDayPrice ? Number(existingData.fullDayPrice) : undefined,
+        full_day_hours: existingData.fullDayHours || undefined,
+        full_day_km: existingData.fullDayKm || undefined,
+        half_day_price: existingData.halfDayPrice ? Number(existingData.halfDayPrice) : undefined,
+        half_day_hours: existingData.halfDayHours || undefined,
+        half_day_km: existingData.halfDayKm || undefined,
+        night_rental_price: existingData.nightRentalPrice ? Number(existingData.nightRentalPrice) : undefined,
+        night_rental_hours: existingData.nightRentalHours || undefined,
+        night_rental_km: existingData.nightRentalKm || undefined,
+        extra_hour_rate: existingData.extraHourRate ? Number(existingData.extraHourRate) : undefined,
+        extra_km_rate: existingData.extraKmRate ? Number(existingData.extraKmRate) : undefined,
+        currency: existingData.currency || 'EUR',
+        notes: existingData.notes || '',
+        is_active: existingData.isActive !== false,
+      });
+    } else if (!open) {
+      // Reset form when modal closes
+      form.reset({
+        vehicle_company_id: vehicleCompanyId,
+        vehicle_type_id: vehicleTypeId,
+        full_day_price: undefined,
+        full_day_hours: undefined,
+        full_day_km: undefined,
+        half_day_price: undefined,
+        half_day_hours: undefined,
+        half_day_km: undefined,
+        night_rental_price: undefined,
+        night_rental_hours: undefined,
+        night_rental_km: undefined,
+        extra_hour_rate: undefined,
+        extra_km_rate: undefined,
+        currency: 'EUR',
+        notes: '',
+        is_active: true,
+      });
+    }
+  }, [existingData, isEditMode, open, form, vehicleCompanyId, vehicleTypeId]);
+
   const onSubmit = async (data: any) => {
     try {
       const processedData = {
@@ -94,27 +144,32 @@ export function AddRentalPricingModal({
         isActive: data.is_active,
       };
 
-      await createVehicleRental(processedData);
+      if (isEditMode && rentalId) {
+        await updateVehicleRental({ id: rentalId, data: processedData });
+      } else {
+        await createVehicleRental(processedData);
+      }
+
       form.reset();
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      console.error('Failed to create vehicle rental:', error);
+      console.error(`Failed to ${isEditMode ? 'update' : 'create'} vehicle rental:`, error);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto !bg-white !text-gray-900">
         <DialogHeader>
-          <DialogTitle>Add Rental Pricing</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="!text-gray-900">{isEditMode ? 'Edit' : 'Add'} Rental Pricing</DialogTitle>
+          <DialogDescription className="!text-gray-600">
             Configure rental pricing options for this vehicle type
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 !text-gray-900">
             {/* Full Day Rental */}
             <Card>
               <CardHeader>
@@ -483,8 +538,8 @@ export function AddRentalPricingModal({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isCreating}>
-                {isCreating ? 'Adding...' : 'Add Rental Pricing'}
+              <Button type="submit" disabled={isCreating || isUpdating}>
+                {isCreating || isUpdating ? (isEditMode ? 'Updating...' : 'Adding...') : (isEditMode ? 'Update Rental Pricing' : 'Add Rental Pricing')}
               </Button>
             </DialogFooter>
           </form>

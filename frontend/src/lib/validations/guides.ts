@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CURRENCIES = ['TRY', 'USD', 'EUR', 'GBP'];
+export const CURRENCIES = ['EUR', 'USD', 'TRY', 'GBP'];
 
 export const COMMON_LANGUAGES = [
   'English',
@@ -44,7 +44,7 @@ export const guideSchema = z.object({
     .length(3, 'Currency code must be 3 characters')
     .toUpperCase()
     .optional()
-    .default('TRY'),
+    .default('EUR'),
   specializations: z.string().optional(), // JSON string
   license_number: z.string().max(100, 'License number is too long').optional(),
   profile_picture_url: z
@@ -66,7 +66,7 @@ export const defaultGuideValues: Partial<GuideFormData> = {
   languages: '',
   specializations: '',
   license_number: '',
-  currency: 'TRY',
+  currency: 'EUR',
   profile_picture_url: '',
   notes: '',
   is_active: true,

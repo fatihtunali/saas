@@ -64,7 +64,7 @@ export default function TourCompanyDetailsPage() {
     );
   }
 
-  if (!tourCompany) {
+  if (!tourCompany || !tourCompany.data) {
     return (
       <div className="container mx-auto py-6">
         <Card>

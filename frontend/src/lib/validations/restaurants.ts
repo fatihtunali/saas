@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CURRENCIES = ['TRY', 'USD', 'EUR', 'GBP'];
+export const CURRENCIES = ['EUR', 'USD', 'TRY', 'GBP'];
 
 export const CUISINE_TYPES = [
   'Turkish',
@@ -40,7 +40,7 @@ export const restaurantSchema = z.object({
     .length(3, 'Currency code must be 3 characters')
     .toUpperCase()
     .optional()
-    .default('TRY'),
+    .default('EUR'),
   capacity: z.number().int().min(1, 'Capacity must be at least 1').optional(),
   cuisine_type: z.string().optional(), // JSON string
   menu_options: z.string().optional(),
@@ -62,7 +62,7 @@ export const defaultRestaurantValues: Partial<RestaurantFormData> = {
   phone: '',
   cuisine_type: '',
   menu_options: '',
-  currency: 'TRY',
+  currency: 'EUR',
   picture_url: '',
   notes: '',
   is_active: true,

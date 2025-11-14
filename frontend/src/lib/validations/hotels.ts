@@ -77,7 +77,7 @@ export const STAR_RATINGS = [
 /**
  * Default currency options
  */
-export const CURRENCIES = ['TRY', 'USD', 'EUR', 'GBP'] as const;
+export const CURRENCIES = ['EUR', 'USD', 'TRY', 'GBP'] as const;
 
 /**
  * Hotel validation schema matching actual database schema
@@ -156,7 +156,7 @@ export const hotelSchema = z.object({
     .toUpperCase()
     .nullable()
     .optional()
-    .default('TRY'),
+    .default('EUR'),
 
   // Meal Plan
   meal_plan: z.string().max(100, 'Meal plan is too long').nullable().optional(),
@@ -206,7 +206,7 @@ export const defaultHotelValues: Partial<HotelFormData> = {
   child_price_0_2: null,
   child_price_3_5: null,
   child_price_6_11: null,
-  currency: 'TRY',
+  currency: 'EUR',
   meal_plan: '',
   meal_plan_supplement: null,
   facilities: '',

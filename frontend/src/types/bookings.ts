@@ -71,7 +71,8 @@ export interface Booking {
   // Client information
   clientId: number | null;
   operatorsClientId: number | null;
-  clientName?: string; // Derived from client table join
+  clientName?: string; // Derived from client table join (B2C)
+  operatorClientName?: string; // Derived from operators_clients table join (B2B)
   clientType?: ClientType; // Derived from client table join
   clientEmail?: string; // Derived from client table join
   clientPhone?: string; // Derived from client table join

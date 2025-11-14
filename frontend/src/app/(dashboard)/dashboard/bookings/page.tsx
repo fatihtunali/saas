@@ -524,7 +524,7 @@ function BookingCard({ booking, onClick }: { booking: Booking; onClick: () => vo
       <div className="flex justify-between items-start mb-2">
         <div>
           <div className="font-mono font-semibold text-sm text-primary">{booking.bookingCode}</div>
-          <div className="text-sm text-muted-foreground mt-0.5">{booking.clientName}</div>
+          <div className="text-sm text-muted-foreground mt-0.5">{booking.clientName || booking.operatorClientName || 'Unknown'}</div>
         </div>
         <StatusBadge status={booking.status} />
       </div>
@@ -772,10 +772,10 @@ export default function BookingsPage() {
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-              {row.original.clientName?.charAt(0).toUpperCase() || '?'}
+              {(row.original.clientName || row.original.operatorClientName)?.charAt(0).toUpperCase() || '?'}
             </div>
             <div>
-              <div className="font-medium">{row.original.clientName || 'Unknown'}</div>
+              <div className="font-medium">{row.original.clientName || row.original.operatorClientName || 'Unknown'}</div>
               {row.original.clientType && (
                 <Badge variant="outline" className="mt-0.5">
                   {row.original.clientType}
@@ -1396,7 +1396,7 @@ export default function BookingsPage() {
                     <li key={booking.id}>
                       <span className="font-mono font-semibold">{booking.bookingCode}</span>
                       {' - '}
-                      {booking.clientName}
+                      {booking.clientName || booking.operatorClientName || 'Unknown'}
                     </li>
                   ))}
                 </ul>

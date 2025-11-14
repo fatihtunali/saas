@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { vehicleTypeSchema, VEHICLE_TYPES } from '@/lib/validations/vehicle-types';
@@ -38,6 +38,8 @@ interface AddVehicleTypeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   vehicleCompanyId: number;
+  vehicleTypeId?: number;
+  existingData?: any;
   onSuccess?: () => void;
 }
 
@@ -45,9 +47,12 @@ export function AddVehicleTypeModal({
   open,
   onOpenChange,
   vehicleCompanyId,
+  vehicleTypeId,
+  existingData,
   onSuccess,
 }: AddVehicleTypeModalProps) {
-  const { createVehicleType, isCreating } = useVehicleTypes();
+  const { createVehicleType, updateVehicleType, isCreating, isUpdating } = useVehicleTypes();
+  const isEditMode = !!vehicleTypeId;
 
   const form = useForm({
     resolver: zodResolver(vehicleTypeSchema) as any,
@@ -61,6 +66,30 @@ export function AddVehicleTypeModal({
     },
   });
 
+  // Load existing data when editing
+  useEffect(() => {
+    if (existingData && isEditMode) {
+      form.reset({
+        vehicle_company_id: vehicleCompanyId,
+        vehicle_type: existingData.vehicleType || '',
+        capacity: existingData.capacity || undefined,
+        luggage_capacity: existingData.luggageCapacity || undefined,
+        notes: existingData.notes || '',
+        is_active: existingData.isActive !== false,
+      });
+    } else if (!open) {
+      // Reset form when modal closes
+      form.reset({
+        vehicle_company_id: vehicleCompanyId,
+        vehicle_type: '',
+        capacity: undefined,
+        luggage_capacity: undefined,
+        notes: '',
+        is_active: true,
+      });
+    }
+  }, [existingData, isEditMode, open, form, vehicleCompanyId]);
+
   const onSubmit = async (data: any) => {
     try {
       const processedData = {
@@ -72,27 +101,32 @@ export function AddVehicleTypeModal({
         isActive: data.is_active,
       };
 
-      await createVehicleType(processedData);
+      if (isEditMode && vehicleTypeId) {
+        await updateVehicleType({ id: vehicleTypeId, data: processedData });
+      } else {
+        await createVehicleType(processedData);
+      }
+
       form.reset();
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      console.error('Failed to create vehicle type:', error);
+      console.error(`Failed to ${isEditMode ? 'update' : 'create'} vehicle type:`, error);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto !bg-white !text-gray-900">
         <DialogHeader>
-          <DialogTitle>Add Vehicle Type</DialogTitle>
-          <DialogDescription>
-            Add a new vehicle type to this company's fleet
+          <DialogTitle className="!text-gray-900">{isEditMode ? 'Edit' : 'Add'} Vehicle Type</DialogTitle>
+          <DialogDescription className="!text-gray-600">
+            {isEditMode ? 'Update' : 'Add a new'} vehicle type {isEditMode ? 'information' : 'to this company\'s fleet'}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 !text-gray-900">
             <FormField
               control={form.control}
               name="vehicle_type"
@@ -208,8 +242,8 @@ export function AddVehicleTypeModal({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isCreating}>
-                {isCreating ? 'Adding...' : 'Add Vehicle Type'}
+              <Button type="submit" disabled={isCreating || isUpdating}>
+                {isCreating || isUpdating ? (isEditMode ? 'Updating...' : 'Adding...') : (isEditMode ? 'Update Vehicle Type' : 'Add Vehicle Type')}
               </Button>
             </DialogFooter>
           </form>

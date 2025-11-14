@@ -60,7 +60,7 @@ export default function EditTourCompanyPage() {
       pvt_price_6_pax: undefined,
       pvt_price_8_pax: undefined,
       pvt_price_10_pax: undefined,
-      currency: 'TRY',
+      currency: 'EUR',
       min_passengers: undefined,
       max_passengers: undefined,
       itinerary: '',
@@ -80,17 +80,17 @@ export default function EditTourCompanyPage() {
         company_name: tcData.companyName || '',
         tour_name: tcData.tourName || '',
         tour_type: tcData.tourType || '',
-        duration_days: tcData.durationDays ?? undefined,
-        duration_hours: tcData.durationHours ?? undefined,
+        duration_days: tcData.durationDays != null ? Math.floor(tcData.durationDays) : undefined,
+        duration_hours: tcData.durationHours != null ? Math.floor(tcData.durationHours) : undefined,
         sic_price: tcData.sicPrice ?? undefined,
         pvt_price_2_pax: tcData.pvtPrice2Pax ?? undefined,
         pvt_price_4_pax: tcData.pvtPrice4Pax ?? undefined,
         pvt_price_6_pax: tcData.pvtPrice6Pax ?? undefined,
         pvt_price_8_pax: tcData.pvtPrice8Pax ?? undefined,
         pvt_price_10_pax: tcData.pvtPrice10Pax ?? undefined,
-        currency: tcData.currency || 'TRY',
-        min_passengers: tcData.minPassengers ?? undefined,
-        max_passengers: tcData.maxPassengers ?? undefined,
+        currency: tcData.currency || 'EUR',
+        min_passengers: tcData.minPassengers != null ? Math.floor(tcData.minPassengers) : undefined,
+        max_passengers: tcData.maxPassengers != null ? Math.floor(tcData.maxPassengers) : undefined,
         itinerary: tcData.itinerary || '',
         inclusions: tcData.inclusions || '',
         exclusions: tcData.exclusions || '',
@@ -105,12 +105,27 @@ export default function EditTourCompanyPage() {
     try {
       // Convert empty strings to undefined for optional fields
       const processedData = {
-        currency: data.currency,
-        notes: data.notes || undefined,
-        pictureUrl: data.picture_url || undefined,
-        supplierId: data.supplier_id || undefined,
+        companyName: data.company_name,
         tourName: data.tour_name || undefined,
         tourType: data.tour_type || undefined,
+        durationDays: data.duration_days ?? undefined,
+        durationHours: data.duration_hours ?? undefined,
+        sicPrice: data.sic_price ?? undefined,
+        pvtPrice2Pax: data.pvt_price_2_pax ?? undefined,
+        pvtPrice4Pax: data.pvt_price_4_pax ?? undefined,
+        pvtPrice6Pax: data.pvt_price_6_pax ?? undefined,
+        pvtPrice8Pax: data.pvt_price_8_pax ?? undefined,
+        pvtPrice10Pax: data.pvt_price_10_pax ?? undefined,
+        currency: data.currency,
+        minPassengers: data.min_passengers ?? undefined,
+        maxPassengers: data.max_passengers ?? undefined,
+        itinerary: data.itinerary || undefined,
+        inclusions: data.inclusions || undefined,
+        exclusions: data.exclusions || undefined,
+        pictureUrl: data.picture_url || undefined,
+        notes: data.notes || undefined,
+        isActive: data.is_active,
+        supplierId: data.supplier_id || undefined,
       };
 
       await updateTourCompany({ id, data: processedData });
@@ -121,7 +136,7 @@ export default function EditTourCompanyPage() {
     }
   };
 
-  const currency = form.watch('currency') || 'TRY';
+  const currency = form.watch('currency') || 'EUR';
 
   if (isLoading) {
     return (
@@ -235,12 +250,14 @@ export default function EditTourCompanyPage() {
                         <Input
                           type="number"
                           min="0"
+                          step="1"
                           placeholder="0"
                           {...field}
                           value={field.value ?? ''}
-                          onChange={e =>
-                            field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
-                          }
+                          onChange={e => {
+                            const val = e.target.value.replace(/[.,]/g, '');
+                            field.onChange(val ? parseInt(val, 10) : undefined);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -258,12 +275,14 @@ export default function EditTourCompanyPage() {
                         <Input
                           type="number"
                           min="0"
+                          step="1"
                           placeholder="0"
                           {...field}
                           value={field.value ?? ''}
-                          onChange={e =>
-                            field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
-                          }
+                          onChange={e => {
+                            const val = e.target.value.replace(/[.,]/g, '');
+                            field.onChange(val ? parseInt(val, 10) : undefined);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -292,8 +311,10 @@ export default function EditTourCompanyPage() {
                         <Input
                           type="number"
                           step="0.01"
+                            lang="en"
                           min="0"
                           placeholder="0.00"
+                          lang="en"
                           {...field}
                           value={field.value ?? ''}
                           onChange={e =>
@@ -331,6 +352,7 @@ export default function EditTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                            lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -362,6 +384,7 @@ export default function EditTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                            lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -393,6 +416,7 @@ export default function EditTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                            lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -424,6 +448,7 @@ export default function EditTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                            lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -455,6 +480,7 @@ export default function EditTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                            lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -492,7 +518,7 @@ export default function EditTourCompanyPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Currency</FormLabel>
-                      <Select value={field.value || 'TRY'} onValueChange={field.onChange}>
+                      <Select value={field.value || 'EUR'} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue />
@@ -521,12 +547,14 @@ export default function EditTourCompanyPage() {
                         <Input
                           type="number"
                           min="1"
+                          step="1"
                           placeholder="1"
                           {...field}
                           value={field.value ?? ''}
-                          onChange={e =>
-                            field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
-                          }
+                          onChange={e => {
+                            const val = e.target.value.replace(/[.,]/g, '');
+                            field.onChange(val ? parseInt(val, 10) : undefined);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -544,12 +572,14 @@ export default function EditTourCompanyPage() {
                         <Input
                           type="number"
                           min="1"
+                          step="1"
                           placeholder="50"
                           {...field}
                           value={field.value ?? ''}
-                          onChange={e =>
-                            field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
-                          }
+                          onChange={e => {
+                            const val = e.target.value.replace(/[.,]/g, '');
+                            field.onChange(val ? parseInt(val, 10) : undefined);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />

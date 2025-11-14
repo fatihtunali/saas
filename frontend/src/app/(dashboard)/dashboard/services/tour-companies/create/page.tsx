@@ -51,14 +51,26 @@ export default function CreateTourCompanyPage() {
       // Convert empty strings to undefined for optional fields
       const processedData = {
         companyName: data.company_name,
-        currency: data.currency,
-        durationDays: data.duration_days,
-        durationHours: data.duration_hours,
-        isActive: data.is_active,
-        notes: data.notes || undefined,
-        pictureUrl: data.picture_url || undefined,
         tourName: data.tour_name || undefined,
         tourType: data.tour_type || undefined,
+        durationDays: data.duration_days ?? undefined,
+        durationHours: data.duration_hours ?? undefined,
+        sicPrice: data.sic_price ?? undefined,
+        pvtPrice2Pax: data.pvt_price_2_pax ?? undefined,
+        pvtPrice4Pax: data.pvt_price_4_pax ?? undefined,
+        pvtPrice6Pax: data.pvt_price_6_pax ?? undefined,
+        pvtPrice8Pax: data.pvt_price_8_pax ?? undefined,
+        pvtPrice10Pax: data.pvt_price_10_pax ?? undefined,
+        currency: data.currency,
+        minPassengers: data.min_passengers ?? undefined,
+        maxPassengers: data.max_passengers ?? undefined,
+        itinerary: data.itinerary || undefined,
+        inclusions: data.inclusions || undefined,
+        exclusions: data.exclusions || undefined,
+        pictureUrl: data.picture_url || undefined,
+        notes: data.notes || undefined,
+        isActive: data.is_active,
+        supplierId: data.supplier_id || undefined,
       };
 
       await createTourCompany(processedData);
@@ -69,7 +81,7 @@ export default function CreateTourCompanyPage() {
     }
   };
 
-  const currency = form.watch('currency') || 'TRY';
+  const currency = form.watch('currency') || 'EUR';
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -163,12 +175,14 @@ export default function CreateTourCompanyPage() {
                         <Input
                           type="number"
                           min="0"
+                          step="1"
                           placeholder="0"
                           {...field}
                           value={field.value ?? ''}
-                          onChange={e =>
-                            field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
-                          }
+                          onChange={e => {
+                            const val = e.target.value.replace(/[.,]/g, '');
+                            field.onChange(val ? parseInt(val, 10) : undefined);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -186,12 +200,14 @@ export default function CreateTourCompanyPage() {
                         <Input
                           type="number"
                           min="0"
+                          step="1"
                           placeholder="0"
                           {...field}
                           value={field.value ?? ''}
-                          onChange={e =>
-                            field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
-                          }
+                          onChange={e => {
+                            const val = e.target.value.replace(/[.,]/g, '');
+                            field.onChange(val ? parseInt(val, 10) : undefined);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -220,6 +236,7 @@ export default function CreateTourCompanyPage() {
                         <Input
                           type="number"
                           step="0.01"
+                          lang="en"
                           min="0"
                           placeholder="0.00"
                           {...field}
@@ -259,6 +276,7 @@ export default function CreateTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                          lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -290,6 +308,7 @@ export default function CreateTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                          lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -321,6 +340,7 @@ export default function CreateTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                          lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -352,6 +372,7 @@ export default function CreateTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                          lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -383,6 +404,7 @@ export default function CreateTourCompanyPage() {
                           <Input
                             type="number"
                             step="0.01"
+                          lang="en"
                             min="0"
                             placeholder="0.00"
                             {...field}
@@ -449,12 +471,14 @@ export default function CreateTourCompanyPage() {
                         <Input
                           type="number"
                           min="1"
+                          step="1"
                           placeholder="1"
                           {...field}
                           value={field.value ?? ''}
-                          onChange={e =>
-                            field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
-                          }
+                          onChange={e => {
+                            const val = e.target.value.replace(/[.,]/g, '');
+                            field.onChange(val ? parseInt(val, 10) : undefined);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -472,12 +496,14 @@ export default function CreateTourCompanyPage() {
                         <Input
                           type="number"
                           min="1"
+                          step="1"
                           placeholder="50"
                           {...field}
                           value={field.value ?? ''}
-                          onChange={e =>
-                            field.onChange(e.target.value ? parseInt(e.target.value) : undefined)
-                          }
+                          onChange={e => {
+                            const val = e.target.value.replace(/[.,]/g, '');
+                            field.onChange(val ? parseInt(val, 10) : undefined);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />

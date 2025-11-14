@@ -24,7 +24,8 @@ export function useTourCompanies(params?: QueryParams) {
   } = useQuery<PaginatedResponse<TourCompany>>({
     queryKey: ['tour-companies', params],
     queryFn: async () => {
-      return await tourCompaniesApi.getAll(params);
+      const response = await tourCompaniesApi.getAll(params);
+      return response;
     },
   });
 
@@ -78,7 +79,7 @@ export function useTourCompanies(params?: QueryParams) {
   });
 
   return {
-    tourCompanies: tourCompanies?.data?.tour_companies || [],
+    tourCompanies: tourCompanies?.data?.tourCompanies || [],
     pagination: tourCompanies?.data?.pagination,
     isLoading,
     error,

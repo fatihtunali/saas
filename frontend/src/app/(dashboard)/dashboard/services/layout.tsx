@@ -9,7 +9,6 @@ import {
   UtensilsCrossed,
   Ticket,
   Package,
-  Truck,
   Flag,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -57,12 +56,6 @@ const servicesNav = [
     href: '/dashboard/services/tour-companies',
     icon: Flag,
     description: 'SIC and private tours',
-  },
-  {
-    title: 'Suppliers',
-    href: '/dashboard/services/suppliers',
-    icon: Truck,
-    description: 'All service suppliers',
   },
 ];
 

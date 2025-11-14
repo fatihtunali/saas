@@ -82,7 +82,7 @@ exports.getSupplierById = async (req, res) => {
       return res.status(404).json({ error: 'Supplier not found' });
     }
 
-    res.json(result.rows[0]);
+    res.json({ data: result.rows[0] });
   } catch (error) {
     console.error('Error fetching supplier:', error);
     res.status(500).json({ error: 'Failed to fetch supplier' });

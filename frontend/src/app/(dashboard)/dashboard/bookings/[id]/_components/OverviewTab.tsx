@@ -100,7 +100,7 @@ export function OverviewTab({ booking }: OverviewTabProps) {
             <div>
               <p className="text-sm text-muted-foreground">Client Name</p>
               <div className="flex items-center gap-2 mt-1">
-                <p className="font-semibold text-lg">{booking.clientName || 'Unknown'}</p>
+                <p className="font-semibold text-lg">{booking.clientName || booking.operatorClientName || 'Unknown'}</p>
                 {booking.clientType && <Badge variant="secondary">{booking.clientType}</Badge>}
               </div>
             </div>

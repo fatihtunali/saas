@@ -19,6 +19,7 @@ import {
   TrendingDown,
   RefreshCw,
   Percent,
+  FileEdit,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -37,6 +38,11 @@ const navigationItems: NavItem[] = [
     title: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
+  },
+  {
+    title: 'Quotations',
+    href: '/dashboard/quotations',
+    icon: FileEdit,
   },
   {
     title: 'Bookings',

@@ -4,19 +4,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ColumnDef } from '@tanstack/react-table';
-import { Edit, Eye, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
+import { Edit, Eye, Plus, Trash2 } from 'lucide-react';
 import { Hotel } from '@/types/services';
 import { useHotels } from '@/hooks/use-hotels';
 import { DataTable } from '@/components/tables/DataTable';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -90,26 +82,14 @@ export default function HotelsPage() {
       cell: ({ row }) => row.original.cityName || 'N/A',
     },
     {
-      accessorKey: 'phone',
-      header: 'Phone',
-      cell: ({ row }) => row.original.phone || 'N/A',
-    },
-    {
-      accessorKey: 'email',
-      header: 'Email',
-      cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground">{row.original.email || 'N/A'}</span>
-      ),
-    },
-    {
       accessorKey: 'pricePerPersonDouble',
-      header: 'Price (DBL)',
+      header: 'PP in DBL',
       cell: ({ row }) => {
         const hotel = row.original;
         if (!hotel.pricePerPersonDouble) return 'N/A';
         return (
-          <div className="text-right font-medium">
-            {Number(hotel.pricePerPersonDouble).toFixed(2)} {hotel.currency || 'TRY'}
+          <div className="font-medium">
+            {Number(hotel.pricePerPersonDouble).toFixed(2)} {hotel.currency || 'EUR'}
           </div>
         );
       },
@@ -134,41 +114,35 @@ export default function HotelsPage() {
       cell: ({ row }) => {
         const hotel = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => router.push(`/dashboard/services/hotels/${hotel.id}`)}
-              >
-                <Eye className="mr-2 h-4 w-4" />
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => router.push(`/dashboard/services/hotels/${hotel.id}/edit`)}
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive"
-                onClick={() => {
-                  setHotelToDelete(hotel.id);
-                  setDeleteDialogOpen(true);
-                }}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push(`/dashboard/services/hotels/${hotel.id}`)}
+              className="h-8 px-2"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push(`/dashboard/services/hotels/${hotel.id}/edit`)}
+              className="h-8 px-2"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setHotelToDelete(hotel.id);
+                setDeleteDialogOpen(true);
+              }}
+              className="h-8 px-2 text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         );
       },
     },

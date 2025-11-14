@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CURRENCIES = ['TRY', 'USD', 'EUR', 'GBP'];
+export const CURRENCIES = ['EUR', 'USD', 'TRY', 'GBP'];
 
 export const entranceFeeSchema = z.object({
   supplier_id: z.number().int().positive().optional(),

@@ -54,33 +54,69 @@ export default function VehicleCompanyDetailsPage() {
   const { data: company, isLoading: isLoadingCompany } = useVehicleCompany(companyId);
 
   // Fetch all vehicle types for this company
-  const { vehicleTypes, isLoading: isLoadingTypes, refetch: refetchTypes } = useVehicleTypes({
+  const { vehicleTypes, isLoading: isLoadingTypes, refetch: refetchTypes, deleteVehicleType } = useVehicleTypes({
     vehicleCompanyId: companyId,
     limit: 100,
   });
 
   // Fetch all rentals for this company
-  const { vehicleRentals, isLoading: isLoadingRentals, refetch: refetchRentals } = useVehicleRentals({
+  const { vehicleRentals, isLoading: isLoadingRentals, refetch: refetchRentals, deleteVehicleRental } = useVehicleRentals({
     vehicleCompanyId: companyId,
     limit: 100,
   });
 
   // Fetch all transfer routes for this company
-  const { transferRoutes, isLoading: isLoadingRoutes, refetch: refetchRoutes } = useTransferRoutes({
+  const { transferRoutes, isLoading: isLoadingRoutes, refetch: refetchRoutes, deleteTransferRoute } = useTransferRoutes({
     vehicleCompanyId: companyId,
     limit: 100,
   });
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteVehicleTypeDialogOpen, setDeleteVehicleTypeDialogOpen] = useState(false);
+  const [deleteRentalDialogOpen, setDeleteRentalDialogOpen] = useState(false);
+  const [deleteRouteDialogOpen, setDeleteRouteDialogOpen] = useState(false);
   const [addVehicleTypeModalOpen, setAddVehicleTypeModalOpen] = useState(false);
   const [addRentalModalOpen, setAddRentalModalOpen] = useState(false);
   const [addRouteModalOpen, setAddRouteModalOpen] = useState(false);
   const [selectedVehicleTypeId, setSelectedVehicleTypeId] = useState<number | null>(null);
+  const [selectedVehicleTypeData, setSelectedVehicleTypeData] = useState<any>(null);
+  const [selectedRentalId, setSelectedRentalId] = useState<number | null>(null);
+  const [selectedRentalData, setSelectedRentalData] = useState<any>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const [selectedRouteData, setSelectedRouteData] = useState<any>(null);
+  const [itemToDelete, setItemToDelete] = useState<{id: number; name: string} | null>(null);
 
   const handleDelete = async () => {
     await deleteVehicleCompany(companyId);
     setDeleteDialogOpen(false);
     router.push('/dashboard/services/vehicles');
+  };
+
+  const handleDeleteVehicleType = async () => {
+    if (itemToDelete) {
+      await deleteVehicleType(itemToDelete.id);
+      setDeleteVehicleTypeDialogOpen(false);
+      setItemToDelete(null);
+      refetchTypes();
+    }
+  };
+
+  const handleDeleteRental = async () => {
+    if (selectedRentalId) {
+      await deleteVehicleRental(selectedRentalId);
+      setDeleteRentalDialogOpen(false);
+      setSelectedRentalId(null);
+      refetchRentals();
+    }
+  };
+
+  const handleDeleteRoute = async () => {
+    if (selectedRouteId) {
+      await deleteTransferRoute(selectedRouteId);
+      setDeleteRouteDialogOpen(false);
+      setSelectedRouteId(null);
+      refetchRoutes();
+    }
   };
 
   const handleAddVehicleTypeSuccess = () => {
@@ -95,13 +131,38 @@ export default function VehicleCompanyDetailsPage() {
     refetchRoutes();
   };
 
-  const openAddRentalModal = (vehicleTypeId: number) => {
+  const openAddVehicleTypeModal = (vehicleType?: any) => {
+    if (vehicleType) {
+      setSelectedVehicleTypeId(vehicleType.id);
+      setSelectedVehicleTypeData(vehicleType);
+    } else {
+      setSelectedVehicleTypeId(null);
+      setSelectedVehicleTypeData(null);
+    }
+    setAddVehicleTypeModalOpen(true);
+  };
+
+  const openAddRentalModal = (vehicleTypeId: number, rental?: any) => {
     setSelectedVehicleTypeId(vehicleTypeId);
+    if (rental) {
+      setSelectedRentalId(rental.id);
+      setSelectedRentalData(rental);
+    } else {
+      setSelectedRentalId(null);
+      setSelectedRentalData(null);
+    }
     setAddRentalModalOpen(true);
   };
 
-  const openAddRouteModal = (vehicleTypeId: number) => {
+  const openAddRouteModal = (vehicleTypeId: number, route?: any) => {
     setSelectedVehicleTypeId(vehicleTypeId);
+    if (route) {
+      setSelectedRouteId(route.id);
+      setSelectedRouteData(route);
+    } else {
+      setSelectedRouteId(null);
+      setSelectedRouteData(null);
+    }
     setAddRouteModalOpen(true);
   };
 
@@ -155,7 +216,7 @@ export default function VehicleCompanyDetailsPage() {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => alert('Edit company feature coming soon')}
+            onClick={() => router.push(`/dashboard/services/vehicles/${companyId}/edit`)}
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit Company
@@ -232,7 +293,7 @@ export default function VehicleCompanyDetailsPage() {
                 Vehicle types, rental rates, and transfer routes
               </CardDescription>
             </div>
-            <Button onClick={() => setAddVehicleTypeModalOpen(true)}>
+            <Button onClick={() => openAddVehicleTypeModal()}>
               <Plus className="h-4 w-4 mr-2" />
               Add Vehicle Type
             </Button>
@@ -267,6 +328,23 @@ export default function VehicleCompanyDetailsPage() {
                             </Badge>
                           )}
                         </div>
+                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                          <div
+                            onClick={() => openAddVehicleTypeModal(vehicleType)}
+                            className="h-8 px-2 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </div>
+                          <div
+                            onClick={() => {
+                              setItemToDelete({ id: vehicleType.id, name: vehicleType.vehicleType });
+                              setDeleteVehicleTypeDialogOpen(true);
+                            }}
+                            className="h-8 px-2 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </div>
+                        </div>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
@@ -287,14 +365,27 @@ export default function VehicleCompanyDetailsPage() {
                                 <DollarSign className="h-4 w-4" />
                                 Rental Pricing
                               </h4>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openAddRentalModal(vehicleType.id)}
-                                title="Edit rental pricing"
-                              >
-                                <Edit className="h-3 w-3" />
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openAddRentalModal(vehicleType.id, rental)}
+                                  className="h-8 px-2"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedRentalId(rental.id);
+                                    setDeleteRentalDialogOpen(true);
+                                  }}
+                                  className="h-8 px-2 text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                               {rental.fullDayPrice && (
@@ -397,13 +488,27 @@ export default function VehicleCompanyDetailsPage() {
                                 {vehicleRoutes.map((route: any) => (
                                   <Card key={route.id} className="border-l-4 border-l-primary/20">
                                     <CardContent className="pt-3 pb-3">
-                                      <div className="flex items-center justify-between">
+                                      <div className="flex items-start justify-between gap-4">
                                         <div className="flex-1">
                                           <div className="flex items-center gap-2 mb-1">
                                             <Navigation2 className="h-4 w-4 text-primary" />
-                                            <span className="font-medium text-sm">
-                                              {route.fromCity?.name || 'Unknown'} → {route.toCity?.name || 'Unknown'}
-                                            </span>
+                                            <div className="flex flex-col">
+                                              <span className="font-medium text-sm">
+                                                {route.fromCity?.name || 'Unknown'}
+                                                {route.fromLocationType && (
+                                                  <span className="text-xs text-muted-foreground ml-1">
+                                                    ({route.fromLocationType})
+                                                  </span>
+                                                )}
+                                                {' → '}
+                                                {route.toCity?.name || 'Unknown'}
+                                                {route.toLocationType && (
+                                                  <span className="text-xs text-muted-foreground ml-1">
+                                                    ({route.toLocationType})
+                                                  </span>
+                                                )}
+                                              </span>
+                                            </div>
                                           </div>
                                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                             {route.distanceKm && (
@@ -416,19 +521,40 @@ export default function VehicleCompanyDetailsPage() {
                                               </span>
                                             )}
                                           </div>
+                                          <div className="mt-2">
+                                            <p className="font-bold text-primary text-sm">
+                                              {route.pricePerVehicle ? Number(route.pricePerVehicle).toFixed(2) : '0.00'} {route.currency || 'EUR'}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">per vehicle</p>
+                                          </div>
+                                          {route.notes && (
+                                            <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+                                              {route.notes}
+                                            </p>
+                                          )}
                                         </div>
-                                        <div className="text-right">
-                                          <p className="font-bold text-primary">
-                                            {route.pricePerVehicle ? Number(route.pricePerVehicle).toFixed(2) : '0.00'} {route.currency || 'EUR'}
-                                          </p>
-                                          <p className="text-xs text-muted-foreground">per vehicle</p>
+                                        <div className="flex items-center gap-2">
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => openAddRouteModal(vehicleType.id, route)}
+                                            className="h-8 px-2"
+                                          >
+                                            <Edit className="h-4 w-4" />
+                                          </Button>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                              setSelectedRouteId(route.id);
+                                              setDeleteRouteDialogOpen(true);
+                                            }}
+                                            className="h-8 px-2 text-destructive hover:text-destructive"
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </Button>
                                         </div>
                                       </div>
-                                      {route.notes && (
-                                        <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
-                                          {route.notes}
-                                        </p>
-                                      )}
                                     </CardContent>
                                   </Card>
                                 ))}
@@ -452,7 +578,7 @@ export default function VehicleCompanyDetailsPage() {
               <p className="text-muted-foreground mb-4">
                 No vehicle types added yet for this company
               </p>
-              <Button onClick={() => setAddVehicleTypeModalOpen(true)}>
+              <Button onClick={() => openAddVehicleTypeModal()}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Your First Vehicle Type
               </Button>
@@ -481,35 +607,77 @@ export default function VehicleCompanyDetailsPage() {
         variant="destructive"
       />
 
-      {/* Add Vehicle Type Modal */}
+      {/* Add/Edit Vehicle Type Modal */}
       <AddVehicleTypeModal
         open={addVehicleTypeModalOpen}
         onOpenChange={setAddVehicleTypeModalOpen}
         vehicleCompanyId={companyId}
+        vehicleTypeId={selectedVehicleTypeId || undefined}
+        existingData={selectedVehicleTypeData}
         onSuccess={handleAddVehicleTypeSuccess}
       />
 
-      {/* Add Rental Pricing Modal */}
+      {/* Add/Edit Rental Pricing Modal */}
       {selectedVehicleTypeId && (
         <AddRentalPricingModal
           open={addRentalModalOpen}
           onOpenChange={setAddRentalModalOpen}
           vehicleCompanyId={companyId}
           vehicleTypeId={selectedVehicleTypeId}
+          rentalId={selectedRentalId || undefined}
+          existingData={selectedRentalData}
           onSuccess={handleAddRentalSuccess}
         />
       )}
 
-      {/* Add Transfer Route Modal */}
+      {/* Add/Edit Transfer Route Modal */}
       {selectedVehicleTypeId && (
         <AddTransferRouteModal
           open={addRouteModalOpen}
           onOpenChange={setAddRouteModalOpen}
           vehicleCompanyId={companyId}
           vehicleTypeId={selectedVehicleTypeId}
+          routeId={selectedRouteId || undefined}
+          existingData={selectedRouteData}
           onSuccess={handleAddRouteSuccess}
         />
       )}
+
+      {/* Delete Vehicle Type Confirmation */}
+      <ConfirmDialog
+        open={deleteVehicleTypeDialogOpen}
+        onOpenChange={setDeleteVehicleTypeDialogOpen}
+        title="Delete Vehicle Type"
+        description={`Are you sure you want to delete "${itemToDelete?.name}"? This action cannot be undone and will remove all associated rentals and transfer routes.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteVehicleType}
+        variant="destructive"
+      />
+
+      {/* Delete Rental Confirmation */}
+      <ConfirmDialog
+        open={deleteRentalDialogOpen}
+        onOpenChange={setDeleteRentalDialogOpen}
+        title="Delete Rental Pricing"
+        description="Are you sure you want to delete this rental pricing? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteRental}
+        variant="destructive"
+      />
+
+      {/* Delete Route Confirmation */}
+      <ConfirmDialog
+        open={deleteRouteDialogOpen}
+        onOpenChange={setDeleteRouteDialogOpen}
+        title="Delete Transfer Route"
+        description="Are you sure you want to delete this transfer route? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteRoute}
+        variant="destructive"
+      />
     </div>
   );
 }

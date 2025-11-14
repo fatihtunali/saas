@@ -12,7 +12,6 @@ import {
   EntranceFee,
   ExtraExpense,
   TourCompany,
-  Supplier,
   CreateHotelDto,
   UpdateHotelDto,
   CreateVehicleCompanyDto,
@@ -33,8 +32,6 @@ import {
   UpdateExtraExpenseDto,
   CreateTourCompanyDto,
   UpdateTourCompanyDto,
-  CreateSupplierDto,
-  UpdateSupplierDto,
   PaginatedResponse,
   QueryParams,
 } from '@/types/services';
@@ -68,6 +65,14 @@ import {
   PaginatedResponse as PaymentPaginatedResponse,
   QueryParams as PaymentQueryParams,
 } from '@/types/payments';
+import {
+  Quotation,
+  QuotationService,
+  CreateQuotationDto,
+  UpdateQuotationDto,
+  CreateQuotationServiceDto,
+  UpdateQuotationServiceDto,
+} from '@/types/quotations';
 
 // Export the base API client
 export const api = apiClient;
@@ -192,17 +197,6 @@ export const tourCompaniesApi = {
   delete: (id: number) => api.delete(`/tour-companies/${id}`),
 };
 
-// Suppliers (added - exists in database)
-export const suppliersApi = {
-  getAll: (params?: QueryParams) =>
-    api.get<PaginatedResponse<Supplier>>(`/suppliers${buildQueryString(params || {})}`),
-  getById: (id: number) => api.get<{ data: Supplier }>(`/suppliers/${id}`),
-  create: (data: CreateSupplierDto) => api.post<{ data: Supplier }>('/suppliers', data),
-  update: (id: number, data: UpdateSupplierDto) =>
-    api.put<{ data: Supplier }>(`/suppliers/${id}`, data),
-  delete: (id: number) => api.delete(`/suppliers/${id}`),
-};
-
 // Operators
 export const operatorsApi = {
   getAll: (params?: QueryParams) =>
@@ -296,4 +290,27 @@ export const commissionsApi = {
   update: (id: number, data: UpdateCommissionDto) =>
     api.put<{ data: Commission }>(`/commissions/${id}`, data),
   delete: (id: number) => api.delete(`/commissions/${id}`),
+};
+
+// Quotations
+export const quotationsApi = {
+  getAll: () => api.get<Quotation[]>('/quotations'),
+  getById: (id: number) => api.get<Quotation>(`/quotations/${id}`),
+  create: (data: CreateQuotationDto) => api.post<Quotation>('/quotations', data),
+  update: (id: number, data: UpdateQuotationDto) => api.put<Quotation>(`/quotations/${id}`, data),
+  delete: (id: number) => api.delete(`/quotations/${id}`),
+};
+
+// Quotation Services
+export const quotationServicesApi = {
+  getAll: (quotationId?: number) =>
+    api.get<QuotationService[]>(
+      `/quotation-services${quotationId ? `?quotation_id=${quotationId}` : ''}`
+    ),
+  getById: (id: number) => api.get<QuotationService>(`/quotation-services/${id}`),
+  create: (data: CreateQuotationServiceDto) =>
+    api.post<QuotationService>('/quotation-services', data),
+  update: (id: number, data: UpdateQuotationServiceDto) =>
+    api.put<QuotationService>(`/quotation-services/${id}`, data),
+  delete: (id: number) => api.delete(`/quotation-services/${id}`),
 };

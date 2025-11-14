@@ -67,7 +67,7 @@ export function BookingHeader({ booking }: BookingHeaderProps) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-muted-foreground">Client</p>
-                  <p className="font-semibold truncate">{booking.clientName || 'Unknown'}</p>
+                  <p className="font-semibold truncate">{booking.clientName || booking.operatorClientName || 'Unknown'}</p>
                   {booking.clientType && (
                     <Badge variant="outline" className="mt-1 text-xs">
                       {booking.clientType}
